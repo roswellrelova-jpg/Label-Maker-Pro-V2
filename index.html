@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delivery and Lab Retail</title>
+    <title>Label Maker Pro V4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
     <style>
         .glass-morphism {
             background: rgba(255, 255, 255, 0.98);
@@ -18,6 +19,27 @@
             border-bottom: 3px solid #2563eb;
             color: #1e40af;
         }
+
+        /* Custom styles for the ticker and clock */
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-ticker {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: ticker 25s linear infinite;
+        }
+        .animate-ticker:hover {
+            animation-play-state: paused;
+            cursor: default;
+        }
+        .mask-image-linear {
+            -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+        }
+
         /* Custom styles for the interactive sticker sheet preview */
         .sticker-cell {
             transition: all 0.2s ease-in-out;
@@ -50,11 +72,28 @@
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen font-sans text-slate-900">
+    
+    <!-- TOP NOTIFICATION & CLOCK BAR -->
+    <div class="bg-slate-900 text-slate-200 border-b border-slate-700 shadow-sm relative z-50">
+        <div class="max-w-6xl mx-auto px-4 md:px-6 py-2.5 flex items-center justify-between text-xs font-medium tracking-wide">
+            <div class="flex items-center gap-2 text-cyan-400 font-bold shrink-0 bg-slate-800/80 border border-slate-700 px-3 py-1 rounded-lg shadow-inner">
+                <i class="far fa-clock"></i>
+                <span id="digitalClockText">--:--:--</span>
+            </div>
+            
+            <div class="overflow-hidden flex-1 ml-6 relative h-5 flex items-center mask-image-linear">
+                <div class="w-full absolute whitespace-nowrap">
+                    <span id="tickerText" class="animate-ticker text-slate-300">System loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="max-w-6xl mx-auto p-4 md:p-6">
         
         <header class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
             <div class="text-center lg:text-left">
-                <h1 class="text-2xl font-black text-blue-900 tracking-tight uppercase">Delivery and Lab Retail</h1>
+                <h1 class="text-2xl font-black text-blue-900 tracking-tight uppercase">Label Maker Pro V4</h1>
                 <p class="text-slate-500 text-sm font-medium">Precision Area Mapping & Inventory System</p>
             </div>
             <nav class="flex bg-white rounded-xl shadow-sm p-1 border border-slate-200 items-center overflow-x-auto max-w-full">
@@ -62,6 +101,7 @@
                 <button onclick="switchTab('print')" id="tab-print" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-400 whitespace-nowrap">PRINT QUEUE</button>
                 <button onclick="switchTab('history')" id="tab-history" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-400 whitespace-nowrap">FULL LOG</button>
                 <button onclick="switchTab('inventory')" id="tab-inventory" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-400 whitespace-nowrap">RETAIL CATALOG</button>
+                <button onclick="switchTab('issues')" id="tab-issues" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-400 whitespace-nowrap">REPRINTS & ISSUES</button>
                 
                 <div class="flex items-center pl-2 border-l border-slate-200 ml-1 shrink-0">
                     <button onclick="openSettings()" class="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all shrink-0" title="Settings">
@@ -244,6 +284,73 @@
                             <!-- Injected via JS -->
                         </tbody>
                     </table>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="section-issues" class="tab-content hidden">
+            <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden p-6 md:p-8">
+                
+                <!-- Add New Issue Form -->
+                <div class="mb-8 p-6 bg-red-50 border border-red-100 rounded-2xl">
+                    <h3 class="text-lg font-black text-red-900 mb-4"><i class="fas fa-exclamation-triangle mr-2"></i>Log Reprint Issue</h3>
+                    <form id="addIssueForm" class="flex flex-col md:flex-row gap-4 items-end flex-wrap">
+                        <div class="flex-1 min-w-[150px]">
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Order Number</label>
+                            <input type="text" id="issueOrder" required placeholder="e.g. 10245" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                        </div>
+                        <div class="flex-1 min-w-[150px]">
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Cabin Number</label>
+                            <input type="number" id="issueCabin" required placeholder="00000" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                        </div>
+                        <div class="flex-[2] min-w-[200px]">
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Issue Description</label>
+                            <input type="text" id="issueDesc" required placeholder="e.g., Missing photo, printer jam..." class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                        </div>
+                        <div class="flex-1 min-w-[150px]">
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Staff Name</label>
+                            <input type="text" id="issueStaff" required placeholder="Name" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                        </div>
+                        <button type="submit" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-md active:scale-95 whitespace-nowrap">
+                            Log Issue
+                        </button>
+                    </form>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                    <div>
+                        <h3 class="font-black text-slate-800 text-xl">Issue & Reprint Log</h3>
+                        <p class="text-sm text-slate-500">Record of encountered problems and reprints.</p>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <button id="clearIssuesBtn" class="flex-1 md:flex-none border border-red-200 text-red-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-50 transition-all">
+                            Clear Issues
+                        </button>
+                        <button id="downloadIssuesExcel" class="flex-1 md:flex-none bg-slate-800 text-white px-6 py-2 rounded-lg font-black text-sm hover:bg-black transition-all">
+                            EXPORT ISSUES
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Issues Table -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden overflow-x-auto max-h-[400px]">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs font-black uppercase tracking-widest sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="p-4">Date / Time</th>
+                                <th class="p-4">Order #</th>
+                                <th class="p-4">Cabin #</th>
+                                <th class="p-4">Issue Description</th>
+                                <th class="p-4">Staff</th>
+                                <th class="p-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="issuesTableBody" class="divide-y divide-slate-100 bg-white">
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                    <div id="emptyIssues" class="p-10 text-center text-slate-300 italic font-medium bg-slate-50">No issues logged yet.</div>
                 </div>
 
             </div>
@@ -496,6 +603,8 @@
         let deliveryHistory = JSON.parse(localStorage.getItem('fullDeliveryHistory')) || [];
         let printQueue = JSON.parse(localStorage.getItem('currentPrintQueue')) || [];
         
+        let issuesLog = JSON.parse(localStorage.getItem('reprintIssuesLog')) || [];
+
         function migrateData(arr) {
             return arr.map(entry => {
                 if (!entry.id) {
@@ -539,6 +648,7 @@
             localStorage.setItem('currentPrintQueue', JSON.stringify(printQueue));
             localStorage.setItem('stickerSheetOffset', stickerOffset.toString());
             localStorage.setItem('appSettings', JSON.stringify(appSettings));
+            localStorage.setItem('reprintIssuesLog', JSON.stringify(issuesLog));
         }
 
         function showCustomAlert(title, message) {
@@ -957,6 +1067,32 @@
                 `;
                 lBody.appendChild(row);
             });
+
+            const issBody = document.getElementById('issuesTableBody');
+            if (issBody) {
+                issBody.innerHTML = '';
+                document.getElementById('emptyIssues').classList.toggle('hidden', issuesLog.length > 0);
+                
+                [...issuesLog].reverse().forEach(issue => {
+                    const row = document.createElement('tr');
+                    row.className = "border-b border-slate-50 hover:bg-slate-50 transition-colors";
+                    row.innerHTML = `
+                        <td class="px-4 py-4 text-xs text-slate-500 whitespace-nowrap">${new Date(issue.timestamp).toLocaleString()}</td>
+                        <td class="px-4 py-4 font-bold text-slate-700">${issue.order}</td>
+                        <td class="px-4 py-4 font-bold text-slate-700">${issue.cabin}</td>
+                        <td class="px-4 py-4 text-slate-600 font-medium">${issue.desc}</td>
+                        <td class="px-4 py-4 text-slate-600 font-medium">${issue.staff}</td>
+                        <td class="px-4 py-4 text-right">
+                            <button onclick="deleteIssue('${issue.id}')" class="text-slate-400 hover:text-red-500 p-2 rounded transition-colors" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    issBody.appendChild(row);
+                });
+            }
+
+            if (typeof updateTicker === 'function') updateTicker();
         }
 
         function handleSearch() {
@@ -1079,6 +1215,80 @@
                 'bg-red-100 text-red-600'
             );
         };
+
+        document.getElementById('addIssueForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const order = document.getElementById('issueOrder').value;
+            const cabin = document.getElementById('issueCabin').value;
+            const desc = document.getElementById('issueDesc').value;
+            const staff = document.getElementById('issueStaff').value;
+
+            issuesLog.push({
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+                timestamp: new Date().toISOString(),
+                order: order,
+                cabin: cabin,
+                desc: desc,
+                staff: staff
+            });
+
+            saveState();
+            updateUI();
+            this.reset();
+        });
+
+        window.deleteIssue = function(id) {
+            showCustomConfirm(
+                'Delete Issue', 
+                'Are you sure you want to delete this issue record?', 
+                'Delete', 
+                'bg-red-600 hover:bg-red-700 shadow-red-200', 
+                () => {
+                    issuesLog = issuesLog.filter(i => String(i.id) !== String(id));
+                    saveState();
+                    updateUI();
+                },
+                '<i class="fas fa-trash-alt"></i>',
+                'bg-red-100 text-red-600'
+            );
+        };
+
+        document.getElementById('clearIssuesBtn').addEventListener('click', () => {
+            if (issuesLog.length === 0) return;
+            showCustomConfirm(
+                'Clear Issues', 
+                'Are you sure you want to clear all logged issues? This action cannot be undone.', 
+                'Clear Issues', 
+                'bg-red-600 hover:bg-red-700 shadow-red-200', 
+                () => {
+                    issuesLog = [];
+                    saveState();
+                    updateUI();
+                },
+                '<i class="fas fa-eraser"></i>',
+                'bg-red-100 text-red-600'
+            );
+        });
+
+        document.getElementById('downloadIssuesExcel').addEventListener('click', () => {
+            if (issuesLog.length === 0) {
+                showCustomAlert('Empty Data', 'There is no issue data to export.');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+            const exportData = issuesLog.map(i => ({
+                'Date/Time': new Date(i.timestamp).toLocaleString(),
+                'Order #': i.order,
+                'Cabin #': i.cabin,
+                'Issue Description': i.desc,
+                'Staff Name': i.staff
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            XLSX.utils.book_append_sheet(wb, ws, "Reprints & Issues");
+            XLSX.writeFile(wb, `Reprint_Issues_Log_${new Date().toISOString().split('T')[0]}.xlsx`);
+        });
 
         document.getElementById('searchBtn').addEventListener('click', handleSearch);
         document.getElementById('cabinSearch').addEventListener('keypress', e => e.key === 'Enter' && handleSearch());
@@ -1298,6 +1508,37 @@
 
         document.getElementById('downloadPDF').addEventListener('click', printLabels);
         document.getElementById('quickPrintBtn').addEventListener('click', printLabels);
+
+        // System Clock and Ticker Logic
+        function updateClock() {
+            const now = new Date();
+            const timeOpts = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const dateOpts = { weekday: 'short', month: 'short', day: 'numeric' };
+            const timeStr = now.toLocaleTimeString(undefined, timeOpts);
+            const dateStr = now.toLocaleDateString(undefined, dateOpts);
+            document.getElementById('digitalClockText').innerText = `${dateStr}  |  ${timeStr}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function updateTicker() {
+            const queueSize = printQueue.length;
+            const todayStr = new Date().toLocaleDateString();
+            const todayLogs = deliveryHistory.filter(h => new Date(h.timestamp).toLocaleDateString() === todayStr).length;
+            
+            let msgs = [];
+            if (queueSize > 0) {
+                msgs.push(`⚠️ ACTION REQUIRED: ${queueSize} label(s) pending in the Print Queue!`);
+            } else {
+                msgs.push(`✅ System Status: All clear. No pending prints.`);
+            }
+            
+            msgs.push(`📦 Total Deliveries Logged Today: ${todayLogs}`);
+            msgs.push(`💡 Tip: You can adjust print offset by clicking the visual grid.`);
+            
+            const fullText = msgs.join('   •   ');
+            document.getElementById('tickerText').innerText = fullText;
+        }
 
         // Init App
         addRetailRow();
