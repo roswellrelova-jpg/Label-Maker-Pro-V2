@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery and Lab Retail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 1);
+        }
+        .tab-active {
+            border-bottom: 3px solid #2563eb;
+            color: #1e40af;
+        }
+        /* Custom styles for the interactive sticker sheet preview */
+        .sticker-cell {
+            transition: all 0.2s ease-in-out;
+            border: 2px dashed #cbd5e1;
+            background-color: #f8fafc;
+        }
+        .sticker-cell.used {
+            background-color: #e2e8f0;
+            border-style: solid;
+            border-color: #cbd5e1;
+            opacity: 0.5;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.5) 5px, rgba(255,255,255,0.5) 10px);
+        }
+        .sticker-cell.active {
+            background-color: #dbeafe;
+            border-color: #3b82f6;
+            border-style: solid;
+            color: #1d4ed8;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+            cursor: pointer;
+        }
+        .sticker-cell:hover:not(.used) {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+        }
+        .sticker-cell.used:hover {
+            opacity: 0.8;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-900">
+    <div class="max-w-6xl mx-auto p-4 md:p-6">
+        
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
+            <div class="text-center lg:text-left">
+                <h1 class="text-2xl font-black text-blue-900 tracking-tight uppercase">Delivery and Lab Retail</h1>
+                <p class="text-slate-500 text-sm font-medium">Precision Area Mapping & Inventory System</p>
+            </div>
+            <nav class="flex bg-white rounded-xl shadow-sm p-1 border border-slate-200 items-center overflow-x-auto max-w-full">
+                <button onclick="switchTab('search')" id="tab-search" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all tab-active whitespace-nowrap">SEARCH & LOG</button>
+                <button onclick="switchTab('print')" id="tab-print" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-400 whitespace-nowrap">PRINT QUEUE</button>
+                <button onclick="switchTab('history')" id="tab-history" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-400 whitespace-nowrap">FULL LOG</button>
+                <button onclick="switchTab('inventory')" id="tab-inventory" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-400 whitespace-nowrap">RETAIL CATALOG</button>
+                
+                <div class="flex items-center pl-2 border-l border-slate-200 ml-1 shrink-0">
+                    <button onclick="openSettings()" class="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all shrink-0" title="Settings">
+                        <i class="fas fa-sliders-h text-lg"></i>
+                    </button>
+                </div>
+            </nav>
+        </header>
+
+        <section id="section-search" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Left: Search Box -->
+                <div class="glass-morphism rounded-2xl shadow-xl p-8 flex flex-col justify-center overflow-hidden relative">
+                    <div class="w-full">
+                        <label class="block text-center text-slate-500 uppercase tracking-widest text-xs font-black mb-4">Enter Cabin Number</label>
+                        <div class="flex flex-col gap-4">
+                            <input type="number" id="cabinSearch" placeholder="00000" 
+                                   class="w-full min-w-0 text-3xl font-bold text-center py-4 rounded-2xl border-2 border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all">
+                            
+                            <div class="w-full h-px bg-slate-200 my-2"></div>
+                            <label class="block text-center text-slate-500 uppercase tracking-widest text-[10px] font-black">Retail Items (Optional)</label>
+
+                            <!-- Dynamic Items Container -->
+                            <div id="retail-items-container" class="space-y-3">
+                                <!-- Populated by JS -->
+                            </div>
+
+                            <button type="button" onclick="addRetailRow()" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-bold text-sm hover:border-blue-400 hover:text-blue-500 transition-colors flex items-center justify-center gap-2">
+                                <i class="fas fa-plus"></i> Add Another Retail Item
+                            </button>
+
+                            <button id="searchBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black text-xl shadow-lg shadow-blue-200 active:scale-95 transition-all flex items-center justify-center gap-2">
+                                LOG DELIVERY
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="notFoundArea" class="hidden mt-8 p-4 bg-red-50 border-2 border-dashed border-red-200 rounded-2xl text-red-600 font-bold text-center text-sm">
+                        Please enter a valid Cabin Number.
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Sticker Sheet Selector -->
+                <div class="glass-morphism rounded-2xl shadow-xl p-6 flex flex-col md:flex-row gap-6 items-center justify-between">
+                    <div class="flex-1 w-full">
+                        <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                            <i class="fas fa-border-all text-blue-500"></i>
+                            Partial Sheet Layout
+                        </h4>
+                        <p class="text-xs text-slate-500 mb-4">Click the grid to select where the first label should print.</p>
+
+                        <div class="grid grid-cols-2 gap-3 text-sm mb-6">
+                            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm text-center">
+                                <span class="block text-slate-400 font-bold text-[10px] uppercase">Skipping</span>
+                                <span class="text-xl font-black text-slate-700"><span id="lblSkipped">0</span> Used</span>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 shadow-sm text-center">
+                                <span class="block text-blue-400 font-bold text-[10px] uppercase">Queue</span>
+                                <span class="text-xl font-black text-blue-700"><span id="lblQueueSize">0</span> Labels</span>
+                            </div>
+                        </div>
+
+                        <button id="quickPrintBtn" class="w-full bg-blue-600 text-white px-4 py-3 rounded-xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2 transform active:scale-95">
+                            <i class="fas fa-print"></i>
+                            PRINT LABELS
+                        </button>
+                    </div>
+
+                    <!-- Mini Visual Representation of 10-Label Sheet -->
+                    <div class="shrink-0 bg-white p-2 rounded-xl shadow-md border border-slate-200 w-[160px] h-[220px] flex flex-col gap-1 relative select-none" id="stickerSheet">
+                        <!-- Populated by Javascript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-print" class="tab-content hidden">
+            <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden">
+                <div class="p-6 bg-white border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h3 class="font-black text-slate-800 text-xl">Labels Pending Print</h3>
+                        <p class="text-sm text-slate-500"><span id="queueCount">0</span> items waiting in queue</p>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <button id="clearQueueBtn" class="flex-1 md:flex-none border border-red-200 text-red-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-50 transition-all">
+                            Clear Queue
+                        </button>
+                        <button id="downloadPDF" class="flex-1 md:flex-none bg-blue-600 text-white px-8 py-3 rounded-xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all flex items-center gap-2 transform active:scale-95">
+                            <i class="fas fa-print"></i>
+                            PRINT LABELS
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-slate-50 text-left border-b border-slate-200">
+                            <tr>
+                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase">Cabin</th>
+                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase text-center">Retail Items</th>
+                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="queueBody" class="divide-y divide-slate-50 bg-white"></tbody>
+                    </table>
+                    <div id="emptyQueue" class="p-20 text-center text-slate-300 italic font-medium bg-slate-50">The print queue is empty.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-history" class="tab-content hidden">
+            <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden">
+                <div class="p-6 bg-white border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h3 class="font-black text-slate-800">Full Delivery & Sales Log</h3>
+                        <p class="text-sm text-slate-500">Permanent record of all saved deliveries and inventory usage</p>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <button id="clearLogBtn" class="flex-1 md:flex-none border border-red-200 text-red-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-50 transition-all">
+                            Delete History
+                        </button>
+                        <button id="downloadExcel" class="flex-1 md:flex-none bg-slate-800 text-white px-6 py-2 rounded-lg font-black text-sm hover:bg-black transition-all">
+                            EXPORT EXCEL
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+                    <table class="w-full">
+                        <thead class="bg-slate-50 text-left sticky top-0 z-10 shadow-sm border-b border-slate-200">
+                            <tr>
+                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase">Timestamp</th>
+                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase">Cabin</th>
+                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase text-center">Retail Items Taken</th>
+                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logBody" class="bg-white"></tbody>
+                    </table>
+                    <div id="emptyLog" class="p-20 text-center text-slate-300 italic font-medium bg-slate-50">No deliveries logged yet.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-inventory" class="tab-content hidden">
+            <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden p-6 md:p-8">
+                
+                <!-- Add New Item Form -->
+                <div class="mb-8 p-6 bg-blue-50 border border-blue-100 rounded-2xl">
+                    <h3 class="text-lg font-black text-blue-900 mb-4"><i class="fas fa-plus-circle mr-2"></i>Add Retail Item</h3>
+                    <form id="addItemForm" class="flex flex-col md:flex-row gap-4 items-end">
+                        <div class="flex-1 w-full">
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Item Name</label>
+                            <input type="text" id="newItemName" required class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                        </div>
+                        <div class="w-full md:w-48">
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Category</label>
+                            <input type="text" id="newItemCategory" required placeholder="e.g. Frames" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                        </div>
+                        <button type="submit" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-md active:scale-95">
+                            Add Item
+                        </button>
+                    </form>
+                </div>
+
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-black text-slate-800 text-xl">Retail Catalog</h3>
+                </div>
+
+                <!-- Inventory Table -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs font-black uppercase tracking-widest">
+                            <tr>
+                                <th class="p-4">Item Name</th>
+                                <th class="p-4 text-center">Category</th>
+                                <th class="p-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody" class="divide-y divide-slate-100 bg-white">
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Copyright Footer -->
+        <footer class="mt-8 text-center text-slate-400 text-sm font-medium">
+            &copy; 2026 Created by Roswell Relova
+        </footer>
+
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md transform transition-all">
+            <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
+                <i class="fas fa-cog text-slate-400"></i>
+                Print Settings
+            </h2>
+            
+            <div class="space-y-4">
+                <label class="flex items-start gap-4 p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors">
+                    <div class="mt-1">
+                        <input type="checkbox" id="settingShowArea" onchange="toggleShowArea(this)" class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                    </div>
+                    <div>
+                        <span class="block font-bold text-slate-800">Show "Area" on Labels</span>
+                        <span class="block text-sm text-slate-500 mt-1">If the cabin matches a known Area, print the Area number on the right side of the label.</span>
+                    </div>
+                </label>
+
+                <div class="p-4 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors">
+                    <label class="block font-bold text-slate-800 mb-2">Special Note (Optional)</label>
+                    <input type="text" id="settingGlobalNote" oninput="toggleGlobalNote(this)" placeholder="e.g. Have a great cruise!" maxlength="40" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none transition-all text-sm">
+                    <span class="block text-sm text-slate-500 mt-2">Automatically print this message at the bottom center of every label.</span>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end items-center border-t border-slate-100 pt-6">
+                <button onclick="closeSettings()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all active:scale-95">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM REUSABLE MODAL (Replaces alert/confirm) -->
+    <div id="customModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4 transition-opacity">
+        <div id="customModalContent" class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-sm transform transition-all scale-100 text-center">
+            <div id="customModalIcon" class="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <h3 id="customModalTitle" class="text-xl font-black text-slate-800 mb-2">Attention</h3>
+            <p id="customModalMessage" class="text-slate-500 mb-8 font-medium leading-relaxed">Message goes here.</p>
+            <div class="flex flex-col gap-3">
+                <button id="customModalConfirm" onclick="confirmCustomModal()" class="w-full px-6 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 active:scale-95">OK</button>
+                <button id="customModalCancel" onclick="closeCustomModal()" class="w-full px-6 py-4 rounded-xl font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors hidden">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT LOG MODAL -->
+    <div id="editLogModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity overflow-y-auto">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-lg transform transition-all my-auto">
+            <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
+                <i class="fas fa-edit text-blue-500"></i> Edit Delivery Log
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Cabin Number</label>
+                    <input type="number" id="editCabinInput" class="w-full text-2xl font-bold text-center py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all">
+                </div>
+                
+                <div class="w-full h-px bg-slate-200 my-4"></div>
+                <label class="block text-center text-slate-500 uppercase tracking-widest text-[10px] font-black">Retail Items</label>
+
+                <!-- Dynamic Items Container for Edit -->
+                <div id="edit-retail-items-container" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+
+                <button type="button" onclick="addEditRetailRow()" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-bold text-sm hover:border-blue-400 hover:text-blue-500 transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-plus"></i> Add Retail Item
+                </button>
+            </div>
+
+            <div class="mt-8 flex gap-3">
+                <button onclick="closeEditModal()" class="flex-1 px-6 py-4 rounded-xl font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Cancel</button>
+                <button onclick="saveEditLog()" class="flex-1 px-6 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 active:scale-95">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default Inventory Array (POS Database)
+        const defaultInventory = [
+            { id: 1, name: 'Aqua Seascape', category: 'Photo Spot' },
+            { id: 2, name: 'TILEPIX', category: 'Frames' },
+            { id: 3, name: 'Basic Gallery Frame', category: 'Frames' },
+            { id: 4, name: 'PHOTO SPOT - WHITE', category: 'Photo Spot' },
+            { id: 5, name: 'PHOTO SPOT - BLUE', category: 'Photo Spot' },
+            { id: 6, name: 'Light UP Frame', category: 'Frames' },
+            { id: 7, name: 'Note Book', category: 'Small Gifts' },
+            { id: 8, name: 'Mug', category: 'Small Gifts' },
+            { id: 9, name: 'Bottle Opener', category: 'Small Gifts' },
+            { id: 10, name: 'Fridge Magnet', category: 'Small Gifts' },
+            { id: 11, name: 'Keychain', category: 'Small Gifts' },
+            { id: 12, name: 'Acrylic 4x6', category: 'Small Gifts' },
+            { id: 13, name: 'Porthole White', category: 'Portholes' },
+            { id: 14, name: 'Porthole Green (Rustic)', category: 'Portholes' },
+            { id: 15, name: 'Porthole Silver', category: 'Portholes' },
+            { id: 16, name: 'Metal Frame V', category: 'Frames' },
+            { id: 17, name: 'Metal Frame H', category: 'Frames' },
+            { id: 18, name: 'Shell Horizontal Frame', category: 'Frames' },
+            { id: 19, name: 'Shell Vertical Frame', category: 'Frames' },
+            { id: 20, name: 'Black Frame H', category: 'Frames' },
+            { id: 21, name: 'Black Frame V', category: 'Frames' },
+            { id: 22, name: 'Compass Collection Folio', category: 'Photo Spot' },
+            { id: 23, name: 'Compass Collection Album', category: 'Photo Spot' },
+            { id: 24, name: 'Compass Collection Frame', category: 'Photo Spot' },
+            { id: 25, name: 'Monkey', category: 'Towel Art' },
+            { id: 26, name: 'Elephant', category: 'Towel Art' },
+            { id: 27, name: 'Porthole Mini', category: 'Portholes' }
+        ];
+
+        const rawMapData = {
+            16: {
+                1: "16166,16168,16170,16172,16174,16176,16178,16180,16182,16184,16186,16188,16190,16192,16194,16195,16196,16198,16200",
+                2: "16776,16778,16780,16782,16783,16784,16785,16786,16787,16788,16789,16790,16791,16792,16793,16794,16795,16796,16798,16800",
+                3: "16140,16141,16142,16143,16144,16145,16146,16148,16150,16152,16154,16155,16156,16157,16158,16159,16160,16161,16162,16164",
+                4: "16744,16746,16748,16750,16751,16752,16753,16754,16755,16756,16757,16758,16759,16760,16761,16762,16764,16766,16768,16770,16772,16774",
+                5: "16100,16102,16104,16106,16108,16110,16112,16114,16116,16118,16120,16122,16124,16126,16128,16130,16132,16134,16136,16138,16139",
+                6: "16700,16702,16704,16706,16708,16710,16712,16714,16716,16718,16720,16722,16724,16726,16728,16730,16732,16734,16736,16738,16740,16742"
+            },
+            15: {
+                7: "15224,15226,15228,15230,15232,15832,15830,15828,15826,15824",
+                8: "15808,15810,15812,15814,15816,15818,15820,15822",
+                9: "15208,15210,15212,15214,15216,15218,15220,15222",
+                10: "15778,15780,15782,15784,15786,15788,15789,15790,15791,15792,15793,15794,15795,15796,15797,15798,15799,15800,15801,15802,15804,15806",
+                11: "15176,15178,15180,15182,15184,15186,15188,15189,15190,15191,15192,15193,15194,15195,15196,15197,15198,15199,15200,15201,15202,15204,15206",
+                12: "15744,15746,15748,15750,15752,15754,15755,15756,15757,15758,15759,15760,15761,15762,15763,15764,15765,15766,15768,15770,15772,15774,15776",
+                13: "15144,15146,15148,15150,15152,15154,15155,15156,15157,15158,15159,15160,15161,15162,15163,15164,15165,15166,15167,15168,15170,15172,15174",
+                14: "15700,15702,15704,15706,15708,15710,15712,15714,15716,15718,15720,15722,15724,15726,15728,15730,15732,15734,15736,15738,15740,15742",
+                15: "15100,15102,15104,15106,15108,15110,15112,15114,15116,15118,15120,15122,15124,15126,15128,15130,15132,15134,15136,15138,15140,15142"
+            },
+            14: {
+                16: "14220,14222,14224,14226,14828,14826",
+                17: "14202,14204,14206,14208,14210,14212,14214,14216,14218",
+                18: "14808,14810,14812,14814,14816,14818,14820,14822,14824",
+                19: "14166,14168,14170,14172,14174,14176,14178,14180,14182,14184,14185,14186,14187,14188,14189,14190,14191,14192,14193,14194,14195,14196",
+                20: "14198,14200,14790,14791,14792,14793,14794,14795,14796,14798,14800,14802,14804,14806",
+                21: "14134,14136,14138,14140,14142,14144,14146,14148,14149,14150,14151,14152,14153,14154,14155,14156,14157,14158,14159,14160,14162,14164",
+                22: "14756,14758,14759,14760,14762,14764,14766,14768,14770,14772,14774,14776,14778,14780,14781,14782,14784,14785,14786,14787,14788,14789",
+                23: "14100,14102,14104,14106,14108,14110,14112,14114,14115,14116,14117,14118,14119,14120,14121,14122,14123,14124,14126,14128,14130,14132",
+                24: "14724,14726,14728,14730,14732,14734,14736,14738,14740,14742,14744,14746,14748,14749,14750,14751,14752,14753,14754,14755,14757",
+                25: "14723,14722,14721,14720,14719,14718,14717,14716,14715,14714,14713,14712,14710,14708,14707,14706,14705,14704,14703,14702,14701,14700"
+            },
+            13: {
+                26: "13242,13244,13246,13248,13850,13848,13846,13844",
+                27: "13226,13228,13230,13232,13234,13236,13238,13240",
+                28: "13828,13830,13832,13834,13836,13838,13840,13842",
+                29: "13207,13208,13209,13210,13211,13212,13213,13214,13216,13218,13220,13222,13224",
+                30: "13809,13810,13811,13812,13813,13814,13816,13818,13820,13822,13824,13826",
+                31: "13175,13176,13177,13178,13179,13180,13182,13184,13186,13188,13190,13192,13194,13196,13198,13200,13201,13202,13203,13204,13205,13206",
+                32: "13777,13778,13779,13780,13782,13784,13786,13788,13790,13792,13794,13796,13798,13800,13801,13802,13803,13804,13805,13806,13807,13808",
+                33: "13150,13152,13154,13155,13156,13157,13158,13159,13160,13161,13162,13163,13164,13165,13166,13167,13168,13169,13170,13171,13172,13173,13174",
+                34: "13750,13752,13754,13756,13758,13759,13760,13761,13762,13763,13764,13765,13766,13767,13768,13769,13770,13771,13772,13773,13774,13775,13776",
+                35: "13142,13144,13146,13148,13501,13503,13505,13507,13509,13511,13513,13515,13517,13519,13521,13523,13525,13527,13529,13531,13533,13535,13537,13539,13541,13543,13545",
+                36: "13732,13734,13736,13738,13740,13742,13744,13746,13748,13547,13549,13551,13553,13555,13557,13559,13561,13563,13565,13567,13569,13571,13573,13575,13577",
+                37: "13104,13106,13108,13110,13111,13112,13114,13116,13118,13120,13122,13124,13126,13128,13130,13132,13134,13136,13138,13140",
+                38: "13100,13102,13700,13702,13704,13706,13708,13710,13711,13712,13713,13714,13716,13718,13720,13722,13724,13726,13728,13730"
+            },
+            12: {
+                39: "12238,12240,12242,12244,12246,12248,12250,12856",
+                40: "12840,12842,12844,12846,12848,12850,12852,12854",
+                41: "12222,12224,12226,12228,12230,12232,12234,12236",
+                42: "12822,12824,12826,12828,12830,12832,12834,12836,12838",
+                43: "12188,12190,12192,12194,12196,12198,12200,12202,12204,12205,12206,12207,12208,12209,12210,12211,12212,12213,12214,12215,12216,12218,12220",
+                44: "12790,12792,12794,12796,12798,12800,12801,12802,12804,12805,12806,12807,12808,12809,12810,12811,12812,12813,12814,12815,12816,12818,12820",
+                45: "12148,12150,12152,12154,12156,12158,12160,12162,12164,12166,12168,12170,12172,12173,12174,12175,12176,12177,12178,12180,12182,12184,12186",
+                46: "12761,12762,12763,12764,12765,12766,12767,12768,12769,12770,12771,12772,12773,12774,12775,12776,12777,12778,12780,12782,12784,12786,12788",
+                47: "12128,12130,12132,12134,12136,12138,12140,12142,12144,12146,12501,12503,12505,12507,12509,12511,12513,12515,12517,12519,12521,12523,12525,12527,12529,12531,12533",
+                48: "12742,12744,12746,12748,12750,12752,12754,12756,12758,12760,12535,12537,12539,12541,12543,12545,12547,12549,12551,12553,12555,12557,12559,12561,12563,12565,12567",
+                49: "12100,12102,12104,12106,12108,12109,12110,12111,12112,12113,12114,12115,12116,12118,12120,12122,12124,12126,12702,12700",
+                50: "12704,12706,12708,12709,12710,12711,12712,12714,12716,12718,12720,12722,12724,12726,12728,12730,12732,12734,12736,12738,12740"
+            },
+            11: {
+                51: "11248,11250,11252,11254,11256,11258,11260,11262,11264,11266,11268,11270,11272,11274,11276,11278,11280,11282,11284",
+                52: "11852,11854,11856,11858,11860,11862,11864,11866,11868,11870,11872,11874,11876,11878,11880,11882,11884,11886",
+                53: "11212,11213,11214,11215,11216,11217,11218,11220,11222,11224,11226,11228,11230,11232,11234,11236,11238,11240,11242,11244,11246",
+                54: "11814,11815,11816,11817,11818,11820,11822,11824,11826,11828,11830,11832,11834,11836,11838,11840,11842,11844,11846,11848,11850",
+                55: "11180,11181,11182,11183,11184,11186,11188,11190,11192,11194,11196,11198,11200,11202,11204,11205,11206,11207,11208,11209,11210,11211",
+                56: "11781,11782,11784,11786,11788,11790,11792,11794,11796,11798,11800,11802,11804,11805,11806,11807,11808,11809,11810,11811,11812,11813",
+                57: "11156,11158,11159,11160,11161,11162,11163,11164,11165,11166,11167,11168,11169,11170,11171,11172,11173,11174,11175,11176,11177,11178,11179",
+                58: "11758,11759,11760,11761,11762,11763,11764,11765,11766,11767,11768,11769,11770,11771,11772,11773,11774,11775,11776,11777,11778,11779,11780",
+                59: "11129,11130,11131,11132,11133,11134,11135,11136,11137,11138,11139,11140,11141,11142,11143,11144,11145,11146,11148,11150,11152,11154",
+                60: "11727,11728,11730,11731,11732,11733,11734,11736,11737,11738,11739,11740,11741,11742,11743,11744,11745,11746,11748,11750,11752,11754,11756",
+                61: "11102,11104,11106,11107,11108,11109,11110,11112,11114,11116,11118,11119,11120,11121,11122,11123,11124,11125,11126,11127,11128",
+                62: "11100,11700,11702,11704,11706,11707,11708,11709,11710,11711,11712,11714,11716,11718,11720,11721,11722,11723,11724,11725,11726"
+            },
+            10: {
+                63: "10254,10256,10258,10260,10262,10264,10266,10268,10270,10272,10274,10276,10278,10280,10282,10284,10286,10888",
+                64: "10850,10852,10854,10856,10858,10860,10862,10864,10866,10868,10870,10872,10874,10876,10878,10880,10882,10884,10886",
+                65: "10215,10216,10217,10218,10219,10220,10222,10224,10226,10228,10230,10232,10234,10236,10238,10240,10242,10244,10246,10248,10250,10252",
+                66: "10813,10814,10815,10816,10817,10818,10819,10820,10822,10824,10826,10828,10830,10832,10834,10836,10838,10840,10842,10844,10846,10848",
+                67: "10181,10182,10183,10184,10186,10188,10190,10192,10194,10196,10198,10200,10202,10204,10206,10208,10209,10210,10211,10212,10213,10214",
+                68: "10779,10780,10781,10782,10783,10784,10786,10788,10790,10792,10794,10796,10798,10800,10802,10804,10805,10806,10808,10809,10810,10811,10812",
+                69: "10156,10158,10160,10161,10162,10163,10164,10165,10166,10167,10168,10169,10170,10171,10172,10173,10174,10175,10176,10177,10178,10179,10180",
+                70: "10750,10752,10754,10756,10758,10760,10762,10763,10764,10765,10766,10767,10768,10769,10770,10771,10772,10773,10774,10775,10776,10777,10778",
+                71: "10130,10131,10132,10133,10134,10135,10136,10137,10138,10139,10140,10141,10142,10143,10144,10145,10146,10147,10148,10150,10152,10154",
+                72: "10727,10728,10729,10730,10731,10732,10733,10734,10735,10736,10737,10738,10739,10740,10741,10742,10743,10744,10745,10746,10747,10748",
+                73: "10100,10102,10103,10104,10106,10108,10110,10112,10114,10116,10117,10118,10120,10121,10122,10124,10125,10126,10127,10128,10129",
+                74: "10700,10702,10704,10706,10708,10709,10710,10711,10712,10713,10714,10715,10716,10717,10718,10719,10720,10722,10724,10725,10726"
+            },
+            9: {
+                75: "9284,9286,9288,9290,9292,9866,9868,9870,9872,9874,9876,9878,9880,9882,9884,9886,9888,9890,9892",
+                76: "9822,9824,9826,9828,9830,9832,9834,9836,9838,9840,9842,9844,9846,9848,9850,9852,9854,9856,9858,9860,9862,9864",
+                77: "9238,9240,9242,9244,9246,9248,9250,9252,9254,9256,9258,9260,9262,9264,9266,9268,9270,9272,9274,9276,9278,9280,9282",
+                78: "9786,9788,9790,9792,9794,9796,9798,9800,9802,9804,9806,9808,9809,9810,9811,9812,9813,9814,9815,9816,9817,9818,9820,9821",
+                79: "9196,9198,9200,9202,9204,9206,9208,9210,9212,9214,9216,9218,9220,9221,9222,9224,9226,9228,9230,9232,9234,9236",
+                80: "9760,9762,9763,9764,9765,9766,9767,9768,9769,9770,9771,9772,9773,9774,9775,9776,9777,9778,9779,9780,9781,9782,9783,9784",
+                81: "9169,9170,9171,9172,9173,9174,9175,9176,9177,9178,9179,9180,9181,9182,9183,9184,9185,9186,9187,9188,9190,9192,9194",
+                82: "9730,9732,9733,9734,9735,9736,9737,9738,9739,9740,9741,9742,9743,9744,9745,9746,9747,9748,9749,9750,9752,9754,9756,9758",
+                83: "9136,9137,9138,9139,9140,9141,9142,9143,9144,9146,9148,9150,9152,9154,9156,9158,9160,9162,9163,9164,9165,9166,9167,9168",
+                84: "9100,9102,9700,9702,9704,9706,9708,9709,9710,9711,9712,9713,9714,9716,9717,9718,9720,9722,9724,9726,9728",
+                85: "9104,9106,9108,9109,9110,9112,9113,9114,9115,9116,9117,9118,9120,9122,9123,9124,9126,9128,9130,9132,9134,9135"
+            },
+            5: {
+                86: "5802,5804,5806,5808,5810,5812,5814,5816,5818,5820,5822,5824,5826,5828,5830,5832,5834,5836,5838",
+                87: "5202,5204,5206,5208,5210,5212,5214,5216,5218,5220,5222,5224,5226,5228,5230,5232,5234,5236,5238",
+                88: "5178,5180,5182,5184,5185,5186,5187,5188,5189,5190,5191,5192,5193,5194,5195,5196,5198,5200,5792,5794,5796,5798,5800",
+                89: "5140,5141,5142,5143,5144,5145,5146,5147,5148,5149,5150,5152,5154,5156,5158,5160,5162,5164,5166,5168,5170,5172,5174,5176",
+                90: "5744,5746,5748,5750,5752,5754,5756,5758,5760,5762,5764,5766,5768,5770,5772,5774,5776,5778,5780,5782,5784,5786,5788,5790",
+                91: "5100,5102,5104,5106,5108,5110,5112,5114,5116,5118,5120,5122,5124,5126,5128,5130,5132,5134,5136,5138,5139",
+                92: "5700,5702,5704,5706,5708,5710,5712,5714,5716,5718,5720,5722,5724,5726,5728,5730,5732,5734,5736,5738,5740,5742"
+            }
+        };
+
+        const cabinDatabase = [];
+        for (const [deck, areas] of Object.entries(rawMapData)) {
+            for (const [area, cabinsStr] of Object.entries(areas)) {
+                cabinsStr.split(',').forEach(c => {
+                    cabinDatabase.push({ cabin: parseInt(c.trim()), deck: parseInt(deck), area: parseInt(area) });
+                });
+            }
+        }
+
+        let inventoryItems = JSON.parse(localStorage.getItem('labRetailInventory')) || defaultInventory;
+        let deliveryHistory = JSON.parse(localStorage.getItem('fullDeliveryHistory')) || [];
+        let printQueue = JSON.parse(localStorage.getItem('currentPrintQueue')) || [];
+        
+        function migrateData(arr) {
+            return arr.map(entry => {
+                if (!entry.id) {
+                    entry.id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+                }
+                
+                if (entry.items) return entry; // Already migrated
+                const items = [];
+                if (entry.retailItemName) {
+                    items.push({
+                        id: entry.retailItemId,
+                        name: entry.retailItemName,
+                        qty: entry.quantity || 1
+                    });
+                }
+                return {
+                    cabin: entry.cabin,
+                    deck: entry.deck,
+                    area: entry.area,
+                    timestamp: entry.timestamp,
+                    items: items
+                };
+            });
+        }
+        
+        deliveryHistory = migrateData(deliveryHistory);
+        printQueue = migrateData(printQueue);
+        
+        let stickerOffset = parseInt(localStorage.getItem('stickerSheetOffset') || '0');
+        let appSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+        if (typeof appSettings.showArea === 'undefined') appSettings.showArea = true;
+        if (typeof appSettings.globalNote === 'undefined') appSettings.globalNote = "";
+        
+        let currentSelection = null;
+        let pendingConfirmAction = null;
+        let editingLogId = null;
+
+        function saveState() {
+            localStorage.setItem('labRetailInventory', JSON.stringify(inventoryItems));
+            localStorage.setItem('fullDeliveryHistory', JSON.stringify(deliveryHistory));
+            localStorage.setItem('currentPrintQueue', JSON.stringify(printQueue));
+            localStorage.setItem('stickerSheetOffset', stickerOffset.toString());
+            localStorage.setItem('appSettings', JSON.stringify(appSettings));
+        }
+
+        function showCustomAlert(title, message) {
+            document.getElementById('customModalIcon').innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            document.getElementById('customModalIcon').className = 'w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-2xl mx-auto mb-4';
+            document.getElementById('customModalTitle').innerText = title;
+            document.getElementById('customModalMessage').innerText = message;
+            document.getElementById('customModalCancel').classList.add('hidden');
+            
+            const confirmBtn = document.getElementById('customModalConfirm');
+            confirmBtn.className = "w-full px-6 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 active:scale-95";
+            confirmBtn.innerText = "OK";
+            
+            pendingConfirmAction = null;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+
+        function showCustomConfirm(title, message, confirmBtnText, confirmBtnClass, action, iconHtml = '<i class="fas fa-question-circle"></i>', iconClass = 'bg-blue-100 text-blue-600') {
+            document.getElementById('customModalIcon').innerHTML = iconHtml;
+            document.getElementById('customModalIcon').className = `w-16 h-16 rounded-full ${iconClass} flex items-center justify-center text-2xl mx-auto mb-4`;
+            document.getElementById('customModalTitle').innerText = title;
+            document.getElementById('customModalMessage').innerText = message;
+            document.getElementById('customModalCancel').classList.remove('hidden');
+            
+            const confirmBtn = document.getElementById('customModalConfirm');
+            confirmBtn.className = `w-full px-6 py-4 rounded-xl font-bold text-white transition-colors shadow-lg active:scale-95 ${confirmBtnClass}`;
+            confirmBtn.innerText = confirmBtnText;
+            
+            pendingConfirmAction = action;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+
+        window.closeCustomModal = function() {
+            document.getElementById('customModal').classList.add('hidden');
+            pendingConfirmAction = null;
+        };
+
+        window.confirmCustomModal = function() {
+            if (pendingConfirmAction) {
+                pendingConfirmAction();
+            }
+            closeCustomModal();
+        };
+
+        window.openSettings = function() {
+            document.getElementById('settingShowArea').checked = appSettings.showArea;
+            document.getElementById('settingGlobalNote').value = appSettings.globalNote;
+            document.getElementById('settingsModal').classList.remove('hidden');
+        };
+
+        window.closeSettings = function() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        };
+
+        window.toggleShowArea = function(el) {
+            appSettings.showArea = el.checked;
+            saveState();
+        };
+
+        window.toggleGlobalNote = function(el) {
+            appSettings.globalNote = el.value;
+            saveState();
+        };
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`section-${tabName}`).classList.remove('hidden');
+            
+            document.querySelectorAll('nav button').forEach(b => {
+                b.classList.remove('tab-active', 'text-blue-800');
+                b.classList.add('text-slate-400');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('tab-active');
+            updateUI();
+        };
+
+        window.addRetailRow = function() {
+            const container = document.getElementById('retail-items-container');
+            const row = document.createElement('div');
+            row.className = 'retail-item-row flex gap-2 w-full';
+            row.innerHTML = `
+                <div class="relative flex-1">
+                    <select class="retailSelect w-full text-center py-3 px-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-bold text-slate-700 text-sm md:text-base cursor-pointer appearance-none bg-white" onchange="toggleRowQty(this)">
+                        <option value="">-- Standard Delivery (No Retail Item) --</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <input type="number" class="retailQty w-24 hidden text-center py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-bold text-slate-700 shadow-sm" value="1" min="1" title="Quantity Taken">
+                <button type="button" class="remove-item-btn bg-red-50 text-red-500 px-4 rounded-xl hover:bg-red-100 transition-colors" onclick="removeRetailRow(this)"><i class="fas fa-times"></i></button>
+            `;
+            
+            // Populate select
+            const select = row.querySelector('.retailSelect');
+            inventoryItems.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.innerText = item.name;
+                select.appendChild(opt);
+            });
+            
+            container.appendChild(row);
+            updateRemoveButtons();
+        };
+
+        window.removeRetailRow = function(btn) {
+            btn.closest('.retail-item-row').remove();
+            updateRemoveButtons();
+        };
+
+        window.toggleRowQty = function(selectEl) {
+            const row = selectEl.closest('.retail-item-row');
+            if(!row) return; // In case of edit modal row
+            const qtyInput = row.querySelector('.retailQty');
+            if (qtyInput) {
+                if (selectEl.value !== "") {
+                    qtyInput.classList.remove('hidden');
+                } else {
+                    qtyInput.classList.add('hidden');
+                    qtyInput.value = 1;
+                }
+            }
+        };
+
+        window.addEditRetailRow = function(selectedId = "", qty = 1) {
+            const container = document.getElementById('edit-retail-items-container');
+            const row = document.createElement('div');
+            row.className = 'edit-retail-item-row flex gap-2 w-full';
+            row.innerHTML = `
+                <div class="relative flex-1">
+                    <select class="editRetailSelect w-full text-center py-3 px-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-bold text-slate-700 text-sm md:text-base cursor-pointer appearance-none bg-white" onchange="toggleEditRowQty(this)">
+                        <option value="">-- Standard Delivery (No Retail Item) --</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <input type="number" class="editRetailQty w-24 ${selectedId === "" ? 'hidden' : ''} text-center py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-bold text-slate-700 shadow-sm" value="${qty}" min="1" title="Quantity Taken">
+                <button type="button" class="remove-edit-item-btn bg-red-50 text-red-500 px-4 rounded-xl hover:bg-red-100 transition-colors" onclick="removeEditRetailRow(this)"><i class="fas fa-times"></i></button>
+            `;
+            
+            const select = row.querySelector('.editRetailSelect');
+            inventoryItems.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.innerText = item.name;
+                select.appendChild(opt);
+            });
+            select.value = selectedId;
+            
+            container.appendChild(row);
+            updateEditRemoveButtons();
+        };
+
+        window.removeEditRetailRow = function(btn) {
+            btn.closest('.edit-retail-item-row').remove();
+            updateEditRemoveButtons();
+        };
+
+        window.toggleEditRowQty = function(selectEl) {
+            const row = selectEl.closest('.edit-retail-item-row');
+            const qtyInput = row.querySelector('.editRetailQty');
+            if (selectEl.value !== "") {
+                qtyInput.classList.remove('hidden');
+            } else {
+                qtyInput.classList.add('hidden');
+                qtyInput.value = 1;
+            }
+        };
+
+        function updateEditRemoveButtons() {
+            const rows = document.querySelectorAll('.edit-retail-item-row');
+            rows.forEach((row) => {
+                const btn = row.querySelector('.remove-edit-item-btn');
+                if (rows.length === 1) {
+                    btn.classList.add('hidden');
+                } else {
+                    btn.classList.remove('hidden');
+                }
+            });
+        }
+
+        window.openEditModal = function(id) {
+            const entry = deliveryHistory.find(e => String(e.id) === String(id));
+            if (!entry) {
+                showCustomAlert("Error", "Could not load the log entry. It may have been deleted or corrupted.");
+                return;
+            }
+            
+            editingLogId = id;
+            document.getElementById('editCabinInput').value = entry.cabin;
+            
+            const container = document.getElementById('edit-retail-items-container');
+            container.innerHTML = '';
+            
+            if (entry.items && entry.items.length > 0) {
+                entry.items.forEach(item => {
+                    addEditRetailRow(item.id, item.qty);
+                });
+            } else {
+                addEditRetailRow(); // Blank row
+            }
+            
+            document.getElementById('editLogModal').classList.remove('hidden');
+        };
+
+        window.closeEditModal = function() {
+            document.getElementById('editLogModal').classList.add('hidden');
+            editingLogId = null;
+        };
+
+        window.saveEditLog = function() {
+            if (!editingLogId) return;
+            
+            const newCabin = parseInt(document.getElementById('editCabinInput').value);
+            if (!newCabin || newCabin <= 0) {
+                showCustomAlert("Invalid Entry", "Please enter a valid cabin number.");
+                return;
+            }
+
+            const entry = deliveryHistory.find(e => String(e.id) === String(editingLogId));
+            if (!entry) return;
+
+            const itemsToLog = [];
+            document.querySelectorAll('.edit-retail-item-row').forEach(row => {
+                const selectId = row.querySelector('.editRetailSelect').value;
+                const qty = parseInt(row.querySelector('.editRetailQty').value) || 1;
+                
+                if (selectId !== "") {
+                    const invItem = inventoryItems.find(i => i.id == selectId);
+                    if (invItem) {
+                        const existing = itemsToLog.find(i => i.id == selectId);
+                        if (existing) {
+                            existing.qty += qty;
+                        } else {
+                            itemsToLog.push({ id: invItem.id, name: invItem.name, qty: qty });
+                        }
+                    }
+                }
+            });
+
+            // Update History Entry
+            entry.cabin = newCabin;
+            entry.items = itemsToLog;
+
+            // Update Print Queue Entry if it exists there
+            const queueEntry = printQueue.find(e => String(e.id) === String(editingLogId));
+            if (queueEntry) {
+                queueEntry.cabin = newCabin;
+                queueEntry.items = itemsToLog;
+            }
+
+            saveState();
+            updateUI();
+            closeEditModal();
+        };
+
+        window.deleteLogEntry = function(id) {
+            showCustomConfirm(
+                'Delete Log', 
+                'Are you sure you want to permanently delete this delivery record?', 
+                'Delete', 
+                'bg-red-600 hover:bg-red-700 shadow-red-200', 
+                () => {
+                    deliveryHistory = deliveryHistory.filter(e => String(e.id) !== String(id));
+                    printQueue = printQueue.filter(e => String(e.id) !== String(id));
+                    saveState();
+                    updateUI();
+                },
+                '<i class="fas fa-trash-alt"></i>',
+                'bg-red-100 text-red-600'
+            );
+        };
+
+        function updateRemoveButtons() {
+            const rows = document.querySelectorAll('.retail-item-row');
+            rows.forEach((row) => {
+                const btn = row.querySelector('.remove-item-btn');
+                if (rows.length === 1) {
+                    btn.classList.add('hidden');
+                } else {
+                    btn.classList.remove('hidden');
+                }
+            });
+        }
+
+        function renderStickerSheet() {
+            const container = document.getElementById('stickerSheet');
+            container.innerHTML = '';
+            
+            const cols = 2;
+            const rows = 5;
+            const totalLabels = cols * rows;
+            
+            container.style.display = 'grid';
+            container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            container.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+            
+            const queueSize = printQueue.length;
+            
+            for (let i = 0; i < totalLabels; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'sticker-cell rounded flex items-center justify-center text-[10px] font-bold';
+                
+                if (i < stickerOffset) {
+                    cell.classList.add('used');
+                    cell.title = "Click to set print start position here";
+                } else if (i >= stickerOffset && i < stickerOffset + queueSize) {
+                    cell.classList.add('active');
+                    const printIndex = i - stickerOffset;
+                    cell.innerText = printQueue[printIndex].cabin;
+                    cell.title = `Printing Cabin ${printQueue[printIndex].cabin}`;
+                } else {
+                    cell.title = "Click to set print start position here";
+                }
+                
+                cell.onclick = () => {
+                    stickerOffset = i;
+                    saveState();
+                    updateUI(); 
+                };
+                
+                container.appendChild(cell);
+            }
+            
+            document.getElementById('lblSkipped').innerText = stickerOffset;
+            document.getElementById('lblQueueSize').innerText = queueSize;
+        }
+
+        function updateUI() {
+            // Update the multi-row dropdowns
+            document.querySelectorAll('.retailSelect, .editRetailSelect').forEach(selectEl => {
+                const currentVal = selectEl.value;
+                selectEl.innerHTML = '<option value="">-- Standard Delivery (No Retail Item) --</option>';
+                inventoryItems.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.id;
+                    opt.innerText = item.name;
+                    selectEl.appendChild(opt);
+                });
+                selectEl.value = currentVal;
+            });
+
+            // Update Inventory Table
+            const invBody = document.getElementById('inventoryTableBody');
+            invBody.innerHTML = '';
+            inventoryItems.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 transition-colors";
+                row.innerHTML = `
+                    <td class="px-4 py-4 font-black text-slate-800">${item.name}</td>
+                    <td class="px-4 py-4 text-center text-slate-500 font-medium">
+                        <span class="bg-slate-100 px-3 py-1 rounded-full text-xs uppercase tracking-widest">${item.category}</span>
+                    </td>
+                    <td class="px-4 py-4 text-right">
+                        <button onclick="deleteInventoryItem(${item.id})" class="text-slate-400 hover:text-red-500 p-2 rounded transition-colors" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                invBody.appendChild(row);
+            });
+
+            // Update Queue Table
+            const qBody = document.getElementById('queueBody');
+            qBody.innerHTML = '';
+            document.getElementById('queueCount').innerText = printQueue.length;
+            document.getElementById('emptyQueue').classList.toggle('hidden', printQueue.length > 0);
+            
+            printQueue.forEach((item, idx) => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 transition-colors";
+                
+                const displayValue = (item.items && item.items.length > 0)
+                    ? item.items.map(i => `<span class="bg-red-50 text-red-600 px-2 py-1 rounded-md font-black text-xs border border-red-100 flex items-center gap-1 w-max mb-1 mx-auto"><i class="fas fa-tag text-[10px]"></i> ${i.qty}x ${i.name}</span>`).join('')
+                    : `<span class="bg-slate-50 text-slate-400 px-3 py-1 rounded-md font-bold text-sm border border-slate-100 flex items-center justify-center w-max mx-auto">Standard Label</span>`;
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-black text-slate-800 text-lg">${item.cabin}</td>
+                    <td class="px-6 py-4 text-center flex flex-col items-center">${displayValue}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="removeFromQueue(${idx})" class="text-red-400 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-all font-bold text-sm">Remove</button>
+                    </td>
+                `;
+                qBody.appendChild(row);
+            });
+
+            renderStickerSheet();
+
+            // Update Full Log
+            const lBody = document.getElementById('logBody');
+            lBody.innerHTML = '';
+            document.getElementById('emptyLog').classList.toggle('hidden', deliveryHistory.length > 0);
+            
+            [...deliveryHistory].reverse().forEach(item => {
+                const row = document.createElement('tr');
+                row.className = "border-b border-slate-50 hover:bg-slate-50";
+                
+                const displayValue = (item.items && item.items.length > 0)
+                    ? item.items.map(i => `<div class="text-red-600 font-bold text-sm mb-1"><i class="fas fa-tag text-[10px] mr-1"></i>${i.qty}x ${i.name}</div>`).join('')
+                    : `<span class="text-slate-400 font-medium text-sm">Standard</span>`;
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-xs text-slate-400 font-medium">${new Date(item.timestamp).toLocaleString()}</td>
+                    <td class="px-6 py-4 font-bold text-slate-700">${item.cabin}</td>
+                    <td class="px-6 py-4 text-center">${displayValue}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="openEditModal('${item.id}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors mr-1" title="Edit Entry">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteLogEntry('${item.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Delete Entry">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                lBody.appendChild(row);
+            });
+        }
+
+        function handleSearch() {
+            const searchInput = document.getElementById('cabinSearch').value;
+            if(!searchInput) return;
+            const num = parseInt(searchInput);
+            
+            const errEl = document.getElementById('notFoundArea');
+            
+            if (num > 0) {
+                // Infer deck from cabin number
+                const deckNum = Math.floor(num / 1000);
+                
+                // Lookup Area if available in database
+                const found = cabinDatabase.find(c => c.cabin === num);
+                const areaNum = found ? found.area : null;
+
+                currentSelection = { cabin: num, deck: deckNum, area: areaNum };
+                errEl.classList.add('hidden');
+                
+                addToLog(true);
+            } else {
+                currentSelection = null;
+                errEl.classList.remove('hidden');
+            }
+        }
+
+        function addToLog(addToPrint = false) {
+            if (!currentSelection) return;
+            
+            const itemsToLog = [];
+            document.querySelectorAll('.retail-item-row').forEach(row => {
+                const selectId = row.querySelector('.retailSelect').value;
+                const qty = parseInt(row.querySelector('.retailQty').value) || 1;
+                
+                if (selectId !== "") {
+                    const invItem = inventoryItems.find(i => i.id == selectId);
+                    if (invItem) {
+                        const existing = itemsToLog.find(i => i.id == selectId);
+                        if (existing) {
+                            existing.qty += qty;
+                        } else {
+                            itemsToLog.push({ id: invItem.id, name: invItem.name, qty: qty });
+                        }
+                    }
+                }
+            });
+            
+            const entry = { 
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+                ...currentSelection, 
+                items: itemsToLog,
+                timestamp: new Date().toISOString() 
+            };
+            
+            deliveryHistory.push(entry);
+            
+            if (addToPrint) {
+                printQueue.push(entry);
+            }
+            
+            saveState();
+            updateUI();
+            
+            // Visual success feedback
+            const searchBtn = document.getElementById('searchBtn');
+            const originalText = searchBtn.innerText;
+            searchBtn.innerHTML = '<i class="fas fa-check"></i> LOGGED';
+            searchBtn.classList.replace('bg-blue-600', 'bg-green-600');
+            searchBtn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+            
+            setTimeout(() => {
+                searchBtn.innerText = originalText;
+                searchBtn.classList.replace('bg-green-600', 'bg-blue-600');
+                searchBtn.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+            }, 800);
+
+            // Cleanup
+            document.getElementById('cabinSearch').value = '';
+            document.getElementById('retail-items-container').innerHTML = '';
+            addRetailRow();
+            document.getElementById('cabinSearch').focus();
+        }
+
+        window.removeFromQueue = function(idx) {
+            printQueue.splice(idx, 1);
+            saveState();
+            updateUI();
+        }
+
+        // Inventory Management Logic
+        document.getElementById('addItemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('newItemName').value;
+            const category = document.getElementById('newItemCategory').value || 'Uncategorized';
+            
+            inventoryItems.push({
+                id: Date.now(),
+                name: name,
+                category: category
+            });
+            
+            saveState();
+            updateUI();
+            this.reset();
+        });
+
+        window.deleteInventoryItem = function(id) {
+            showCustomConfirm(
+                'Delete Item', 
+                'Are you sure you want to remove this item from the inventory catalog?', 
+                'Delete', 
+                'bg-red-600 hover:bg-red-700 shadow-red-200', 
+                () => {
+                    inventoryItems = inventoryItems.filter(i => String(i.id) !== String(id));
+                    saveState();
+                    updateUI();
+                },
+                '<i class="fas fa-trash-alt"></i>',
+                'bg-red-100 text-red-600'
+            );
+        };
+
+        document.getElementById('searchBtn').addEventListener('click', handleSearch);
+        document.getElementById('cabinSearch').addEventListener('keypress', e => e.key === 'Enter' && handleSearch());
+        
+        document.getElementById('clearQueueBtn').addEventListener('click', () => {
+            if (printQueue.length === 0) return;
+            showCustomConfirm(
+                'Clear Queue', 
+                'Clear the current print queue? (Historical log and inventory deductions remain unaffected)', 
+                'Clear Queue', 
+                'bg-red-600 hover:bg-red-700 shadow-red-200', 
+                () => {
+                    printQueue = [];
+                    saveState();
+                    updateUI();
+                },
+                '<i class="fas fa-eraser"></i>',
+                'bg-red-100 text-red-600'
+            );
+        });
+
+        document.getElementById('clearLogBtn').addEventListener('click', () => {
+            if (deliveryHistory.length === 0) return;
+            showCustomConfirm(
+                'Delete History', 
+                'DANGER: Delete the ENTIRE delivery and sales log history? This action cannot be undone.', 
+                'Delete History', 
+                'bg-red-600 hover:bg-red-700 shadow-red-200', 
+                () => {
+                    deliveryHistory = [];
+                    saveState();
+                    updateUI();
+                },
+                '<i class="fas fa-fire"></i>',
+                'bg-red-100 text-red-600'
+            );
+        });
+
+        document.getElementById('downloadExcel').addEventListener('click', () => {
+            if (deliveryHistory.length === 0 && inventoryItems.length === 0) {
+                showCustomAlert('Empty Data', 'There is no data to export.');
+                return;
+            }
+            
+            const wb = XLSX.utils.book_new();
+            
+            // 1. Transaction Log Sheet (Flattened)
+            const logData = [];
+            
+            deliveryHistory.forEach(h => {
+                const timeStr = new Date(h.timestamp).toLocaleString();
+                const cabinStr = h.cabin;
+                const areaStr = h.area ? h.area : 'N/A';
+                
+                if (h.items && h.items.length > 0) {
+                    h.items.forEach(i => {
+                        logData.push({
+                            'Date/Time': timeStr,
+                            'Cabin': cabinStr,
+                            'Area': areaStr,
+                            'Item': i.name,
+                            'Usage (Qty)': i.qty
+                        });
+                    });
+                } else {
+                    logData.push({
+                        'Date/Time': timeStr,
+                        'Cabin': cabinStr,
+                        'Area': areaStr,
+                        'Item': 'Standard Label',
+                        'Usage (Qty)': '-'
+                    });
+                }
+            });
+
+            // Initialize the main sheet
+            const wsLog = logData.length > 0 ? XLSX.utils.json_to_sheet(logData) : XLSX.utils.aoa_to_sheet([['Date/Time', 'Cabin', 'Area', 'Item', 'Usage (Qty)']]);
+            
+            // 2. Inventory Usage Summary (Tally) Logic
+            const usageTally = {};
+            
+            // Pre-populate with all current inventory items
+            inventoryItems.forEach(item => {
+                usageTally[item.id] = { name: item.name, category: item.category, used: 0 };
+            });
+            
+            // Calculate usage quantities from delivery history
+            deliveryHistory.forEach(h => {
+                if (h.items && h.items.length > 0) {
+                    h.items.forEach(i => {
+                        if (usageTally[i.id]) {
+                            usageTally[i.id].used += i.qty;
+                        } else {
+                            // Handle items that were logged but later deleted from the catalog
+                            usageTally[i.id] = { name: i.name + " (Deleted)", category: "Unknown", used: i.qty };
+                        }
+                    });
+                }
+            });
+
+            // Sort items alphabetically to match the desired tally look
+            const sortedItems = Object.values(usageTally).sort((a, b) => a.name.localeCompare(b.name));
+            
+            // --- APPEND TALLY TO THE BOTTOM OF THE LOG SHEET ---
+            const tallyAOA = [
+                [], // Blank Row spacer
+                [], // Blank Row spacer
+                ['INVENTORY USAGE SUMMARY (TALLY)', ''],
+                ['Item Description', 'Total Quantity Used']
+            ];
+            
+            sortedItems.forEach(item => {
+                tallyAOA.push([item.name, item.used]);
+            });
+            
+            // origin: -1 tells the library to append to the bottom of the existing sheet
+            XLSX.utils.sheet_add_aoa(wsLog, tallyAOA, { origin: -1 });
+            XLSX.utils.book_append_sheet(wb, wsLog, "Transaction Log");
+            
+            // --- ALSO CREATE THE DEDICATED INVENTORY SHEET ---
+            const tallyData = sortedItems.map(item => ({
+                'Item Description': item.name,
+                'Category': item.category,
+                'Total Quantity Used (Missing)': item.used
+            }));
+            
+            if (tallyData.length > 0) {
+                const wsTally = XLSX.utils.json_to_sheet(tallyData);
+                XLSX.utils.book_append_sheet(wb, wsTally, "Inventory Tally");
+            }
+
+            XLSX.writeFile(wb, `Delivery_And_Retail_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+        });
+
+        function printLabels() {
+            if (printQueue.length === 0) {
+                showCustomAlert("Empty Queue", "The print queue is empty! Please search and add cabins before printing.");
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'in', format: 'letter' });
+            
+            const labelsPerPage = 10;
+            const labelWidth = 4.0;
+            const labelHeight = 2.0;
+            const leftMargin = 0.16;
+            const topMargin = 0.5;
+            const horizontalGap = 0.18;
+
+            printQueue.forEach((item, index) => {
+                const effectiveIndex = index + stickerOffset;
+                
+                if (index > 0 && effectiveIndex % labelsPerPage === 0) {
+                    doc.addPage();
+                }
+                
+                const pageIndex = effectiveIndex % labelsPerPage;
+                const col = pageIndex % 2;
+                const row = Math.floor(pageIndex / 2);
+                
+                const x = leftMargin + (col * (labelWidth + horizontalGap));
+                const y = topMargin + (row * labelHeight);
+
+                doc.setTextColor(54, 117, 196); 
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(14);
+                doc.text("CABIN NUMBER", x + 2, y + 0.35, { align: "center" });
+
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(60);
+                doc.text(item.cabin.toString(), x + 2, y + 1.15, { align: "center" });
+
+                if (appSettings.showArea && item.area) {
+                    doc.setTextColor(54, 117, 196); // Blue
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(24);
+                    doc.text(`AREA ${item.area}`, x + 3.85, y + 1.8, { align: "right" });
+                }
+
+                if (item.items && item.items.length > 0) {
+                    const displayName = item.items.map(i => `${i.qty}x ${i.name}`).join('\n');
+                    
+                    doc.setTextColor(220, 38, 38); // Red
+                    doc.setFont("helvetica", "bold");
+                    
+                    let fontSize = 10;
+                    doc.setFontSize(fontSize);
+                    let noteLines = doc.splitTextToSize(displayName.toUpperCase(), 2.0); // Restrict to left half of sticker
+                    
+                    // Smart auto-fit: Reduce font size automatically if the list is too long to fit vertically
+                    while (noteLines.length * (fontSize * 0.016) > 0.50 && fontSize > 6) {
+                        fontSize -= 0.5;
+                        doc.setFontSize(fontSize);
+                        noteLines = doc.splitTextToSize(displayName.toUpperCase(), 2.0);
+                    }
+                    
+                    // Draw downwards from below the cabin number to prevent overlapping upwards
+                    doc.text(noteLines, x + 0.15, y + 1.35, { align: "left" });
+                }
+
+                if (appSettings.globalNote && appSettings.globalNote.trim() !== '') {
+                    doc.setTextColor(54, 117, 196); 
+                    doc.setFont("helvetica", "bolditalic");
+                    doc.setFontSize(11);
+                    doc.text(appSettings.globalNote.trim(), x + 2.0, y + 1.92, { align: "center" });
+                }
+            });
+
+            doc.save(`Labels_${new Date().getTime()}.pdf`);
+            
+            printQueue = [];
+            stickerOffset = 0;
+            saveState();
+            updateUI();
+        }
+
+        document.getElementById('downloadPDF').addEventListener('click', printLabels);
+        document.getElementById('quickPrintBtn').addEventListener('click', printLabels);
+
+        // Init App
+        addRetailRow();
+        updateUI();
+    </script>
+</body>
+</html>
