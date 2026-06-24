@@ -16,8 +16,8 @@
             border: 1px solid rgba(226, 232, 240, 1);
         }
         .tab-active {
-            border-bottom: 3px solid #2563eb;
-            color: #1e40af;
+            border-bottom: 3px solid #2563eb !important;
+            color: #1e40af !important;
         }
 
         /* Custom styles for the ticker and clock */
@@ -38,6 +38,15 @@
         .mask-image-linear {
             -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
             mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+        }
+
+        /* Hide scrollbar for navigation */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
         }
 
         /* Custom styles for the interactive sticker sheet preview */
@@ -69,21 +78,105 @@
             opacity: 0.8;
             cursor: pointer;
         }
+
+        /* --- THEME OVERRIDES --- */
+        
+        /* NIGHT MODE */
+        body.theme-night {
+            background-color: #0f172a !important; /* slate-900 */
+            color: #e2e8f0 !important; /* slate-200 */
+        }
+        body.theme-night .bg-white, body.theme-night .bg-slate-50 {
+            background-color: #1e293b !important; /* slate-800 */
+        }
+        body.theme-night .text-slate-800, body.theme-night .text-slate-900, body.theme-night .text-slate-700 {
+            color: #f8fafc !important; /* slate-50 */
+        }
+        body.theme-night .text-slate-500, body.theme-night .text-slate-400, body.theme-night .text-slate-600 {
+            color: #94a3b8 !important; /* slate-400 */
+        }
+        body.theme-night .border-slate-200, body.theme-night .border-slate-100, body.theme-night .border-slate-300 {
+            border-color: #334155 !important; /* slate-700 */
+        }
+        body.theme-night .glass-morphism {
+            background: rgba(30, 41, 59, 0.98) !important;
+            border-color: rgba(51, 65, 85, 1) !important;
+        }
+        body.theme-night input:not([type="checkbox"]), body.theme-night select {
+            background-color: #0f172a !important;
+            color: #f1f5f9 !important;
+            border-color: #475569 !important;
+        }
+        body.theme-night .hover\:bg-slate-50:hover {
+            background-color: #334155 !important;
+        }
+        body.theme-night #emptyQueue, body.theme-night #emptyLog, body.theme-night #emptyIssues {
+            background-color: #0f172a !important;
+        }
+
+        /* READING MODE (SEPIA) */
+        body.theme-reading {
+            background-color: #fef3c7 !important; /* amber-50 */
+            color: #451a03 !important; /* amber-900 */
+        }
+        body.theme-reading .bg-white { background-color: #fffbeb !important; } /* amber-50 lighter */
+        body.theme-reading .bg-slate-50 { background-color: #fef3c7 !important; }
+        body.theme-reading .text-slate-800, body.theme-reading .text-slate-900, body.theme-reading .text-slate-700 {
+            color: #451a03 !important; /* amber-900 */
+        }
+        body.theme-reading .text-slate-500, body.theme-reading .text-slate-400, body.theme-reading .text-slate-600 {
+            color: #78350f !important; /* amber-800 */
+        }
+        body.theme-reading .border-slate-200, body.theme-reading .border-slate-100, body.theme-reading .border-slate-300 {
+            border-color: #fcd34d !important; /* amber-300 */
+        }
+        body.theme-reading .glass-morphism {
+            background: rgba(255, 251, 235, 0.98) !important;
+            border-color: rgba(253, 230, 138, 1) !important;
+        }
+        body.theme-reading input:not([type="checkbox"]), body.theme-reading select {
+            background-color: #fffbeb !important;
+            color: #451a03 !important;
+            border-color: #fcd34d !important;
+        }
+        body.theme-reading .hover\:bg-slate-50:hover {
+            background-color: #fde68a !important;
+        }
+        body.theme-reading #emptyQueue, body.theme-reading #emptyLog, body.theme-reading #emptyIssues {
+            background-color: #fef3c7 !important;
+        }
+
+        /* PRINT MEDIA OVERRIDE (Always White) */
+        @media print {
+            body {
+                background-color: white !important;
+                color: black !important;
+            }
+            .glass-morphism, * {
+                background: white !important;
+                border-color: #ccc !important;
+                color: black !important;
+                box-shadow: none !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen font-sans text-slate-900">
+<body class="bg-slate-50 min-h-screen font-sans text-slate-900 transition-colors duration-300 theme-day">
     
     <!-- TOP NOTIFICATION & CLOCK BAR -->
-    <div class="bg-slate-900 text-slate-200 border-b border-slate-700 shadow-sm relative z-50">
+    <div class="bg-slate-900 text-slate-200 border-b border-slate-700 shadow-sm relative z-50 no-print">
         <div class="max-w-6xl mx-auto px-4 md:px-6 py-2.5 flex items-center justify-between text-xs font-medium tracking-wide">
             <div class="flex items-center gap-2 text-cyan-400 font-bold shrink-0 bg-slate-800/80 border border-slate-700 px-3 py-1 rounded-lg shadow-inner">
                 <i class="far fa-clock"></i>
                 <span id="digitalClockText">--:--:--</span>
             </div>
             
-            <div class="overflow-hidden flex-1 ml-6 relative h-5 flex items-center mask-image-linear">
-                <div class="w-full absolute whitespace-nowrap">
-                    <span id="tickerText" class="animate-ticker text-slate-300">System loading...</span>
+            <div class="overflow-hidden flex-1 ml-6 relative h-8 flex items-center mask-image-linear">
+                <div class="w-full absolute whitespace-nowrap flex items-center">
+                    <span id="tickerText" class="animate-ticker text-slate-300 text-sm">System loading...</span>
                 </div>
             </div>
         </div>
@@ -92,18 +185,21 @@
     <div class="max-w-6xl mx-auto p-4 md:p-6">
         
         <header class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
-            <div class="text-center lg:text-left">
+            <div class="text-center lg:text-left shrink-0">
                 <h1 class="text-2xl font-black text-blue-900 tracking-tight uppercase">Label Maker Pro V4</h1>
                 <p class="text-slate-500 text-sm font-medium">Precision Area Mapping & Inventory System</p>
             </div>
-            <nav class="flex bg-white rounded-xl shadow-sm p-1 border border-slate-200 items-center overflow-x-auto max-w-full">
-                <button onclick="switchTab('search')" id="tab-search" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all tab-active whitespace-nowrap">SEARCH & LOG</button>
-                <button onclick="switchTab('print')" id="tab-print" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-400 whitespace-nowrap">PRINT QUEUE</button>
-                <button onclick="switchTab('history')" id="tab-history" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-400 whitespace-nowrap">FULL LOG</button>
-                <button onclick="switchTab('inventory')" id="tab-inventory" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-400 whitespace-nowrap">RETAIL CATALOG</button>
-                <button onclick="switchTab('issues')" id="tab-issues" class="px-4 md:px-6 py-2 rounded-lg font-bold text-sm transition-all text-slate-400 whitespace-nowrap">REPRINTS & ISSUES</button>
+            <nav class="flex w-full lg:w-auto flex-1 justify-between bg-white rounded-xl shadow-sm p-1 border border-slate-200 items-center overflow-x-auto no-scrollbar max-w-full no-print">
+                <button onclick="switchTab('search')" id="tab-search" class="px-2 md:px-3 lg:px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all tab-active whitespace-nowrap flex-1 text-center">SEARCH & LOG</button>
+                <button onclick="switchTab('print')" id="tab-print" class="px-2 md:px-3 lg:px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">PRINT QUEUE</button>
+                <button onclick="switchTab('history')" id="tab-history" class="px-2 md:px-3 lg:px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">FULL LOG</button>
+                <button onclick="switchTab('inventory')" id="tab-inventory" class="px-2 md:px-3 lg:px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">RETAIL CATALOG</button>
+                <button onclick="switchTab('issues')" id="tab-issues" class="px-2 md:px-3 lg:px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">REPRINTS & ISSUES</button>
                 
-                <div class="flex items-center pl-2 border-l border-slate-200 ml-1 shrink-0">
+                <div class="flex items-center pl-2 border-l border-slate-200 ml-1 shrink-0 gap-1">
+                    <a href="#" id="navLookupLink" target="_blank" class="p-2 rounded-lg text-blue-500 hover:text-blue-700 hover:bg-blue-50 transition-all shrink-0 flex items-center justify-center font-bold text-xs px-3" title="Order Lookup Tool">
+                        <i class="fas fa-external-link-alt mr-1"></i> Lookup
+                    </a>
                     <button onclick="openSettings()" class="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all shrink-0" title="Settings">
                         <i class="fas fa-sliders-h text-lg"></i>
                     </button>
@@ -219,7 +315,14 @@
                         <h3 class="font-black text-slate-800">Full Delivery & Sales Log</h3>
                         <p class="text-sm text-slate-500">Permanent record of all saved deliveries and inventory usage</p>
                     </div>
-                    <div class="flex gap-2 w-full md:w-auto">
+                    <!-- Live Search Bar for Full Log -->
+                    <div class="flex-1 md:mx-6 w-full mt-4 md:mt-0">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                            <input type="text" id="logSearchInput" oninput="updateUI()" placeholder="Search logs (Cabin, Item, Date)..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:border-blue-500 outline-none text-sm transition-all shadow-sm">
+                        </div>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto mt-4 md:mt-0">
                         <button id="clearLogBtn" class="flex-1 md:flex-none border border-red-200 text-red-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-50 transition-all">
                             Delete History
                         </button>
@@ -240,7 +343,7 @@
                         </thead>
                         <tbody id="logBody" class="bg-white"></tbody>
                     </table>
-                    <div id="emptyLog" class="p-20 text-center text-slate-300 italic font-medium bg-slate-50">No deliveries logged yet.</div>
+                    <div id="emptyLog" class="p-20 text-center text-slate-300 italic font-medium bg-slate-50">No deliveries found.</div>
                 </div>
             </div>
         </section>
@@ -249,7 +352,7 @@
             <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden p-6 md:p-8">
                 
                 <!-- Add New Item Form -->
-                <div class="mb-8 p-6 bg-blue-50 border border-blue-100 rounded-2xl">
+                <div class="mb-8 p-6 bg-blue-50 border border-blue-100 rounded-2xl transition-colors">
                     <h3 class="text-lg font-black text-blue-900 mb-4"><i class="fas fa-plus-circle mr-2"></i>Add Retail Item</h3>
                     <form id="addItemForm" class="flex flex-col md:flex-row gap-4 items-end">
                         <div class="flex-1 w-full">
@@ -293,7 +396,7 @@
             <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden p-6 md:p-8">
                 
                 <!-- Add New Issue Form -->
-                <div class="mb-8 p-6 bg-red-50 border border-red-100 rounded-2xl">
+                <div class="mb-8 p-6 bg-red-50 border border-red-100 rounded-2xl transition-colors">
                     <h3 class="text-lg font-black text-red-900 mb-4"><i class="fas fa-exclamation-triangle mr-2"></i>Log Reprint Issue</h3>
                     <form id="addIssueForm" class="flex flex-col md:flex-row gap-4 items-end flex-wrap">
                         <div class="flex-1 min-w-[150px]">
@@ -357,40 +460,94 @@
         </section>
 
         <!-- Copyright Footer -->
-        <footer class="mt-8 text-center text-slate-400 text-sm font-medium">
+        <footer class="mt-8 text-center text-slate-400 text-sm font-medium no-print">
             &copy; 2026 Created by Roswell Relova
         </footer>
 
     </div>
 
     <!-- SETTINGS MODAL -->
-    <div id="settingsModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity">
-        <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md transform transition-all">
+    <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md transform transition-all max-h-[90vh] overflow-y-auto theme-border">
             <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
-                <i class="fas fa-cog text-slate-400"></i>
-                Print Settings
+                <i class="fas fa-cog text-blue-500"></i>
+                System Settings
             </h2>
             
-            <div class="space-y-4">
-                <label class="flex items-start gap-4 p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors">
-                    <div class="mt-1">
-                        <input type="checkbox" id="settingShowArea" onchange="toggleShowArea(this)" class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+            <div class="space-y-6">
+                <!-- Visual / Theme Settings -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">Visual & Appearance</h4>
+                    
+                    <div class="space-y-4">
+                        <div class="flex flex-col gap-2">
+                            <label class="font-bold text-slate-800 text-sm">Application Theme</label>
+                            <select id="settingTheme" onchange="toggleTheme(this)" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none text-sm cursor-pointer transition-colors bg-white">
+                                <option value="day">Day Mode (Standard)</option>
+                                <option value="night">Night Mode (Dark)</option>
+                                <option value="reading">Reading Mode (Sepia)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex flex-col gap-2">
+                            <label class="font-bold text-slate-800 text-sm">Notification Bar Text Size</label>
+                            <select id="settingNotifSize" onchange="toggleNotifSize(this)" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none text-sm cursor-pointer transition-colors bg-white">
+                                <option value="small">Small</option>
+                                <option value="normal">Normal</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <span class="block font-bold text-slate-800">Show "Area" on Labels</span>
-                        <span class="block text-sm text-slate-500 mt-1">If the cabin matches a known Area, print the Area number on the right side of the label.</span>
-                    </div>
-                </label>
+                </div>
 
-                <div class="p-4 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors">
-                    <label class="block font-bold text-slate-800 mb-2">Special Note (Optional)</label>
-                    <input type="text" id="settingGlobalNote" oninput="toggleGlobalNote(this)" placeholder="e.g. Have a great cruise!" maxlength="40" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none transition-all text-sm">
-                    <span class="block text-sm text-slate-500 mt-2">Automatically print this message at the bottom center of every label.</span>
+                <!-- Print Settings -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">Print Options</h4>
+                    <label class="flex items-start gap-4 p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors">
+                        <div class="mt-1">
+                            <input type="checkbox" id="settingShowArea" onchange="toggleShowArea(this)" class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                        </div>
+                        <div>
+                            <span class="block font-bold text-slate-800 text-sm">Show "Area" on Labels</span>
+                            <span class="block text-xs text-slate-500 mt-1">If the cabin matches a known Area, print the Area number on the right side of the label.</span>
+                        </div>
+                    </label>
+
+                    <div class="mt-4 p-4 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors">
+                        <label class="block font-bold text-slate-800 mb-2 text-sm">Special Note (Optional)</label>
+                        <input type="text" id="settingGlobalNote" oninput="toggleGlobalNote(this)" placeholder="e.g. Have a great cruise!" maxlength="40" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none transition-all text-sm">
+                        <span class="block text-xs text-slate-500 mt-2">Automatically print this message at the bottom center of every label.</span>
+                    </div>
+                </div>
+
+                <!-- System Links -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">System Links</h4>
+                    <div class="flex flex-col gap-2">
+                        <label class="font-bold text-slate-800 text-sm">Order Lookup URL</label>
+                        <input type="text" id="settingLookupUrl" oninput="toggleLookupUrl(this)" placeholder="e.g. http://10.76.50.193/..." class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none text-sm transition-all bg-white">
+                        <span class="block text-[10px] text-slate-500 mt-1">Leave blank to hide the Lookup button.</span>
+                    </div>
+                </div>
+
+                <!-- Data Management -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">Data Management</h4>
+                    <div class="flex gap-2">
+                        <button onclick="exportBackup()" class="flex-1 bg-slate-800 text-white py-2 rounded-xl text-sm font-bold hover:bg-black transition-all shadow flex items-center justify-center gap-2">
+                            <i class="fas fa-download"></i> Backup JSON
+                        </button>
+                        <button onclick="triggerRestore()" class="flex-1 border border-slate-300 text-slate-700 py-2 rounded-xl text-sm font-bold hover:bg-slate-100 transition-all shadow-sm flex items-center justify-center gap-2 bg-white">
+                            <i class="fas fa-upload"></i> Restore JSON
+                        </button>
+                        <input type="file" id="backupUpload" class="hidden" accept=".json" onchange="restoreBackup(event)">
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-2 text-center">Save or load your entire database securely.</p>
                 </div>
             </div>
 
             <div class="mt-8 flex justify-end items-center border-t border-slate-100 pt-6">
-                <button onclick="closeSettings()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all active:scale-95">
+                <button onclick="closeSettings()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all active:scale-95 w-full">
                     Done
                 </button>
             </div>
@@ -399,7 +556,7 @@
 
     <!-- CUSTOM REUSABLE MODAL (Replaces alert/confirm) -->
     <div id="customModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4 transition-opacity">
-        <div id="customModalContent" class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-sm transform transition-all scale-100 text-center">
+        <div id="customModalContent" class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-sm transform transition-all scale-100 text-center theme-border">
             <div id="customModalIcon" class="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mx-auto mb-4">
                 <i class="fas fa-info-circle"></i>
             </div>
@@ -414,7 +571,7 @@
 
     <!-- EDIT LOG MODAL -->
     <div id="editLogModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity overflow-y-auto">
-        <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-lg transform transition-all my-auto">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-lg transform transition-all my-auto theme-border">
             <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
                 <i class="fas fa-edit text-blue-500"></i> Edit Delivery Log
             </h2>
@@ -634,9 +791,14 @@
         printQueue = migrateData(printQueue);
         
         let stickerOffset = parseInt(localStorage.getItem('stickerSheetOffset') || '0');
+        
+        // App Settings & Theming Initialization
         let appSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
         if (typeof appSettings.showArea === 'undefined') appSettings.showArea = true;
         if (typeof appSettings.globalNote === 'undefined') appSettings.globalNote = "";
+        if (typeof appSettings.theme === 'undefined') appSettings.theme = "day";
+        if (typeof appSettings.notificationSize === 'undefined') appSettings.notificationSize = "normal";
+        if (typeof appSettings.lookupUrl === 'undefined') appSettings.lookupUrl = "http://10.76.50.193/photoweb/Forms/OrderLookup.aspx";
         
         let currentSelection = null;
         let pendingConfirmAction = null;
@@ -649,6 +811,37 @@
             localStorage.setItem('stickerSheetOffset', stickerOffset.toString());
             localStorage.setItem('appSettings', JSON.stringify(appSettings));
             localStorage.setItem('reprintIssuesLog', JSON.stringify(issuesLog));
+        }
+
+        function applySettings() {
+            // Apply Theme
+            document.body.className = `min-h-screen font-sans text-slate-900 transition-colors duration-300 theme-${appSettings.theme}`;
+            
+            // Apply Size
+            const tickerEl = document.getElementById('tickerText');
+            const sizeMap = { 'small': 'text-xs', 'normal': 'text-sm', 'large': 'text-base font-bold' };
+            tickerEl.className = `animate-ticker text-slate-300 transition-all duration-300 ${sizeMap[appSettings.notificationSize]}`;
+            
+            // Sync UI Elements
+            document.getElementById('settingShowArea').checked = appSettings.showArea;
+            document.getElementById('settingGlobalNote').value = appSettings.globalNote;
+            document.getElementById('settingTheme').value = appSettings.theme;
+            document.getElementById('settingNotifSize').value = appSettings.notificationSize;
+            document.getElementById('settingLookupUrl').value = appSettings.lookupUrl;
+
+            // Apply Lookup Link
+            const lookupBtn = document.getElementById('navLookupLink');
+            if (appSettings.lookupUrl && appSettings.lookupUrl.trim() !== '') {
+                lookupBtn.classList.remove('hidden');
+                let finalUrl = appSettings.lookupUrl.trim();
+                // Ensure the URL is treated as an absolute path by prefixing with http:// if missing
+                if (!/^https?:\/\//i.test(finalUrl)) {
+                    finalUrl = 'http://' + finalUrl;
+                }
+                lookupBtn.href = finalUrl;
+            } else {
+                lookupBtn.classList.add('hidden');
+            }
         }
 
         function showCustomAlert(title, message) {
@@ -694,8 +887,6 @@
         };
 
         window.openSettings = function() {
-            document.getElementById('settingShowArea').checked = appSettings.showArea;
-            document.getElementById('settingGlobalNote').value = appSettings.globalNote;
             document.getElementById('settingsModal').classList.remove('hidden');
         };
 
@@ -711,6 +902,72 @@
         window.toggleGlobalNote = function(el) {
             appSettings.globalNote = el.value;
             saveState();
+        };
+
+        window.toggleTheme = function(el) {
+            appSettings.theme = el.value;
+            saveState();
+            applySettings();
+        };
+
+        window.toggleNotifSize = function(el) {
+            appSettings.notificationSize = el.value;
+            saveState();
+            applySettings();
+        };
+
+        window.toggleLookupUrl = function(el) {
+            appSettings.lookupUrl = el.value;
+            saveState();
+            applySettings();
+        };
+
+        // --- BACKUP & RESTORE LOGIC ---
+        window.exportBackup = function() {
+            const backupObj = {
+                labRetailInventory: inventoryItems,
+                fullDeliveryHistory: deliveryHistory,
+                currentPrintQueue: printQueue,
+                reprintIssuesLog: issuesLog,
+                stickerSheetOffset: stickerOffset,
+                appSettings: appSettings
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `LabelMakerPro_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            dlAnchorElem.click();
+        };
+
+        window.triggerRestore = function() {
+            document.getElementById('backupUpload').click();
+        };
+
+        window.restoreBackup = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    if (backup.labRetailInventory) inventoryItems = backup.labRetailInventory;
+                    if (backup.fullDeliveryHistory) deliveryHistory = backup.fullDeliveryHistory;
+                    if (backup.currentPrintQueue) printQueue = backup.currentPrintQueue;
+                    if (backup.reprintIssuesLog) issuesLog = backup.reprintIssuesLog;
+                    if (typeof backup.stickerSheetOffset !== 'undefined') stickerOffset = backup.stickerSheetOffset;
+                    if (backup.appSettings) appSettings = backup.appSettings;
+                    
+                    saveState();
+                    applySettings();
+                    updateUI();
+                    showCustomAlert("Restore Successful", "Your system data has been completely restored from the backup file.");
+                } catch (err) {
+                    showCustomAlert("Restore Failed", "The selected file is invalid or corrupted. Please make sure it's a valid Label Maker JSON backup.");
+                }
+                // Clear input so same file can be uploaded again if needed
+                event.target.value = ''; 
+            };
+            reader.readAsText(file);
         };
 
         window.switchTab = function(tabName) {
@@ -1039,12 +1296,27 @@
 
             renderStickerSheet();
 
-            // Update Full Log
+            // Update Full Log with Search Logic
             const lBody = document.getElementById('logBody');
             lBody.innerHTML = '';
-            document.getElementById('emptyLog').classList.toggle('hidden', deliveryHistory.length > 0);
             
-            [...deliveryHistory].reverse().forEach(item => {
+            const logSearchInput = document.getElementById('logSearchInput');
+            const logSearchTerm = logSearchInput ? logSearchInput.value.toLowerCase().trim() : "";
+            
+            let filteredHistory = [...deliveryHistory].reverse();
+            
+            if (logSearchTerm) {
+                filteredHistory = filteredHistory.filter(item => {
+                    const timeStr = new Date(item.timestamp).toLocaleString().toLowerCase();
+                    const cabinStr = String(item.cabin);
+                    const itemsStr = item.items ? item.items.map(i => i.name).join(' ').toLowerCase() : "standard label";
+                    return cabinStr.includes(logSearchTerm) || timeStr.includes(logSearchTerm) || itemsStr.includes(logSearchTerm);
+                });
+            }
+
+            document.getElementById('emptyLog').classList.toggle('hidden', filteredHistory.length > 0);
+            
+            filteredHistory.forEach(item => {
                 const row = document.createElement('tr');
                 row.className = "border-b border-slate-50 hover:bg-slate-50";
                 
@@ -1541,6 +1813,7 @@
         }
 
         // Init App
+        applySettings();
         addRetailRow();
         updateUI();
     </script>
