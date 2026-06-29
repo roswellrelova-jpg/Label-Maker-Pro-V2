@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <style>
@@ -431,7 +432,10 @@
                             Clear Issues
                         </button>
                         <button id="downloadIssuesExcel" class="flex-1 md:flex-none bg-slate-800 text-white px-6 py-2 rounded-lg font-black text-sm hover:bg-black transition-all">
-                            EXPORT ISSUES
+                            EXPORT EXCEL
+                        </button>
+                        <button id="downloadIssuesPDF" class="flex-1 md:flex-none bg-blue-600 text-white px-6 py-2 rounded-lg font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">
+                            EXPORT PDF
                         </button>
                     </div>
                 </div>
@@ -598,6 +602,39 @@
             <div class="mt-8 flex gap-3">
                 <button onclick="closeEditModal()" class="flex-1 px-6 py-4 rounded-xl font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Cancel</button>
                 <button onclick="saveEditLog()" class="flex-1 px-6 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 active:scale-95">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT ISSUE MODAL -->
+    <div id="editIssueModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity overflow-y-auto">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-lg transform transition-all my-auto theme-border">
+            <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
+                <i class="fas fa-edit text-blue-500"></i> Edit Logged Issue
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Order Number</label>
+                    <input type="text" id="editIssueOrder" class="w-full text-lg font-bold p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Cabin Number</label>
+                    <input type="number" id="editIssueCabin" class="w-full text-lg font-bold p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Issue Description</label>
+                    <input type="text" id="editIssueDesc" class="w-full text-lg font-bold p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Staff Name</label>
+                    <input type="text" id="editIssueStaff" class="w-full text-lg font-bold p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none transition-all">
+                </div>
+            </div>
+
+            <div class="mt-8 flex gap-3">
+                <button onclick="closeEditIssueModal()" class="flex-1 px-6 py-4 rounded-xl font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Cancel</button>
+                <button onclick="saveEditIssue()" class="flex-1 px-6 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 active:scale-95">Save Changes</button>
             </div>
         </div>
     </div>
@@ -803,6 +840,7 @@
         let currentSelection = null;
         let pendingConfirmAction = null;
         let editingLogId = null;
+        let editingIssueId = null; // Track currently edited issue
 
         function saveState() {
             localStorage.setItem('labRetailInventory', JSON.stringify(inventoryItems));
@@ -834,7 +872,6 @@
             if (appSettings.lookupUrl && appSettings.lookupUrl.trim() !== '') {
                 lookupBtn.classList.remove('hidden');
                 let finalUrl = appSettings.lookupUrl.trim();
-                // Ensure the URL is treated as an absolute path by prefixing with http:// if missing
                 if (!/^https?:\/\//i.test(finalUrl)) {
                     finalUrl = 'http://' + finalUrl;
                 }
@@ -964,7 +1001,6 @@
                 } catch (err) {
                     showCustomAlert("Restore Failed", "The selected file is invalid or corrupted. Please make sure it's a valid Label Maker JSON backup.");
                 }
-                // Clear input so same file can be uploaded again if needed
                 event.target.value = ''; 
             };
             reader.readAsText(file);
@@ -999,7 +1035,6 @@
                 <button type="button" class="remove-item-btn bg-red-50 text-red-500 px-4 rounded-xl hover:bg-red-100 transition-colors" onclick="removeRetailRow(this)"><i class="fas fa-times"></i></button>
             `;
             
-            // Populate select
             const select = row.querySelector('.retailSelect');
             inventoryItems.forEach(item => {
                 const opt = document.createElement('option');
@@ -1019,7 +1054,7 @@
 
         window.toggleRowQty = function(selectEl) {
             const row = selectEl.closest('.retail-item-row');
-            if(!row) return; // In case of edit modal row
+            if(!row) return; 
             const qtyInput = row.querySelector('.retailQty');
             if (qtyInput) {
                 if (selectEl.value !== "") {
@@ -1107,7 +1142,7 @@
                     addEditRetailRow(item.id, item.qty);
                 });
             } else {
-                addEditRetailRow(); // Blank row
+                addEditRetailRow(); 
             }
             
             document.getElementById('editLogModal').classList.remove('hidden');
@@ -1148,11 +1183,9 @@
                 }
             });
 
-            // Update History Entry
             entry.cabin = newCabin;
             entry.items = itemsToLog;
 
-            // Update Print Queue Entry if it exists there
             const queueEntry = printQueue.find(e => String(e.id) === String(editingLogId));
             if (queueEntry) {
                 queueEntry.cabin = newCabin;
@@ -1179,6 +1212,49 @@
                 '<i class="fas fa-trash-alt"></i>',
                 'bg-red-100 text-red-600'
             );
+        };
+
+        window.toggleIssueStatus = function(id) {
+            const issue = issuesLog.find(i => String(i.id) === String(id));
+            if (issue) {
+                issue.finished = !issue.finished;
+                saveState();
+                updateUI();
+            }
+        };
+
+        window.openEditIssueModal = function(id) {
+            const issue = issuesLog.find(i => String(i.id) === String(id));
+            if (!issue) return;
+            
+            editingIssueId = id;
+            document.getElementById('editIssueOrder').value = issue.order;
+            document.getElementById('editIssueCabin').value = issue.cabin;
+            document.getElementById('editIssueDesc').value = issue.desc;
+            document.getElementById('editIssueStaff').value = issue.staff;
+            
+            document.getElementById('editIssueModal').classList.remove('hidden');
+        };
+
+        window.closeEditIssueModal = function() {
+            document.getElementById('editIssueModal').classList.add('hidden');
+            editingIssueId = null;
+        };
+
+        window.saveEditIssue = function() {
+            if (!editingIssueId) return;
+            
+            const issue = issuesLog.find(i => String(i.id) === String(editingIssueId));
+            if (!issue) return;
+
+            issue.order = document.getElementById('editIssueOrder').value;
+            issue.cabin = document.getElementById('editIssueCabin').value;
+            issue.desc = document.getElementById('editIssueDesc').value;
+            issue.staff = document.getElementById('editIssueStaff').value;
+
+            saveState();
+            updateUI();
+            closeEditIssueModal();
         };
 
         function updateRemoveButtons() {
@@ -1237,7 +1313,6 @@
         }
 
         function updateUI() {
-            // Update the multi-row dropdowns
             document.querySelectorAll('.retailSelect, .editRetailSelect').forEach(selectEl => {
                 const currentVal = selectEl.value;
                 selectEl.innerHTML = '<option value="">-- Standard Delivery (No Retail Item) --</option>';
@@ -1250,7 +1325,6 @@
                 selectEl.value = currentVal;
             });
 
-            // Update Inventory Table
             const invBody = document.getElementById('inventoryTableBody');
             invBody.innerHTML = '';
             inventoryItems.forEach(item => {
@@ -1270,7 +1344,6 @@
                 invBody.appendChild(row);
             });
 
-            // Update Queue Table
             const qBody = document.getElementById('queueBody');
             qBody.innerHTML = '';
             document.getElementById('queueCount').innerText = printQueue.length;
@@ -1296,7 +1369,6 @@
 
             renderStickerSheet();
 
-            // Update Full Log with Search Logic
             const lBody = document.getElementById('logBody');
             lBody.innerHTML = '';
             
@@ -1340,6 +1412,7 @@
                 lBody.appendChild(row);
             });
 
+            // Updating Issues Table with Cross Out functionality
             const issBody = document.getElementById('issuesTableBody');
             if (issBody) {
                 issBody.innerHTML = '';
@@ -1347,14 +1420,25 @@
                 
                 [...issuesLog].reverse().forEach(issue => {
                     const row = document.createElement('tr');
-                    row.className = "border-b border-slate-50 hover:bg-slate-50 transition-colors";
+                    const isFinished = issue.finished;
+                    const rowClass = isFinished ? "bg-slate-50/50" : "hover:bg-slate-50 transition-colors";
+                    const textClass = isFinished ? "line-through text-slate-400 opacity-60" : "text-slate-700";
+                    const descClass = isFinished ? "line-through text-slate-400 opacity-60" : "text-slate-600 underline cursor-pointer hover:text-blue-600";
+                    
+                    row.className = `border-b border-slate-50 ${rowClass}`;
                     row.innerHTML = `
                         <td class="px-4 py-4 text-xs text-slate-500 whitespace-nowrap">${new Date(issue.timestamp).toLocaleString()}</td>
-                        <td class="px-4 py-4 font-bold text-slate-700">${issue.order}</td>
-                        <td class="px-4 py-4 font-bold text-slate-700">${issue.cabin}</td>
-                        <td class="px-4 py-4 text-slate-600 font-medium">${issue.desc}</td>
-                        <td class="px-4 py-4 text-slate-600 font-medium">${issue.staff}</td>
-                        <td class="px-4 py-4 text-right">
+                        <td class="px-4 py-4 font-bold ${textClass}">${issue.order}</td>
+                        <td class="px-4 py-4 font-bold ${textClass}">${issue.cabin}</td>
+                        <td class="px-4 py-4 font-medium ${descClass}" onclick="openEditIssueModal('${issue.id}')" title="Click to edit description">${issue.desc}</td>
+                        <td class="px-4 py-4 font-medium ${textClass}">${issue.staff}</td>
+                        <td class="px-4 py-4 text-right whitespace-nowrap">
+                            <button onclick="toggleIssueStatus('${issue.id}')" class="${isFinished ? 'text-green-500' : 'text-slate-400 hover:text-green-500'} p-2 rounded transition-colors" title="${isFinished ? 'Mark Unfinished' : 'Mark Finished'}">
+                                <i class="fas ${isFinished ? 'fa-check-circle' : 'fa-check'}"></i>
+                            </button>
+                            <button onclick="openEditIssueModal('${issue.id}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors mx-1" title="Edit Entry">
+                                <i class="fas fa-edit"></i>
+                            </button>
                             <button onclick="deleteIssue('${issue.id}')" class="text-slate-400 hover:text-red-500 p-2 rounded transition-colors" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -1375,10 +1459,7 @@
             const errEl = document.getElementById('notFoundArea');
             
             if (num > 0) {
-                // Infer deck from cabin number
                 const deckNum = Math.floor(num / 1000);
-                
-                // Lookup Area if available in database
                 const found = cabinDatabase.find(c => c.cabin === num);
                 const areaNum = found ? found.area : null;
 
@@ -1429,7 +1510,6 @@
             saveState();
             updateUI();
             
-            // Visual success feedback
             const searchBtn = document.getElementById('searchBtn');
             const originalText = searchBtn.innerText;
             searchBtn.innerHTML = '<i class="fas fa-check"></i> LOGGED';
@@ -1442,7 +1522,6 @@
                 searchBtn.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
             }, 800);
 
-            // Cleanup
             document.getElementById('cabinSearch').value = '';
             document.getElementById('retail-items-container').innerHTML = '';
             addRetailRow();
@@ -1455,7 +1534,6 @@
             updateUI();
         }
 
-        // Inventory Management Logic
         document.getElementById('addItemForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const name = document.getElementById('newItemName').value;
@@ -1501,7 +1579,8 @@
                 order: order,
                 cabin: cabin,
                 desc: desc,
-                staff: staff
+                staff: staff,
+                finished: false
             });
 
             saveState();
@@ -1554,12 +1633,53 @@
                 'Order #': i.order,
                 'Cabin #': i.cabin,
                 'Issue Description': i.desc,
-                'Staff Name': i.staff
+                'Staff Name': i.staff,
+                'Status': i.finished ? 'Resolved' : 'Pending'
             }));
 
             const ws = XLSX.utils.json_to_sheet(exportData);
             XLSX.utils.book_append_sheet(wb, ws, "Reprints & Issues");
             XLSX.writeFile(wb, `Reprint_Issues_Log_${new Date().toISOString().split('T')[0]}.xlsx`);
+        });
+
+        // PDF Export Logic for Issues
+        document.getElementById('downloadIssuesPDF').addEventListener('click', () => {
+            if (issuesLog.length === 0) {
+                showCustomAlert('Empty Data', 'There is no issue data to export.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+            
+            doc.setFontSize(18);
+            doc.text("Reprint Issues Log", 14, 22);
+            doc.setFontSize(11);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+
+            const tableData = issuesLog.map(i => [
+                new Date(i.timestamp).toLocaleString(),
+                i.order,
+                i.cabin,
+                i.desc,
+                i.staff,
+                i.finished ? 'Resolved' : 'Pending'
+            ]);
+
+            doc.autoTable({
+                startY: 36,
+                head: [['Date/Time', 'Order #', 'Cabin #', 'Issue Description', 'Staff Name', 'Status']],
+                body: tableData,
+                theme: 'striped',
+                headStyles: { fillColor: [54, 117, 196] },
+                didParseCell: function(data) {
+                    if (data.section === 'body' && tableData[data.row.index][5] === 'Resolved') {
+                        data.cell.styles.textColor = [150, 150, 150];
+                    }
+                }
+            });
+
+            doc.save(`Reprint_Issues_Log_${new Date().toISOString().split('T')[0]}.pdf`);
         });
 
         document.getElementById('searchBtn').addEventListener('click', handleSearch);
@@ -1607,7 +1727,6 @@
             
             const wb = XLSX.utils.book_new();
             
-            // 1. Transaction Log Sheet (Flattened)
             const logData = [];
             
             deliveryHistory.forEach(h => {
@@ -1636,38 +1755,31 @@
                 }
             });
 
-            // Initialize the main sheet
             const wsLog = logData.length > 0 ? XLSX.utils.json_to_sheet(logData) : XLSX.utils.aoa_to_sheet([['Date/Time', 'Cabin', 'Area', 'Item', 'Usage (Qty)']]);
             
-            // 2. Inventory Usage Summary (Tally) Logic
             const usageTally = {};
             
-            // Pre-populate with all current inventory items
             inventoryItems.forEach(item => {
                 usageTally[item.id] = { name: item.name, category: item.category, used: 0 };
             });
             
-            // Calculate usage quantities from delivery history
             deliveryHistory.forEach(h => {
                 if (h.items && h.items.length > 0) {
                     h.items.forEach(i => {
                         if (usageTally[i.id]) {
                             usageTally[i.id].used += i.qty;
                         } else {
-                            // Handle items that were logged but later deleted from the catalog
                             usageTally[i.id] = { name: i.name + " (Deleted)", category: "Unknown", used: i.qty };
                         }
                     });
                 }
             });
 
-            // Sort items alphabetically to match the desired tally look
             const sortedItems = Object.values(usageTally).sort((a, b) => a.name.localeCompare(b.name));
             
-            // --- APPEND TALLY TO THE BOTTOM OF THE LOG SHEET ---
             const tallyAOA = [
-                [], // Blank Row spacer
-                [], // Blank Row spacer
+                [], 
+                [], 
                 ['INVENTORY USAGE SUMMARY (TALLY)', ''],
                 ['Item Description', 'Total Quantity Used']
             ];
@@ -1676,11 +1788,9 @@
                 tallyAOA.push([item.name, item.used]);
             });
             
-            // origin: -1 tells the library to append to the bottom of the existing sheet
             XLSX.utils.sheet_add_aoa(wsLog, tallyAOA, { origin: -1 });
             XLSX.utils.book_append_sheet(wb, wsLog, "Transaction Log");
             
-            // --- ALSO CREATE THE DEDICATED INVENTORY SHEET ---
             const tallyData = sortedItems.map(item => ({
                 'Item Description': item.name,
                 'Category': item.category,
@@ -1735,7 +1845,7 @@
                 doc.text(item.cabin.toString(), x + 2, y + 1.15, { align: "center" });
 
                 if (appSettings.showArea && item.area) {
-                    doc.setTextColor(54, 117, 196); // Blue
+                    doc.setTextColor(54, 117, 196); 
                     doc.setFont("helvetica", "bold");
                     doc.setFontSize(24);
                     doc.text(`AREA ${item.area}`, x + 3.85, y + 1.8, { align: "right" });
@@ -1744,21 +1854,19 @@
                 if (item.items && item.items.length > 0) {
                     const displayName = item.items.map(i => `${i.qty}x ${i.name}`).join('\n');
                     
-                    doc.setTextColor(220, 38, 38); // Red
+                    doc.setTextColor(220, 38, 38); 
                     doc.setFont("helvetica", "bold");
                     
                     let fontSize = 10;
                     doc.setFontSize(fontSize);
-                    let noteLines = doc.splitTextToSize(displayName.toUpperCase(), 2.0); // Restrict to left half of sticker
+                    let noteLines = doc.splitTextToSize(displayName.toUpperCase(), 2.0); 
                     
-                    // Smart auto-fit: Reduce font size automatically if the list is too long to fit vertically
                     while (noteLines.length * (fontSize * 0.016) > 0.50 && fontSize > 6) {
                         fontSize -= 0.5;
                         doc.setFontSize(fontSize);
                         noteLines = doc.splitTextToSize(displayName.toUpperCase(), 2.0);
                     }
                     
-                    // Draw downwards from below the cabin number to prevent overlapping upwards
                     doc.text(noteLines, x + 0.15, y + 1.35, { align: "left" });
                 }
 
