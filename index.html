@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <style>
@@ -159,6 +160,50 @@
             .glass-morphism, * { background: white !important; border-color: #ccc !important; color: black !important; box-shadow: none !important; }
             .no-print { display: none !important; }
         }
+
+        /* ADVANCED THEME TRANSITIONS */
+        #theme-transition-overlay { 
+            will-change: clip-path, background-color; 
+        }
+        @keyframes scanline-anim {
+            0% { transform: translateY(-100vh); }
+            100% { transform: translateY(100vh); }
+        }
+        .animate-scanline-fast {
+            background: linear-gradient(to bottom, transparent, rgba(255, 0, 0, 0.2) 10%, rgba(255, 0, 0, 0.8) 50%, rgba(255, 0, 0, 0.2) 90%, transparent);
+            height: 40vh;
+            width: 100%;
+            animation: scanline-anim 1.2s linear infinite;
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        .glitch-text { 
+            animation: glitch-anim 0.2s infinite linear alternate-reverse; 
+        }
+        @keyframes glitch-anim {
+            0% { transform: translate(0) skew(0deg); text-shadow: 3px 0 red, -3px 0 cyan; }
+            25% { transform: translate(-3px, 2px) skew(-5deg); text-shadow: -3px 0 red, 3px 0 cyan; }
+            50% { transform: translate(3px, -2px) skew(5deg); text-shadow: 3px 0 red, -3px 0 cyan; }
+            75% { transform: translate(-2px, -3px) skew(-5deg); text-shadow: -3px 0 red, 3px 0 cyan; }
+            100% { transform: translate(0) skew(0deg); text-shadow: 3px 0 red, -3px 0 cyan; }
+        }
+
+        /* --- THEME SPECIFIC INTERACTION EFFECTS --- */
+        @keyframes shake-rog {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            10%, 30%, 50%, 70%, 90% { transform: translate(-2px, -2px) rotate(-1deg); box-shadow: inset 0 0 50px rgba(255,0,0,0.5); border-color: red;}
+            20%, 40%, 60%, 80% { transform: translate(2px, 2px) rotate(1deg); box-shadow: inset 0 0 50px rgba(255,0,0,0.8); border-color: darkred;}
+        }
+        .effect-log-rog { animation: shake-rog 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        
+        @keyframes flash-legion {
+            0% { box-shadow: inset 0 0 0px rgba(0, 229, 255, 0); background-color: rgba(0, 229, 255, 0); }
+            20% { box-shadow: inset 0 0 100px rgba(0, 229, 255, 0.8); background-color: rgba(0, 229, 255, 0.2); }
+            100% { box-shadow: inset 0 0 0px rgba(0, 229, 255, 0); background-color: transparent; }
+        }
+        .effect-log-legion { animation: flash-legion 0.6s ease-out both; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen font-sans text-slate-900 transition-colors duration-300 theme-day">
@@ -639,7 +684,83 @@
         </div>
     </div>
 
+    <!-- ADVANCED THEME TRANSITION OVERLAY -->
+    <div id="theme-transition-overlay" class="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center hidden overflow-hidden">
+        <div id="theme-transition-scanline" class="hidden"></div>
+        <div id="theme-transition-text" class="text-4xl md:text-6xl font-black tracking-[0.2em] md:tracking-[0.5em] text-center px-4 relative z-10 flex flex-col items-center gap-6"></div>
+    </div>
+
     <script>
+        // --- AUDIO ENGINE (TONE.JS) ---
+        let audioInit = false;
+        const synths = {};
+
+        async function initAudio() {
+            if (audioInit) return;
+            await Tone.start();
+            Tone.Destination.volume.value = -8; // Slightly reduced master volume
+
+            // Standard Clicks & Success
+            synths.click = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.01 } }).toDestination();
+            synths.success = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "triangle" }, envelope: { attack: 0.05, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();
+
+            // ROG Synths (Aggressive, Distorted, Bass-heavy)
+            const rogDist = new Tone.Distortion(0.8).toDestination();
+            synths.rogClick = new Tone.MembraneSynth({ pitchDecay: 0.2, octaves: 4, oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 0.1 } }).connect(rogDist);
+            synths.rogBoot = new Tone.FMSynth({ harmonicity: 0.5, modulationIndex: 10, oscillator: { type: "sawtooth" }, envelope: { attack: 0.1, decay: 0.5, sustain: 0.2, release: 2 } }).connect(rogDist);
+            synths.rogSuccess = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 6, oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.4, sustain: 0, release: 1 } }).connect(rogDist);
+
+            // Legion Synths (Icy, High-pitched, Reverb, Crystalline)
+            const legionVerb = new Tone.Reverb(2.5).toDestination();
+            synths.legionClick = new Tone.MetalSynth({ frequency: 1500, envelope: { attack: 0.001, decay: 0.05, release: 0.01 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }).connect(legionVerb);
+            synths.legionBoot = new Tone.FMSynth({ harmonicity: 2.5, modulationIndex: 5, oscillator: { type: "sine" }, envelope: { attack: 0.05, decay: 0.2, sustain: 0.2, release: 3 } }).connect(legionVerb);
+            synths.legionSuccess = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 3, modulationIndex: 2, oscillator: { type: "sine" }, envelope: { attack: 0.01, decay: 0.3, sustain: 0.1, release: 2 } }).connect(legionVerb);
+
+            audioInit = true;
+        }
+
+        // Initialize audio context on first interaction with the page
+        document.addEventListener('pointerdown', initAudio, { once: true });
+        document.addEventListener('keydown', initAudio, { once: true });
+
+        function playClick() {
+            if (!audioInit) return;
+            if (appSettings.theme === 'rog') synths.rogClick.triggerAttackRelease("C1", "16n");
+            else if (appSettings.theme === 'legion') synths.legionClick.triggerAttackRelease("32n");
+            else synths.click.triggerAttackRelease("C4", "32n");
+        }
+
+        function playSuccess() {
+            if (!audioInit) return;
+            if (appSettings.theme === 'rog') {
+                synths.rogSuccess.triggerAttackRelease("C1", "8n");
+                setTimeout(() => synths.rogSuccess.triggerAttackRelease("C0", "4n"), 150);
+            } else if (appSettings.theme === 'legion') {
+                synths.legionSuccess.triggerAttackRelease(["E5", "B5", "E6"], "8n");
+            } else {
+                synths.success.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            }
+        }
+
+        function playBootSequence(theme) {
+            if (!audioInit) return;
+            if (theme === 'rog') {
+                synths.rogBoot.triggerAttackRelease("C1", "1m");
+            } else if (theme === 'legion') {
+                synths.legionBoot.triggerAttackRelease("C6", "8n");
+                setTimeout(() => synths.legionBoot.triggerAttackRelease("E6", "8n"), 150);
+                setTimeout(() => synths.legionBoot.triggerAttackRelease("G6", "1m"), 300);
+            }
+        }
+
+        // Bind global click sound to interactive elements
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('button, a, input, select, .sticker-cell, .tab-content th, .tab-content td')) {
+                playClick();
+            }
+        });
+
+        // Default Inventory Array (POS Database)
         const defaultInventory = [
             { id: 1, name: 'Aqua Seascape', category: 'Photo Spot', stock: 0 },
             { id: 2, name: 'TILEPIX', category: 'Frames', stock: 0 },
@@ -768,7 +889,77 @@
         window.toggleShowArea = (el) => { appSettings.showArea = el.checked; saveState(); };
         window.toggleGlobalNote = (el) => { appSettings.globalNote = el.value; saveState(); };
         window.toggleLabelHeader = (el) => { appSettings.labelHeader = el.value; saveState(); };
-        window.toggleTheme = (el) => { appSettings.theme = el.value; saveState(); applySettings(); };
+        
+        window.toggleTheme = function(el) {
+            const newTheme = el.value;
+            if (appSettings.theme === newTheme) return; // Ignore if clicking current theme
+            
+            const overlay = document.getElementById('theme-transition-overlay');
+            const text = document.getElementById('theme-transition-text');
+            const scanline = document.getElementById('theme-transition-scanline');
+            
+            // Sync all theme dropdowns globally so they match instantly
+            document.getElementById('quickThemeSelector').value = newTheme;
+            if (document.getElementById('settingTheme')) document.getElementById('settingTheme').value = newTheme;
+            
+            // Prepare Overlay
+            overlay.classList.remove('hidden');
+            overlay.style.transition = 'none'; 
+            
+            // Setup Visuals based on target theme
+            if (newTheme === 'rog') {
+                overlay.style.backgroundColor = '#000000';
+                overlay.style.clipPath = 'polygon(0 50%, 100% 50%, 100% 50%, 0 50%)'; // Start flat horizontal line
+                text.innerHTML = '<i class="fas fa-biohazard text-8xl text-red-600 mb-4 animate-pulse drop-shadow-[0_0_20px_rgba(255,0,0,1)]"></i><span class="text-red-600 glitch-text drop-shadow-[0_0_15px_rgba(255,0,0,1)]">ROG OVERRIDE</span>';
+                scanline.className = 'animate-scanline-fast';
+            } else if (newTheme === 'legion') {
+                overlay.style.backgroundColor = '#0b111a';
+                overlay.style.clipPath = 'circle(0% at 50% 50%)'; // Start center dot
+                text.innerHTML = '<i class="fas fa-snowflake text-8xl text-cyan-400 mb-4 animate-pulse drop-shadow-[0_0_20px_rgba(0,255,255,1)]"></i><span class="text-cyan-400 drop-shadow-[0_0_15px_rgba(0,255,255,1)]">LEGION PROTOCOL</span>';
+                scanline.className = 'hidden';
+            } else {
+                overlay.style.backgroundColor = newTheme === 'night' ? '#0f172a' : (newTheme === 'reading' ? '#fef3c7' : '#ffffff');
+                overlay.style.clipPath = 'circle(0% at 50% 50%)';
+                text.innerHTML = '';
+                scanline.className = 'hidden';
+            }
+
+            // Force browser reflow to apply 'none' transition before turning it back on
+            void overlay.offsetWidth;
+
+            // Trigger Sound Profile
+            if(typeof playBootSequence === 'function') playBootSequence(newTheme);
+
+            // Trigger IN Animation (Expanding)
+            overlay.style.transition = 'clip-path 0.6s cubic-bezier(0.77, 0, 0.17, 1)';
+            if (newTheme === 'rog') {
+                overlay.style.clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 100%)';
+            } else {
+                overlay.style.clipPath = 'circle(150% at 50% 50%)';
+            }
+
+            // Apply real theme change halfway through the overlay hold
+            setTimeout(() => {
+                appSettings.theme = newTheme;
+                saveState();
+                applySettings();
+            }, 600);
+
+            // Trigger OUT Animation (Collapsing)
+            setTimeout(() => {
+                if (newTheme === 'rog') {
+                    overlay.style.clipPath = 'polygon(0 50%, 100% 50%, 100% 50%, 0 50%)';
+                } else {
+                    overlay.style.clipPath = 'circle(0% at 50% 50%)';
+                }
+                
+                // Hide container fully after exit animation finishes
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                }, 600);
+            }, 1500); // Hold overlay on screen for 900ms
+        };
+
         window.toggleNotifSize = (el) => { appSettings.notificationSize = el.value; saveState(); applySettings(); };
         window.toggleLookupUrl = (el) => { appSettings.lookupUrl = el.value; saveState(); applySettings(); };
 
@@ -1085,6 +1276,18 @@
             saveState();
             updateUI();
             
+            // Audio & Visual Effects
+            if(typeof playSuccess === 'function') playSuccess();
+            
+            const searchBoxContainer = document.querySelector('.md\\:col-span-7'); // Target the left search box
+            if (appSettings.theme === 'rog') {
+                searchBoxContainer.classList.add('effect-log-rog');
+                setTimeout(() => searchBoxContainer.classList.remove('effect-log-rog'), 400);
+            } else if (appSettings.theme === 'legion') {
+                searchBoxContainer.classList.add('effect-log-legion');
+                setTimeout(() => searchBoxContainer.classList.remove('effect-log-legion'), 600);
+            }
+
             const searchBtn = document.getElementById('searchBtn');
             const originalText = searchBtn.innerText;
             searchBtn.innerHTML = '<i class="fas fa-check"></i> LOGGED';
