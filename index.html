@@ -41,6 +41,16 @@
             mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
         }
 
+        /* Glowing text effects for the ticker */
+        .ticker-glow-normal {
+            color: #a5f3fc; /* Bright cyan */
+            text-shadow: 0 0 8px rgba(34, 211, 238, 0.8), 0 0 16px rgba(34, 211, 238, 0.4);
+        }
+        .ticker-glow-alert {
+            color: #fef08a; /* Bright yellow */
+            text-shadow: 0 0 8px rgba(250, 204, 21, 0.8), 0 0 16px rgba(250, 204, 21, 0.4);
+        }
+
         /* Hide scrollbar for navigation */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
@@ -48,6 +58,23 @@
         .no-scrollbar {
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+            border-radius: 6px;
+            margin: 0 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 6px;
+            border: 2px solid #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
         }
 
         /* Custom styles for the interactive sticker sheet preview */
@@ -175,9 +202,9 @@
                 <span id="digitalClockText">--:--:--</span>
             </div>
             
-            <div class="overflow-hidden flex-1 ml-6 relative h-8 flex items-center mask-image-linear">
+            <div class="overflow-hidden flex-1 ml-6 relative h-10 flex items-center mask-image-linear">
                 <div class="w-full absolute whitespace-nowrap flex items-center">
-                    <span id="tickerText" class="animate-ticker text-slate-300 text-sm">System loading...</span>
+                    <span id="tickerText" class="animate-ticker transition-all duration-300">System loading...</span>
                 </div>
             </div>
         </div>
@@ -237,45 +264,48 @@
                     </div>
 
                     <div id="notFoundArea" class="hidden mt-8 p-4 bg-red-50 border-2 border-dashed border-red-200 rounded-2xl text-red-600 font-bold text-center text-sm">
-                        Please enter a valid Cabin Number.
-                    </div>
+                    Please enter a valid Cabin Number.
                 </div>
+            </div>
 
-                <!-- Right: Interactive Sticker Sheet Selector -->
-                <div class="glass-morphism rounded-2xl shadow-xl p-6 flex flex-col md:flex-row gap-6 items-center justify-between">
-                    <div class="flex-1 w-full">
-                        <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+            <!-- Right: Interactive Sticker Sheet Selector -->
+            <div class="glass-morphism rounded-2xl shadow-xl p-6 flex flex-col gap-6">
+                <!-- Header & Controls -->
+                <div class="flex flex-col xl:flex-row gap-4 justify-between items-start xl:items-center w-full">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-slate-800 mb-1 flex items-center gap-2">
                             <i class="fas fa-border-all text-blue-500"></i>
                             Partial Sheet Layout
                         </h4>
-                        <p class="text-xs text-slate-500 mb-4">Click the grid to select where the first label should print.</p>
-
-                        <div class="grid grid-cols-2 gap-3 text-sm mb-6">
-                            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm text-center">
-                                <span class="block text-slate-400 font-bold text-[10px] uppercase">Skipping</span>
-                                <span class="text-xl font-black text-slate-700"><span id="lblSkipped">0</span> Used</span>
-                            </div>
-                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 shadow-sm text-center">
-                                <span class="block text-blue-400 font-bold text-[10px] uppercase">Queue</span>
-                                <span class="text-xl font-black text-blue-700"><span id="lblQueueSize">0</span> Labels</span>
-                            </div>
+                        <p class="text-xs text-slate-500">Select used spots or enter skipped amount.</p>
+                    </div>
+                    
+                    <div class="flex flex-wrap items-center gap-3 shrink-0">
+                        <div class="flex items-center gap-2 bg-white p-2 px-3 rounded-lg border border-slate-200 shadow-sm">
+                            <span class="text-slate-400 font-bold text-[10px] uppercase">Skip:</span>
+                            <input type="number" id="offsetInput" min="0" max="99" value="0" class="w-10 text-lg font-black text-slate-700 bg-transparent outline-none text-center" onchange="manualUpdateOffset(this.value)">
                         </div>
-
-                        <button id="quickPrintBtn" class="w-full bg-blue-600 text-white px-4 py-3 rounded-xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2 transform active:scale-95">
-                            <i class="fas fa-print"></i>
-                            PRINT LABELS
+                        <div class="flex items-center gap-2 bg-blue-50 p-2 px-3 rounded-lg border border-blue-200 shadow-sm">
+                            <span class="text-blue-400 font-bold text-[10px] uppercase">Queue:</span>
+                            <span class="text-lg font-black text-blue-700 min-w-[1.5rem] text-center" id="lblQueueSize">0</span>
+                        </div>
+                        <button id="quickPrintBtn" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2 transform active:scale-95">
+                            <i class="fas fa-print"></i> PRINT
                         </button>
                     </div>
+                </div>
 
-                    <!-- Mini Visual Representation of 10-Label Sheet -->
-                    <div class="shrink-0 bg-white p-2 rounded-xl shadow-md border border-slate-200 w-[160px] h-[220px] flex flex-col gap-1 relative select-none" id="stickerSheet">
+                <!-- Visual Representation of Label Sheets -->
+                <div class="w-full overflow-x-auto pb-4 custom-scrollbar">
+                    <div class="flex gap-6 min-w-max px-1" id="stickerSheetContainer">
                         <!-- Populated by Javascript -->
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section id="section-print" class="tab-content hidden">
+    <section id="section-print" class="tab-content hidden">
             <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden">
                 <div class="p-6 bg-white border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
@@ -507,6 +537,11 @@
                 <!-- Print Settings -->
                 <div>
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">Print Options</h4>
+                    <div class="mb-4 p-4 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors">
+                        <label class="block font-bold text-slate-800 mb-2 text-sm">Label Header Text</label>
+                        <input type="text" id="settingLabelHeader" oninput="toggleLabelHeader(this)" placeholder="e.g. CABIN NUMBER" maxlength="20" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none transition-all text-sm uppercase">
+                        <span class="block text-xs text-slate-500 mt-2">Text printed at the very top of each label.</span>
+                    </div>
                     <label class="flex items-start gap-4 p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors">
                         <div class="mt-1">
                             <input type="checkbox" id="settingShowArea" onchange="toggleShowArea(this)" class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
@@ -569,6 +604,24 @@
             <div class="flex flex-col gap-3">
                 <button id="customModalConfirm" onclick="confirmCustomModal()" class="w-full px-6 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 active:scale-95">OK</button>
                 <button id="customModalCancel" onclick="closeCustomModal()" class="w-full px-6 py-4 rounded-xl font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors hidden">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INSTRUCTION MODAL -->
+    <div id="instructionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity overflow-y-auto">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-sm transform transition-all my-auto theme-border text-center">
+            <div class="w-16 h-16 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fas fa-comment-dots"></i>
+            </div>
+            <h2 class="text-xl font-black text-slate-800 mb-2">Special Instruction</h2>
+            <p class="text-sm text-slate-500 mb-6">Add a custom note for this specific label.</p>
+            
+            <input type="text" id="instructionInput" placeholder="e.g. Leave at door" maxlength="40" class="w-full text-center py-3 px-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-bold text-slate-700 mb-6 transition-all">
+
+            <div class="flex gap-3">
+                <button onclick="closeInstructionModal()" class="flex-1 px-4 py-3 rounded-xl font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Cancel</button>
+                <button onclick="saveInstruction()" class="flex-1 px-4 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 active:scale-95">Save Note</button>
             </div>
         </div>
     </div>
@@ -833,6 +886,7 @@
         let appSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
         if (typeof appSettings.showArea === 'undefined') appSettings.showArea = true;
         if (typeof appSettings.globalNote === 'undefined') appSettings.globalNote = "";
+        if (typeof appSettings.labelHeaderText === 'undefined') appSettings.labelHeaderText = "CABIN NUMBER";
         if (typeof appSettings.theme === 'undefined') appSettings.theme = "day";
         if (typeof appSettings.notificationSize === 'undefined') appSettings.notificationSize = "normal";
         if (typeof appSettings.lookupUrl === 'undefined') appSettings.lookupUrl = "http://10.76.50.193/photoweb/Forms/OrderLookup.aspx";
@@ -841,8 +895,17 @@
         let pendingConfirmAction = null;
         let editingLogId = null;
         let editingIssueId = null; // Track currently edited issue
+        let instructionTargetId = null; // Track item for special instruction
 
-        function saveState() {
+    window.manualUpdateOffset = function(val) {
+        let parsed = parseInt(val);
+        if (isNaN(parsed) || parsed < 0) parsed = 0;
+        stickerOffset = parsed;
+        saveState();
+        updateUI();
+    };
+
+    function saveState() {
             localStorage.setItem('labRetailInventory', JSON.stringify(inventoryItems));
             localStorage.setItem('fullDeliveryHistory', JSON.stringify(deliveryHistory));
             localStorage.setItem('currentPrintQueue', JSON.stringify(printQueue));
@@ -857,12 +920,20 @@
             
             // Apply Size
             const tickerEl = document.getElementById('tickerText');
-            const sizeMap = { 'small': 'text-xs', 'normal': 'text-sm', 'large': 'text-base font-bold' };
-            tickerEl.className = `animate-ticker text-slate-300 transition-all duration-300 ${sizeMap[appSettings.notificationSize]}`;
+            tickerEl.classList.remove('text-xs', 'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl', 'font-bold', 'font-black');
+            
+            if (appSettings.notificationSize === 'small') {
+                tickerEl.classList.add('text-sm', 'font-bold');
+            } else if (appSettings.notificationSize === 'normal') {
+                tickerEl.classList.add('text-lg', 'font-black');
+            } else if (appSettings.notificationSize === 'large') {
+                tickerEl.classList.add('text-2xl', 'font-black');
+            }
             
             // Sync UI Elements
             document.getElementById('settingShowArea').checked = appSettings.showArea;
             document.getElementById('settingGlobalNote').value = appSettings.globalNote;
+            document.getElementById('settingLabelHeader').value = appSettings.labelHeaderText;
             document.getElementById('settingTheme').value = appSettings.theme;
             document.getElementById('settingNotifSize').value = appSettings.notificationSize;
             document.getElementById('settingLookupUrl').value = appSettings.lookupUrl;
@@ -938,6 +1009,11 @@
 
         window.toggleGlobalNote = function(el) {
             appSettings.globalNote = el.value;
+            saveState();
+        };
+
+        window.toggleLabelHeader = function(el) {
+            appSettings.labelHeaderText = el.value.toUpperCase();
             saveState();
         };
 
@@ -1241,6 +1317,40 @@
             editingIssueId = null;
         };
 
+        window.openInstructionModal = function(id) {
+            instructionTargetId = id;
+            const entry = printQueue.find(e => String(e.id) === String(id));
+            document.getElementById('instructionInput').value = entry && entry.specialInstruction ? entry.specialInstruction : '';
+            document.getElementById('instructionModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('instructionInput').focus(), 100);
+        };
+
+        window.closeInstructionModal = function() {
+            document.getElementById('instructionModal').classList.add('hidden');
+            instructionTargetId = null;
+        };
+
+        window.saveInstruction = function() {
+            if (!instructionTargetId) return;
+            const note = document.getElementById('instructionInput').value.trim();
+            
+            // Update in print queue
+            const queueEntry = printQueue.find(e => String(e.id) === String(instructionTargetId));
+            if (queueEntry) {
+                queueEntry.specialInstruction = note;
+            }
+            
+            // Update in full history
+            const historyEntry = deliveryHistory.find(e => String(e.id) === String(instructionTargetId));
+            if (historyEntry) {
+                historyEntry.specialInstruction = note;
+            }
+
+            saveState();
+            updateUI();
+            closeInstructionModal();
+        };
+
         window.saveEditIssue = function() {
             if (!editingIssueId) return;
             
@@ -1270,49 +1380,74 @@
         }
 
         function renderStickerSheet() {
-            const container = document.getElementById('stickerSheet');
-            container.innerHTML = '';
+        const container = document.getElementById('stickerSheetContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        
+        const queueSize = printQueue.length;
+        const totalSpotsUsed = stickerOffset + queueSize;
+        
+        // Calculate number of sheets needed (at least 1)
+        let numSheets = Math.max(1, Math.ceil(totalSpotsUsed / 10));
+        
+        // If the last sheet is perfectly full, add one extra empty sheet so user can click it for the next offset
+        if (totalSpotsUsed > 0 && totalSpotsUsed % 10 === 0) {
+            numSheets++;
+        }
+        
+        for (let s = 0; s < numSheets; s++) {
+            const sheet = document.createElement('div');
+            sheet.className = 'shrink-0 bg-white p-2 rounded-xl shadow-md border border-slate-200 w-[160px] h-[220px] grid grid-cols-2 grid-rows-5 gap-1 relative select-none';
             
-            const cols = 2;
-            const rows = 5;
-            const totalLabels = cols * rows;
-            
-            container.style.display = 'grid';
-            container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-            container.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-            
-            const queueSize = printQueue.length;
-            
-            for (let i = 0; i < totalLabels; i++) {
+            for (let i = s * 10; i < (s + 1) * 10; i++) {
                 const cell = document.createElement('div');
-                cell.className = 'sticker-cell rounded flex items-center justify-center text-[10px] font-bold';
+                cell.className = 'sticker-cell rounded flex flex-col items-center justify-center text-[10px] font-bold relative overflow-hidden text-center px-1 touch-manipulation cursor-pointer';
                 
                 if (i < stickerOffset) {
                     cell.classList.add('used');
                     cell.title = "Click to set print start position here";
+                    cell.onclick = () => {
+                        stickerOffset = i;
+                        saveState();
+                        updateUI(); 
+                    };
                 } else if (i >= stickerOffset && i < stickerOffset + queueSize) {
                     cell.classList.add('active');
                     const printIndex = i - stickerOffset;
-                    cell.innerText = printQueue[printIndex].cabin;
-                    cell.title = `Printing Cabin ${printQueue[printIndex].cabin}`;
+                    const item = printQueue[printIndex];
+                    
+                    let innerContent = `<span>${item.cabin}</span>`;
+                    if (item.specialInstruction) {
+                        innerContent += `<i class="fas fa-comment-dots text-orange-500 mt-1 text-[8px]" title="${item.specialInstruction}"></i>`;
+                    }
+                    cell.innerHTML = innerContent;
+                    cell.title = `Cabin ${item.cabin}. Click to add/edit special instruction.`;
+                    
+                    cell.onclick = () => {
+                        openInstructionModal(item.id);
+                    };
                 } else {
                     cell.title = "Click to set print start position here";
+                    cell.onclick = () => {
+                        stickerOffset = i;
+                        saveState();
+                        updateUI(); 
+                    };
                 }
                 
-                cell.onclick = () => {
-                    stickerOffset = i;
-                    saveState();
-                    updateUI(); 
-                };
-                
-                container.appendChild(cell);
+                sheet.appendChild(cell);
             }
-            
-            document.getElementById('lblSkipped').innerText = stickerOffset;
-            document.getElementById('lblQueueSize').innerText = queueSize;
+            container.appendChild(sheet);
         }
+        
+        const offsetInput = document.getElementById('offsetInput');
+        if(offsetInput) offsetInput.value = stickerOffset;
+        
+        const queueLabel = document.getElementById('lblQueueSize');
+        if(queueLabel) queueLabel.innerText = queueSize;
+    }
 
-        function updateUI() {
+    function updateUI() {
             document.querySelectorAll('.retailSelect, .editRetailSelect').forEach(selectEl => {
                 const currentVal = selectEl.value;
                 selectEl.innerHTML = '<option value="">-- Standard Delivery (No Retail Item) --</option>';
@@ -1353,9 +1488,13 @@
                 const row = document.createElement('tr');
                 row.className = "hover:bg-slate-50 transition-colors";
                 
-                const displayValue = (item.items && item.items.length > 0)
+                let displayValue = (item.items && item.items.length > 0)
                     ? item.items.map(i => `<span class="bg-red-50 text-red-600 px-2 py-1 rounded-md font-black text-xs border border-red-100 flex items-center gap-1 w-max mb-1 mx-auto"><i class="fas fa-tag text-[10px]"></i> ${i.qty}x ${i.name}</span>`).join('')
                     : `<span class="bg-slate-50 text-slate-400 px-3 py-1 rounded-md font-bold text-sm border border-slate-100 flex items-center justify-center w-max mx-auto">Standard Label</span>`;
+
+                if (item.specialInstruction) {
+                    displayValue += `<div class="text-[10px] text-orange-600 font-bold mt-1 bg-orange-50 px-2 py-1 rounded border border-orange-100 w-max mx-auto"><i class="fas fa-comment-dots mr-1"></i>${item.specialInstruction}</div>`;
+                }
 
                 row.innerHTML = `
                     <td class="px-6 py-4 font-black text-slate-800 text-lg">${item.cabin}</td>
@@ -1392,9 +1531,13 @@
                 const row = document.createElement('tr');
                 row.className = "border-b border-slate-50 hover:bg-slate-50";
                 
-                const displayValue = (item.items && item.items.length > 0)
+                let displayValue = (item.items && item.items.length > 0)
                     ? item.items.map(i => `<div class="text-red-600 font-bold text-sm mb-1"><i class="fas fa-tag text-[10px] mr-1"></i>${i.qty}x ${i.name}</div>`).join('')
                     : `<span class="text-slate-400 font-medium text-sm">Standard</span>`;
+
+                if (item.specialInstruction) {
+                    displayValue += `<div class="text-[10px] text-orange-600 font-bold mt-1 inline-block bg-orange-50 px-2 py-1 rounded border border-orange-100"><i class="fas fa-comment-dots mr-1"></i>${item.specialInstruction}</div>`;
+                }
 
                 row.innerHTML = `
                     <td class="px-6 py-4 text-xs text-slate-400 font-medium">${new Date(item.timestamp).toLocaleString()}</td>
@@ -1838,7 +1981,9 @@
                 doc.setTextColor(54, 117, 196); 
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(14);
-                doc.text("CABIN NUMBER", x + 2, y + 0.35, { align: "center" });
+                
+                const headerText = appSettings.labelHeaderText && appSettings.labelHeaderText.trim() !== '' ? appSettings.labelHeaderText.trim() : "CABIN NUMBER";
+                doc.text(headerText.toUpperCase(), x + 2, y + 0.35, { align: "center" });
 
                 doc.setFont("helvetica", "bold");
                 doc.setFontSize(60);
@@ -1868,6 +2013,13 @@
                     }
                     
                     doc.text(noteLines, x + 0.15, y + 1.35, { align: "left" });
+                }
+
+                if (item.specialInstruction) {
+                    doc.setTextColor(234, 88, 12); // Orange tint
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(10);
+                    doc.text(`* ${item.specialInstruction.toUpperCase()} *`, x + 2.0, y + 1.68, { align: "center" });
                 }
 
                 if (appSettings.globalNote && appSettings.globalNote.trim() !== '') {
@@ -1906,18 +2058,24 @@
             const todayStr = new Date().toLocaleDateString();
             const todayLogs = deliveryHistory.filter(h => new Date(h.timestamp).toLocaleDateString() === todayStr).length;
             
+            const tickerEl = document.getElementById('tickerText');
             let msgs = [];
+            
             if (queueSize > 0) {
                 msgs.push(`⚠️ ACTION REQUIRED: ${queueSize} label(s) pending in the Print Queue!`);
+                tickerEl.classList.add('ticker-glow-alert');
+                tickerEl.classList.remove('ticker-glow-normal');
             } else {
                 msgs.push(`✅ System Status: All clear. No pending prints.`);
+                tickerEl.classList.add('ticker-glow-normal');
+                tickerEl.classList.remove('ticker-glow-alert');
             }
             
             msgs.push(`📦 Total Deliveries Logged Today: ${todayLogs}`);
             msgs.push(`💡 Tip: You can adjust print offset by clicking the visual grid.`);
             
             const fullText = msgs.join('   •   ');
-            document.getElementById('tickerText').innerText = fullText;
+            tickerEl.innerText = fullText;
         }
 
         // Init App
