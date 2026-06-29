@@ -176,6 +176,220 @@
             background-color: #172554;
         }
 
+        /* ROG MODE (GAMER) */
+        body.theme-rog {
+            background-color: #09090b !important; /* Zinc-950 */
+            color: #fafafa !important; 
+        }
+        body.theme-rog .bg-white, body.theme-rog .bg-slate-50 {
+            background-color: #18181b !important; /* Zinc-900 */
+        }
+        body.theme-rog .bg-slate-900 {
+            background-color: #000000 !important; /* Pitch black top bar */
+            border-bottom-color: #ef4444 !important; /* Red border line */
+        }
+        body.theme-rog .text-slate-800, body.theme-rog .text-slate-900, body.theme-rog .text-slate-700 {
+            color: #f4f4f5 !important; 
+        }
+        body.theme-rog .text-slate-500, body.theme-rog .text-slate-400, body.theme-rog .text-slate-600 {
+            color: #a1a1aa !important; 
+        }
+        body.theme-rog .border-slate-200, body.theme-rog .border-slate-100, body.theme-rog .border-slate-300 {
+            border-color: #27272a !important; 
+        }
+        body.theme-rog .glass-morphism {
+            background: rgba(24, 24, 27, 0.95) !important;
+            border-color: #3f3f46 !important; 
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.05) !important; /* Slight red ambient glow */
+        }
+        body.theme-rog input:not([type="checkbox"]), body.theme-rog select {
+            background-color: #09090b !important;
+            color: #fafafa !important;
+            border-color: #3f3f46 !important;
+        }
+        body.theme-rog input::placeholder {
+            color: #71717a !important; 
+        }
+        body.theme-rog input[type="checkbox"] {
+            accent-color: #ef4444 !important;
+        }
+        body.theme-rog input:focus, body.theme-rog select:focus {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2) !important;
+        }
+        body.theme-rog .hover\:bg-slate-50:hover {
+            background-color: #27272a !important;
+        }
+        body.theme-rog #emptyQueue, body.theme-rog #emptyLog, body.theme-rog #emptyIssues {
+            background-color: #09090b !important;
+        }
+        
+        /* ROG Red Accents (Replacing Blues) */
+        body.theme-rog .text-blue-900, body.theme-rog .text-blue-800, body.theme-rog .text-blue-700 {
+            color: #f87171 !important; /* Light neon red */
+        }
+        body.theme-rog .text-blue-600, body.theme-rog .text-blue-500, body.theme-rog .text-cyan-400 {
+            color: #ef4444 !important; /* Bright Red */
+        }
+        body.theme-rog .bg-blue-600, body.theme-rog .bg-blue-700 {
+            background-color: #dc2626 !important; /* Deep Red buttons */
+            border: 1px solid #ef4444 !important;
+        }
+        body.theme-rog .bg-blue-600:hover, body.theme-rog .bg-blue-700:hover {
+            background-color: #b91c1c !important;
+        }
+        body.theme-rog .bg-blue-50, body.theme-rog .bg-blue-100 {
+            background-color: #450a0a !important; /* Dark red background for active/highlighted areas */
+            border-color: #7f1d1d !important;
+        }
+        body.theme-rog .shadow-blue-200, body.theme-rog .shadow-lg.shadow-blue-200 {
+            box-shadow: 0 4px 15px -3px rgba(220, 38, 38, 0.6) !important; /* Red glow dropshadow */
+        }
+        body.theme-rog .tab-active {
+            border-bottom: 3px solid #ef4444 !important;
+            color: #f87171 !important;
+            text-shadow: 0 0 8px rgba(239,68,68,0.4);
+        }
+        
+        /* ROG Notification Ticker Glow Overrides */
+        body.theme-rog .animate-ticker.text-cyan-300 {
+            color: #ef4444 !important;
+            filter: drop-shadow(0 0 8px rgba(239,68,68,0.8)) !important;
+        }
+        body.theme-rog .animate-ticker.text-yellow-300 {
+            color: #f97316 !important; /* Orange/Gold warning for ROG */
+            filter: drop-shadow(0 0 8px rgba(249,115,22,0.8)) !important;
+        }
+
+        /* ROG Sticker Sheet Specifics */
+        body.theme-rog .sticker-cell {
+            background-color: #09090b;
+            border-color: #3f3f46;
+        }
+        body.theme-rog .sticker-cell.used {
+            background-color: #18181b;
+            border-color: #27272a;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(239,68,68,0.05) 5px, rgba(239,68,68,0.05) 10px);
+        }
+        body.theme-rog .sticker-cell.active {
+            background-color: #450a0a; 
+            border-color: #ef4444;
+            color: #fca5a5;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+        body.theme-rog .sticker-cell:hover:not(.used) {
+            border-color: #f87171;
+            background-color: #27272a;
+        }
+
+        /* LEGION MODE (ICE BLUE GAMER) */
+        body.theme-legion {
+            background-color: #0b0f19 !important; 
+            color: #f8fafc !important; 
+        }
+        body.theme-legion .bg-white, body.theme-legion .bg-slate-50 {
+            background-color: #151b2b !important; 
+        }
+        body.theme-legion .bg-slate-900 {
+            background-color: #06090e !important; 
+            border-bottom-color: #00e5ff !important; 
+        }
+        body.theme-legion .text-slate-800, body.theme-legion .text-slate-900, body.theme-legion .text-slate-700 {
+            color: #f1f5f9 !important; 
+        }
+        body.theme-legion .text-slate-500, body.theme-legion .text-slate-400, body.theme-legion .text-slate-600 {
+            color: #94a3b8 !important; 
+        }
+        body.theme-legion .border-slate-200, body.theme-legion .border-slate-100, body.theme-legion .border-slate-300 {
+            border-color: #1e293b !important; 
+        }
+        body.theme-legion .glass-morphism {
+            background: rgba(21, 27, 43, 0.95) !important;
+            border-color: #334155 !important; 
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.05) !important; 
+        }
+        body.theme-legion input:not([type="checkbox"]), body.theme-legion select {
+            background-color: #0b0f19 !important;
+            color: #f8fafc !important;
+            border-color: #334155 !important;
+        }
+        body.theme-legion input::placeholder {
+            color: #64748b !important; 
+        }
+        body.theme-legion input[type="checkbox"] {
+            accent-color: #00e5ff !important;
+        }
+        body.theme-legion input:focus, body.theme-legion select:focus {
+            border-color: #00e5ff !important;
+            box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.2) !important;
+        }
+        body.theme-legion .hover\:bg-slate-50:hover {
+            background-color: #1e293b !important;
+        }
+        body.theme-legion #emptyQueue, body.theme-legion #emptyLog, body.theme-legion #emptyIssues {
+            background-color: #0b0f19 !important;
+        }
+        
+        /* Legion Cyan/Ice Blue Accents */
+        body.theme-legion .text-blue-900, body.theme-legion .text-blue-800, body.theme-legion .text-blue-700 {
+            color: #67e8f9 !important; 
+        }
+        body.theme-legion .text-blue-600, body.theme-legion .text-blue-500, body.theme-legion .text-cyan-400 {
+            color: #00e5ff !important; 
+        }
+        body.theme-legion .bg-blue-600, body.theme-legion .bg-blue-700 {
+            background-color: #0891b2 !important; 
+            border: 1px solid #00e5ff !important;
+            color: #ffffff !important;
+        }
+        body.theme-legion .bg-blue-600:hover, body.theme-legion .bg-blue-700:hover {
+            background-color: #0e7490 !important;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4) !important;
+        }
+        body.theme-legion .bg-blue-50, body.theme-legion .bg-blue-100 {
+            background-color: #083344 !important; 
+            border-color: #164e63 !important;
+        }
+        body.theme-legion .shadow-blue-200, body.theme-legion .shadow-lg.shadow-blue-200 {
+            box-shadow: 0 4px 15px -3px rgba(0, 229, 255, 0.3) !important; 
+        }
+        body.theme-legion .tab-active {
+            border-bottom: 3px solid #00e5ff !important;
+            color: #67e8f9 !important;
+            text-shadow: 0 0 8px rgba(0,229,255,0.4);
+        }
+        
+        /* Legion Notification Ticker Glow Overrides */
+        body.theme-legion .animate-ticker.text-cyan-300 {
+            color: #00e5ff !important;
+            filter: drop-shadow(0 0 8px rgba(0,229,255,0.8)) !important;
+        }
+        body.theme-legion .animate-ticker.text-yellow-300 {
+            color: #fbbf24 !important; 
+            filter: drop-shadow(0 0 8px rgba(251,191,36,0.8)) !important;
+        }
+
+        /* Legion Sticker Sheet Specifics */
+        body.theme-legion .sticker-cell {
+            background-color: #0b0f19;
+            border-color: #334155;
+        }
+        body.theme-legion .sticker-cell.used {
+            background-color: #151b2b;
+            border-color: #1e293b;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,229,255,0.05) 5px, rgba(0,229,255,0.05) 10px);
+        }
+        body.theme-legion .sticker-cell.active {
+            background-color: #083344; 
+            border-color: #00e5ff;
+            color: #a5f3fc;
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+        }
+        body.theme-legion .sticker-cell:hover:not(.used) {
+            border-color: #67e8f9;
+            background-color: #1e293b;
+        }
+
         /* READING MODE (SEPIA) */
         body.theme-reading {
             background-color: #fef3c7 !important; 
@@ -246,26 +460,43 @@
 
     <div class="max-w-6xl mx-auto p-4 md:p-6">
         
-        <header class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
-            <div class="text-center lg:text-left shrink-0">
-                <h1 class="text-2xl font-black text-blue-900 tracking-tight uppercase">Label Maker Pro V4</h1>
-                <p class="text-slate-500 text-sm font-medium">Precision Area Mapping & Inventory System</p>
-            </div>
-            <nav class="flex w-full lg:w-auto flex-1 justify-between bg-white rounded-xl shadow-sm p-1 border border-slate-200 items-center overflow-x-auto no-scrollbar max-w-full no-print">
-                <button onclick="switchTab('search')" id="tab-search" class="px-2 md:px-3 lg:px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all tab-active whitespace-nowrap flex-1 text-center">SEARCH & LOG</button>
-                <button onclick="switchTab('print')" id="tab-print" class="px-2 md:px-3 lg:px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">PRINT QUEUE</button>
-                <button onclick="switchTab('history')" id="tab-history" class="px-2 md:px-3 lg:px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">FULL LOG</button>
-                <button onclick="switchTab('inventory')" id="tab-inventory" class="px-2 md:px-3 lg:px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">RETAIL CATALOG</button>
-                <button onclick="switchTab('issues')" id="tab-issues" class="px-2 md:px-3 lg:px-4 py-2 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">REPRINTS & ISSUES</button>
+        <header class="mb-6 flex flex-col gap-4">
+            <!-- Title and Controls Row -->
+            <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+                <div class="text-center lg:text-left shrink-0">
+                    <h1 class="text-2xl font-black text-blue-900 tracking-tight uppercase">Label Maker Pro V4</h1>
+                    <p class="text-slate-500 text-sm font-medium">Precision Area Mapping & Inventory System</p>
+                </div>
                 
-                <div class="flex items-center pl-2 border-l border-slate-200 ml-1 shrink-0 gap-1">
-                    <a href="#" id="navLookupLink" target="_blank" class="p-2 rounded-lg text-blue-500 hover:text-blue-700 hover:bg-blue-50 transition-all shrink-0 flex items-center justify-center font-bold text-xs px-3" title="Order Lookup Tool">
+                <!-- Moved Controls (Theme, Lookup, Settings) out of scrolling nav -->
+                <div class="flex items-center bg-white rounded-xl shadow-sm p-1 border border-slate-200 shrink-0 gap-1 no-print transition-colors">
+                    <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 shrink-0 transition-colors" title="Quick Theme Toggle">
+                        <i class="fas fa-moon text-blue-500 text-sm"></i>
+                        <select id="quickThemeSelect" onchange="toggleTheme(this)" class="bg-transparent text-slate-600 font-bold text-sm outline-none cursor-pointer focus:ring-0 border-none">
+                            <option value="day">Day</option>
+                            <option value="night">Night</option>
+                            <option value="rog">ROG (Gamer)</option>
+                            <option value="legion">Legion (Ice Blue)</option>
+                            <option value="reading">Sepia</option>
+                        </select>
+                    </div>
+
+                    <a href="#" id="navLookupLink" target="_blank" class="px-4 py-2 rounded-lg text-blue-500 hover:text-blue-700 hover:bg-blue-50 transition-all shrink-0 flex items-center justify-center font-bold text-sm" title="Order Lookup Tool">
                         <i class="fas fa-external-link-alt mr-1"></i> Lookup
                     </a>
-                    <button onclick="openSettings()" class="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all shrink-0" title="Settings">
-                        <i class="fas fa-sliders-h text-lg"></i>
+                    <button onclick="openSettings()" class="px-4 py-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all shrink-0" title="Settings">
+                        <i class="fas fa-sliders-h text-xl"></i>
                     </button>
                 </div>
+            </div>
+
+            <!-- Tab Navigation Row (Dedicated horizontal scroll) -->
+            <nav class="flex w-full justify-between bg-white rounded-xl shadow-sm p-1 border border-slate-200 items-center overflow-x-auto no-scrollbar max-w-full no-print transition-colors">
+                <button onclick="switchTab('search')" id="tab-search" class="px-3 lg:px-6 py-2.5 rounded-lg font-bold text-xs md:text-sm transition-all tab-active whitespace-nowrap flex-1 text-center">SEARCH & LOG</button>
+                <button onclick="switchTab('print')" id="tab-print" class="px-3 lg:px-6 py-2.5 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">PRINT QUEUE</button>
+                <button onclick="switchTab('history')" id="tab-history" class="px-3 lg:px-6 py-2.5 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">FULL LOG</button>
+                <button onclick="switchTab('inventory')" id="tab-inventory" class="px-3 lg:px-6 py-2.5 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">RETAIL CATALOG</button>
+                <button onclick="switchTab('issues')" id="tab-issues" class="px-3 lg:px-6 py-2.5 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">REPRINTS & ISSUES</button>
             </nav>
         </header>
 
@@ -541,6 +772,8 @@
                             <select id="settingTheme" onchange="toggleTheme(this)" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none text-sm cursor-pointer transition-colors bg-white">
                                 <option value="day">Day Mode (Standard)</option>
                                 <option value="night">Night Mode (Dark)</option>
+                                <option value="rog">ROG Mode (Gamer)</option>
+                                <option value="legion">Legion Mode (Ice Blue)</option>
                                 <option value="reading">Reading Mode (Sepia)</option>
                             </select>
                         </div>
@@ -788,7 +1021,13 @@
             
             document.getElementById('settingShowArea').checked = appSettings.showArea;
             document.getElementById('settingGlobalNote').value = appSettings.globalNote;
+            
+            // Sync both theme dropdowns
             document.getElementById('settingTheme').value = appSettings.theme;
+            if (document.getElementById('quickThemeSelect')) {
+                document.getElementById('quickThemeSelect').value = appSettings.theme;
+            }
+
             document.getElementById('settingNotifSize').value = appSettings.notificationSize;
             document.getElementById('settingLookupUrl').value = appSettings.lookupUrl;
             document.getElementById('settingLabelHeader').value = appSettings.labelHeaderText;
