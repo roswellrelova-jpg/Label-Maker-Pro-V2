@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Label Maker Pro V4</title>
+    <title>Label & Retail Delivery Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -40,37 +40,32 @@
             -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
             mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
         }
+        
+        /* Neon Glows for Ticker */
+        .neon-glow {
+            text-shadow: 0 0 8px rgba(34, 211, 238, 0.8), 0 0 16px rgba(34, 211, 238, 0.4);
+        }
+        .neon-glow-warning {
+            text-shadow: 0 0 8px rgba(250, 204, 21, 0.8), 0 0 16px rgba(250, 204, 21, 0.4);
+            color: #facc15 !important;
+        }
 
         /* Hide scrollbar for navigation */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Custom Scrollbar for sheets */
-        .custom-scrollbar::-webkit-scrollbar {
-            height: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        /* Custom scrollbar for horizontal sheet container */
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         /* Custom styles for the interactive sticker sheet preview */
         .sticker-cell {
             transition: all 0.2s ease-in-out;
             border: 2px dashed #cbd5e1;
             background-color: #f8fafc;
+            min-height: 38px;
         }
         .sticker-cell.used {
             background-color: #e2e8f0;
@@ -90,353 +85,79 @@
         .sticker-cell:hover:not(.used) {
             border-color: #2563eb;
             background-color: #eff6ff;
-        }
-        .sticker-cell.used:hover {
-            opacity: 0.8;
             cursor: pointer;
         }
+        .sticker-cell.used:hover { opacity: 0.8; cursor: pointer; }
 
         /* --- THEME OVERRIDES --- */
         
-        /* NIGHT MODE */
-        body.theme-night {
-            background-color: #0f172a !important; 
-            color: #e2e8f0 !important; 
-        }
-        body.theme-night .bg-white, body.theme-night .bg-slate-50 {
-            background-color: #1e293b !important; 
-        }
-        body.theme-night .text-slate-800, body.theme-night .text-slate-900, body.theme-night .text-slate-700 {
-            color: #f8fafc !important; 
-        }
-        body.theme-night .text-slate-500, body.theme-night .text-slate-400, body.theme-night .text-slate-600 {
-            color: #94a3b8 !important; 
-        }
-        body.theme-night .border-slate-200, body.theme-night .border-slate-100, body.theme-night .border-slate-300 {
-            border-color: #334155 !important; 
-        }
-        body.theme-night .glass-morphism {
-            background: rgba(30, 41, 59, 0.98) !important;
-            border-color: rgba(51, 65, 85, 1) !important;
-        }
-        body.theme-night input:not([type="checkbox"]), body.theme-night select {
-            background-color: #0f172a !important;
-            color: #f1f5f9 !important;
-            border-color: #475569 !important;
-        }
-        body.theme-night input::placeholder {
-            color: #64748b !important; /* Much lighter placeholder text */
-        }
-        body.theme-night .hover\:bg-slate-50:hover {
-            background-color: #334155 !important;
-        }
-        body.theme-night #emptyQueue, body.theme-night #emptyLog, body.theme-night #emptyIssues {
-            background-color: #0f172a !important;
-        }
-        
-        /* Enhanced Night Mode Visibility Fixes */
-        body.theme-night .text-blue-900, body.theme-night .text-blue-800 {
-            color: #93c5fd !important; /* Lighter blue for headers and tabs */
-        }
-        body.theme-night .text-blue-700, body.theme-night .text-blue-600 {
-            color: #60a5fa !important; 
-        }
-        body.theme-night .bg-blue-50 {
-            background-color: #1e3a8a !important; /* Dark blue instead of glaring white */
-            border-color: #1e40af !important;
-        }
-        body.theme-night .bg-blue-100 {
-            background-color: #1e40af !important;
-        }
-        body.theme-night .shadow-blue-200 {
-            box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.6) !important; /* Remove harsh white halo */
-        }
-        body.theme-night .tab-active {
-            border-bottom: 3px solid #60a5fa !important;
-            color: #93c5fd !important;
-        }
-        
-        /* Night Mode Sticker Sheet Specifics */
-        body.theme-night .sticker-cell {
-            background-color: #0f172a;
-            border-color: #475569;
-        }
-        body.theme-night .sticker-cell.used {
-            background-color: #1e293b;
-            border-color: #334155;
-            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.05) 5px, rgba(255,255,255,0.05) 10px);
-        }
-        body.theme-night .sticker-cell.active {
-            background-color: #1e3a8a; /* Deep blue active state */
-            border-color: #60a5fa;
-            color: #bfdbfe;
-        }
-        body.theme-night .sticker-cell:hover:not(.used) {
-            border-color: #93c5fd;
-            background-color: #172554;
-        }
-
-        /* ROG MODE (GAMER) */
-        body.theme-rog {
-            background-color: #09090b !important; /* Zinc-950 */
-            color: #fafafa !important; 
-        }
-        body.theme-rog .bg-white, body.theme-rog .bg-slate-50 {
-            background-color: #18181b !important; /* Zinc-900 */
-        }
-        body.theme-rog .bg-slate-900 {
-            background-color: #000000 !important; /* Pitch black top bar */
-            border-bottom-color: #ef4444 !important; /* Red border line */
-        }
-        body.theme-rog .text-slate-800, body.theme-rog .text-slate-900, body.theme-rog .text-slate-700 {
-            color: #f4f4f5 !important; 
-        }
-        body.theme-rog .text-slate-500, body.theme-rog .text-slate-400, body.theme-rog .text-slate-600 {
-            color: #a1a1aa !important; 
-        }
-        body.theme-rog .border-slate-200, body.theme-rog .border-slate-100, body.theme-rog .border-slate-300 {
-            border-color: #27272a !important; 
-        }
-        body.theme-rog .glass-morphism {
-            background: rgba(24, 24, 27, 0.95) !important;
-            border-color: #3f3f46 !important; 
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.05) !important; /* Slight red ambient glow */
-        }
-        body.theme-rog input:not([type="checkbox"]), body.theme-rog select {
-            background-color: #09090b !important;
-            color: #fafafa !important;
-            border-color: #3f3f46 !important;
-        }
-        body.theme-rog input::placeholder {
-            color: #71717a !important; 
-        }
-        body.theme-rog input[type="checkbox"] {
-            accent-color: #ef4444 !important;
-        }
-        body.theme-rog input:focus, body.theme-rog select:focus {
-            border-color: #ef4444 !important;
-            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2) !important;
-        }
-        body.theme-rog .hover\:bg-slate-50:hover {
-            background-color: #27272a !important;
-        }
-        body.theme-rog #emptyQueue, body.theme-rog #emptyLog, body.theme-rog #emptyIssues {
-            background-color: #09090b !important;
-        }
-        
-        /* ROG Red Accents (Replacing Blues) */
-        body.theme-rog .text-blue-900, body.theme-rog .text-blue-800, body.theme-rog .text-blue-700 {
-            color: #f87171 !important; /* Light neon red */
-        }
-        body.theme-rog .text-blue-600, body.theme-rog .text-blue-500, body.theme-rog .text-cyan-400 {
-            color: #ef4444 !important; /* Bright Red */
-        }
-        body.theme-rog .bg-blue-600, body.theme-rog .bg-blue-700 {
-            background-color: #dc2626 !important; /* Deep Red buttons */
-            border: 1px solid #ef4444 !important;
-        }
-        body.theme-rog .bg-blue-600:hover, body.theme-rog .bg-blue-700:hover {
-            background-color: #b91c1c !important;
-        }
-        body.theme-rog .bg-blue-50, body.theme-rog .bg-blue-100 {
-            background-color: #450a0a !important; /* Dark red background for active/highlighted areas */
-            border-color: #7f1d1d !important;
-        }
-        body.theme-rog .shadow-blue-200, body.theme-rog .shadow-lg.shadow-blue-200 {
-            box-shadow: 0 4px 15px -3px rgba(220, 38, 38, 0.6) !important; /* Red glow dropshadow */
-        }
-        body.theme-rog .tab-active {
-            border-bottom: 3px solid #ef4444 !important;
-            color: #f87171 !important;
-            text-shadow: 0 0 8px rgba(239,68,68,0.4);
-        }
-        
-        /* ROG Notification Ticker Glow Overrides */
-        body.theme-rog .animate-ticker.text-cyan-300 {
-            color: #ef4444 !important;
-            filter: drop-shadow(0 0 8px rgba(239,68,68,0.8)) !important;
-        }
-        body.theme-rog .animate-ticker.text-yellow-300 {
-            color: #f97316 !important; /* Orange/Gold warning for ROG */
-            filter: drop-shadow(0 0 8px rgba(249,115,22,0.8)) !important;
-        }
-
-        /* ROG Sticker Sheet Specifics */
-        body.theme-rog .sticker-cell {
-            background-color: #09090b;
-            border-color: #3f3f46;
-        }
-        body.theme-rog .sticker-cell.used {
-            background-color: #18181b;
-            border-color: #27272a;
-            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(239,68,68,0.05) 5px, rgba(239,68,68,0.05) 10px);
-        }
-        body.theme-rog .sticker-cell.active {
-            background-color: #450a0a; 
-            border-color: #ef4444;
-            color: #fca5a5;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
-        }
-        body.theme-rog .sticker-cell:hover:not(.used) {
-            border-color: #f87171;
-            background-color: #27272a;
-        }
-
-        /* LEGION MODE (ICE BLUE GAMER) */
-        body.theme-legion {
-            background-color: #0b0f19 !important; 
-            color: #f8fafc !important; 
-        }
-        body.theme-legion .bg-white, body.theme-legion .bg-slate-50 {
-            background-color: #151b2b !important; 
-        }
-        body.theme-legion .bg-slate-900 {
-            background-color: #06090e !important; 
-            border-bottom-color: #00e5ff !important; 
-        }
-        body.theme-legion .text-slate-800, body.theme-legion .text-slate-900, body.theme-legion .text-slate-700 {
-            color: #f1f5f9 !important; 
-        }
-        body.theme-legion .text-slate-500, body.theme-legion .text-slate-400, body.theme-legion .text-slate-600 {
-            color: #94a3b8 !important; 
-        }
-        body.theme-legion .border-slate-200, body.theme-legion .border-slate-100, body.theme-legion .border-slate-300 {
-            border-color: #1e293b !important; 
-        }
-        body.theme-legion .glass-morphism {
-            background: rgba(21, 27, 43, 0.95) !important;
-            border-color: #334155 !important; 
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.05) !important; 
-        }
-        body.theme-legion input:not([type="checkbox"]), body.theme-legion select {
-            background-color: #0b0f19 !important;
-            color: #f8fafc !important;
-            border-color: #334155 !important;
-        }
-        body.theme-legion input::placeholder {
-            color: #64748b !important; 
-        }
-        body.theme-legion input[type="checkbox"] {
-            accent-color: #00e5ff !important;
-        }
-        body.theme-legion input:focus, body.theme-legion select:focus {
-            border-color: #00e5ff !important;
-            box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.2) !important;
-        }
-        body.theme-legion .hover\:bg-slate-50:hover {
-            background-color: #1e293b !important;
-        }
-        body.theme-legion #emptyQueue, body.theme-legion #emptyLog, body.theme-legion #emptyIssues {
-            background-color: #0b0f19 !important;
-        }
-        
-        /* Legion Cyan/Ice Blue Accents */
-        body.theme-legion .text-blue-900, body.theme-legion .text-blue-800, body.theme-legion .text-blue-700 {
-            color: #67e8f9 !important; 
-        }
-        body.theme-legion .text-blue-600, body.theme-legion .text-blue-500, body.theme-legion .text-cyan-400 {
-            color: #00e5ff !important; 
-        }
-        body.theme-legion .bg-blue-600, body.theme-legion .bg-blue-700 {
-            background-color: #0891b2 !important; 
-            border: 1px solid #00e5ff !important;
-            color: #ffffff !important;
-        }
-        body.theme-legion .bg-blue-600:hover, body.theme-legion .bg-blue-700:hover {
-            background-color: #0e7490 !important;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4) !important;
-        }
-        body.theme-legion .bg-blue-50, body.theme-legion .bg-blue-100 {
-            background-color: #083344 !important; 
-            border-color: #164e63 !important;
-        }
-        body.theme-legion .shadow-blue-200, body.theme-legion .shadow-lg.shadow-blue-200 {
-            box-shadow: 0 4px 15px -3px rgba(0, 229, 255, 0.3) !important; 
-        }
-        body.theme-legion .tab-active {
-            border-bottom: 3px solid #00e5ff !important;
-            color: #67e8f9 !important;
-            text-shadow: 0 0 8px rgba(0,229,255,0.4);
-        }
-        
-        /* Legion Notification Ticker Glow Overrides */
-        body.theme-legion .animate-ticker.text-cyan-300 {
-            color: #00e5ff !important;
-            filter: drop-shadow(0 0 8px rgba(0,229,255,0.8)) !important;
-        }
-        body.theme-legion .animate-ticker.text-yellow-300 {
-            color: #fbbf24 !important; 
-            filter: drop-shadow(0 0 8px rgba(251,191,36,0.8)) !important;
-        }
-
-        /* Legion Sticker Sheet Specifics */
-        body.theme-legion .sticker-cell {
-            background-color: #0b0f19;
-            border-color: #334155;
-        }
-        body.theme-legion .sticker-cell.used {
-            background-color: #151b2b;
-            border-color: #1e293b;
-            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,229,255,0.05) 5px, rgba(0,229,255,0.05) 10px);
-        }
-        body.theme-legion .sticker-cell.active {
-            background-color: #083344; 
-            border-color: #00e5ff;
-            color: #a5f3fc;
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
-        }
-        body.theme-legion .sticker-cell:hover:not(.used) {
-            border-color: #67e8f9;
-            background-color: #1e293b;
-        }
+        /* NIGHT MODE (Improved) */
+        body.theme-night { background-color: #0f172a !important; color: #f1f5f9 !important; }
+        body.theme-night .bg-white, body.theme-night .bg-slate-50 { background-color: #1e293b !important; }
+        body.theme-night .text-slate-800, body.theme-night .text-slate-900, body.theme-night .text-slate-700 { color: #f8fafc !important; }
+        body.theme-night .text-blue-900 { color: #93c5fd !important; }
+        body.theme-night .text-slate-500, body.theme-night .text-slate-400, body.theme-night .text-slate-600 { color: #94a3b8 !important; }
+        body.theme-night .border-slate-200, body.theme-night .border-slate-100, body.theme-night .border-slate-300 { border-color: #334155 !important; }
+        body.theme-night .glass-morphism { background: rgba(30, 41, 59, 0.98) !important; border-color: rgba(51, 65, 85, 1) !important; }
+        body.theme-night input:not([type="checkbox"]), body.theme-night select { background-color: #0f172a !important; color: #f1f5f9 !important; border-color: #475569 !important; }
+        body.theme-night input::placeholder { color: #64748b !important; }
+        body.theme-night .hover\:bg-slate-50:hover { background-color: #334155 !important; }
+        body.theme-night .bg-blue-50 { background-color: #1e3a8a !important; border-color: #1e40af !important; }
+        body.theme-night .bg-red-50 { background-color: #450a0a !important; border-color: #7f1d1d !important; }
+        body.theme-night .text-blue-700 { color: #bfdbfe !important; }
+        body.theme-night .tab-active { border-bottom-color: #3b82f6 !important; color: #60a5fa !important; }
+        body.theme-night .bg-blue-600 { box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39) !important; }
 
         /* READING MODE (SEPIA) */
-        body.theme-reading {
-            background-color: #fef3c7 !important; 
-            color: #451a03 !important; 
-        }
+        body.theme-reading { background-color: #fef3c7 !important; color: #451a03 !important; }
         body.theme-reading .bg-white { background-color: #fffbeb !important; } 
         body.theme-reading .bg-slate-50 { background-color: #fef3c7 !important; }
-        body.theme-reading .text-slate-800, body.theme-reading .text-slate-900, body.theme-reading .text-slate-700 {
-            color: #451a03 !important; 
-        }
-        body.theme-reading .text-slate-500, body.theme-reading .text-slate-400, body.theme-reading .text-slate-600 {
-            color: #78350f !important; 
-        }
-        body.theme-reading .border-slate-200, body.theme-reading .border-slate-100, body.theme-reading .border-slate-300 {
-            border-color: #fcd34d !important; 
-        }
-        body.theme-reading .glass-morphism {
-            background: rgba(255, 251, 235, 0.98) !important;
-            border-color: rgba(253, 230, 138, 1) !important;
-        }
-        body.theme-reading input:not([type="checkbox"]), body.theme-reading select {
-            background-color: #fffbeb !important;
-            color: #451a03 !important;
-            border-color: #fcd34d !important;
-        }
-        body.theme-reading .hover\:bg-slate-50:hover {
-            background-color: #fde68a !important;
-        }
-        body.theme-reading #emptyQueue, body.theme-reading #emptyLog, body.theme-reading #emptyIssues {
-            background-color: #fef3c7 !important;
-        }
+        body.theme-reading .text-slate-800, body.theme-reading .text-slate-900, body.theme-reading .text-slate-700 { color: #451a03 !important; }
+        body.theme-reading .text-slate-500, body.theme-reading .text-slate-400, body.theme-reading .text-slate-600 { color: #78350f !important; }
+        body.theme-reading .border-slate-200, body.theme-reading .border-slate-100, body.theme-reading .border-slate-300 { border-color: #fcd34d !important; }
+        body.theme-reading .glass-morphism { background: rgba(255, 251, 235, 0.98) !important; border-color: rgba(253, 230, 138, 1) !important; }
+        body.theme-reading input:not([type="checkbox"]), body.theme-reading select { background-color: #fffbeb !important; color: #451a03 !important; border-color: #fcd34d !important; }
+        body.theme-reading .hover\:bg-slate-50:hover { background-color: #fde68a !important; }
+        
+        /* ROG GAMER MODE */
+        body.theme-rog { background-color: #000000 !important; color: #f8fafc !important; }
+        body.theme-rog .bg-white, body.theme-rog .bg-slate-50 { background-color: #111111 !important; border-color: #330000 !important; }
+        body.theme-rog .text-slate-800, body.theme-rog .text-slate-900, body.theme-rog .text-slate-700 { color: #ff3333 !important; }
+        body.theme-rog .text-blue-900, body.theme-rog .text-blue-700 { color: #ff0000 !important; }
+        body.theme-rog .text-slate-500, body.theme-rog .text-slate-400, body.theme-rog .text-slate-600 { color: #888888 !important; }
+        body.theme-rog .border-slate-200, body.theme-rog .border-slate-100, body.theme-rog .border-slate-300 { border-color: #330000 !important; }
+        body.theme-rog .glass-morphism { background: rgba(10, 10, 10, 0.98) !important; border-color: #550000 !important; }
+        body.theme-rog input:not([type="checkbox"]), body.theme-rog select { background-color: #000000 !important; color: #ffffff !important; border-color: #440000 !important; }
+        body.theme-rog input::placeholder { color: #550000 !important; }
+        body.theme-rog .hover\:bg-slate-50:hover { background-color: #220000 !important; }
+        body.theme-rog .tab-active { border-bottom-color: #ff0000 !important; color: #ff0000 !important; }
+        body.theme-rog .bg-blue-600 { background-color: #cc0000 !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.5) !important; color: white !important;}
+        body.theme-rog .bg-blue-600:hover { background-color: #ff0000 !important; }
+        body.theme-rog .bg-blue-50 { background-color: #220000 !important; border-color: #440000 !important; }
+        body.theme-rog .sticker-cell.active { background-color: #330000 !important; border-color: #ff0000 !important; color: #ff9999 !important; box-shadow: 0 0 8px rgba(255,0,0,0.4); }
 
-        /* PRINT MEDIA OVERRIDE (Always White) */
+        /* LEGION ICE BLUE MODE */
+        body.theme-legion { background-color: #0b111a !important; color: #e2e8f0 !important; }
+        body.theme-legion .bg-white, body.theme-legion .bg-slate-50 { background-color: #121c29 !important; border-color: #1a2a3a !important; }
+        body.theme-legion .text-slate-800, body.theme-legion .text-slate-900, body.theme-legion .text-slate-700 { color: #00e5ff !important; }
+        body.theme-legion .text-blue-900, body.theme-legion .text-blue-700 { color: #00b3cc !important; }
+        body.theme-legion .text-slate-500, body.theme-legion .text-slate-400, body.theme-legion .text-slate-600 { color: #708a9f !important; }
+        body.theme-legion .border-slate-200, body.theme-legion .border-slate-100, body.theme-legion .border-slate-300 { border-color: #1a2a3a !important; }
+        body.theme-legion .glass-morphism { background: rgba(15, 22, 33, 0.98) !important; border-color: #20354a !important; }
+        body.theme-legion input:not([type="checkbox"]), body.theme-legion select { background-color: #0b111a !important; color: #ffffff !important; border-color: #20354a !important; }
+        body.theme-legion input::placeholder { color: #40556a !important; }
+        body.theme-legion .hover\:bg-slate-50:hover { background-color: #1a2a3a !important; }
+        body.theme-legion .tab-active { border-bottom-color: #00e5ff !important; color: #00e5ff !important; }
+        body.theme-legion .bg-blue-600 { background-color: #0099b3 !important; box-shadow: 0 0 15px rgba(0, 229, 255, 0.4) !important; color: white !important;}
+        body.theme-legion .bg-blue-600:hover { background-color: #00e5ff !important; color: #000 !important; }
+        body.theme-legion .bg-blue-50 { background-color: #0b2233 !important; border-color: #10334a !important; }
+        body.theme-legion .sticker-cell.active { background-color: #0f3044 !important; border-color: #00e5ff !important; color: #99f5ff !important; box-shadow: 0 0 8px rgba(0,229,255,0.4); }
+
+        /* PRINT MEDIA OVERRIDE */
         @media print {
-            body {
-                background-color: white !important;
-                color: black !important;
-            }
-            .glass-morphism, * {
-                background: white !important;
-                border-color: #ccc !important;
-                color: black !important;
-                box-shadow: none !important;
-            }
-            .no-print {
-                display: none !important;
-            }
+            body { background-color: white !important; color: black !important; }
+            .glass-morphism, * { background: white !important; border-color: #ccc !important; color: black !important; box-shadow: none !important; }
+            .no-print { display: none !important; }
         }
     </style>
 </head>
@@ -444,7 +165,7 @@
     
     <!-- TOP NOTIFICATION & CLOCK BAR -->
     <div class="bg-slate-900 text-slate-200 border-b border-slate-700 shadow-sm relative z-50 no-print">
-        <div class="max-w-6xl mx-auto px-4 md:px-6 py-2.5 flex items-center justify-between text-xs font-medium tracking-wide">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between text-xs font-medium tracking-wide">
             <div class="flex items-center gap-2 text-cyan-400 font-bold shrink-0 bg-slate-800/80 border border-slate-700 px-3 py-1 rounded-lg shadow-inner">
                 <i class="far fa-clock"></i>
                 <span id="digitalClockText">--:--:--</span>
@@ -452,72 +173,67 @@
             
             <div class="overflow-hidden flex-1 ml-6 relative h-8 flex items-center mask-image-linear">
                 <div class="w-full absolute whitespace-nowrap flex items-center">
-                    <span id="tickerText" class="animate-ticker text-slate-300 text-sm drop-shadow-md">System loading...</span>
+                    <span id="tickerText" class="animate-ticker text-cyan-400 font-bold text-base neon-glow transition-all duration-300">System loading...</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto p-4 md:p-6">
+    <div class="max-w-7xl mx-auto p-4 md:p-6">
         
-        <header class="mb-6 flex flex-col gap-4">
-            <!-- Title and Controls Row -->
-            <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
-                <div class="text-center lg:text-left shrink-0">
-                    <h1 class="text-2xl font-black text-blue-900 tracking-tight uppercase">Label Maker Pro V4</h1>
-                    <p class="text-slate-500 text-sm font-medium">Precision Area Mapping & Inventory System</p>
-                </div>
-                
-                <!-- Moved Controls (Theme, Lookup, Settings) out of scrolling nav -->
-                <div class="flex items-center bg-white rounded-xl shadow-sm p-1 border border-slate-200 shrink-0 gap-1 no-print transition-colors">
-                    <div class="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 shrink-0 transition-colors" title="Quick Theme Toggle">
-                        <i class="fas fa-moon text-blue-500 text-sm"></i>
-                        <select id="quickThemeSelect" onchange="toggleTheme(this)" class="bg-transparent text-slate-600 font-bold text-sm outline-none cursor-pointer focus:ring-0 border-none">
-                            <option value="day">Day</option>
-                            <option value="night">Night</option>
-                            <option value="rog">ROG (Gamer)</option>
-                            <option value="legion">Legion (Ice Blue)</option>
-                            <option value="reading">Sepia</option>
-                        </select>
-                    </div>
-
-                    <a href="#" id="navLookupLink" target="_blank" class="px-4 py-2 rounded-lg text-blue-500 hover:text-blue-700 hover:bg-blue-50 transition-all shrink-0 flex items-center justify-center font-bold text-sm" title="Order Lookup Tool">
-                        <i class="fas fa-external-link-alt mr-1"></i> Lookup
-                    </a>
-                    <button onclick="openSettings()" class="px-4 py-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all shrink-0" title="Settings">
-                        <i class="fas fa-sliders-h text-xl"></i>
-                    </button>
-                </div>
+        <!-- HEADER WITH CONTROLS -->
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-4 gap-4">
+            <div class="text-center lg:text-left shrink-0">
+                <h1 class="text-3xl font-black text-blue-900 tracking-tight uppercase">Label Maker Pro V4</h1>
+                <p class="text-slate-500 text-sm font-medium">Precision Area Mapping & Inventory System</p>
             </div>
-
-            <!-- Tab Navigation Row (Dedicated horizontal scroll) -->
-            <nav class="flex w-full justify-between bg-white rounded-xl shadow-sm p-1 border border-slate-200 items-center overflow-x-auto no-scrollbar max-w-full no-print transition-colors">
-                <button onclick="switchTab('search')" id="tab-search" class="px-3 lg:px-6 py-2.5 rounded-lg font-bold text-xs md:text-sm transition-all tab-active whitespace-nowrap flex-1 text-center">SEARCH & LOG</button>
-                <button onclick="switchTab('print')" id="tab-print" class="px-3 lg:px-6 py-2.5 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">PRINT QUEUE</button>
-                <button onclick="switchTab('history')" id="tab-history" class="px-3 lg:px-6 py-2.5 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">FULL LOG</button>
-                <button onclick="switchTab('inventory')" id="tab-inventory" class="px-3 lg:px-6 py-2.5 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">RETAIL CATALOG</button>
-                <button onclick="switchTab('issues')" id="tab-issues" class="px-3 lg:px-6 py-2.5 rounded-lg font-bold text-xs md:text-sm transition-all text-slate-400 whitespace-nowrap flex-1 text-center">REPRINTS & ISSUES</button>
-            </nav>
+            
+            <!-- Global Tools pinned to Top Right -->
+            <div class="flex items-center bg-white rounded-xl shadow-sm p-1.5 border border-slate-200 shrink-0 gap-2 no-print glass-morphism">
+                <div class="flex items-center border-r border-slate-200 pr-2 mr-1">
+                    <i class="fas fa-moon text-slate-400 mx-2"></i>
+                    <select id="quickThemeSelector" onchange="toggleTheme(this)" class="bg-transparent text-sm font-bold text-slate-600 outline-none cursor-pointer p-1">
+                        <option value="day">Day Mode</option>
+                        <option value="night">Night Mode</option>
+                        <option value="reading">Sepia Mode</option>
+                        <option value="rog">ROG (Gamer)</option>
+                        <option value="legion">Legion (Ice Blue)</option>
+                    </select>
+                </div>
+                <a href="#" id="navLookupLink" target="_blank" class="px-3 py-1.5 rounded-lg text-blue-500 hover:text-blue-700 hover:bg-blue-50 transition-all flex items-center justify-center font-bold text-sm" title="Order Lookup Tool">
+                    <i class="fas fa-external-link-alt mr-1"></i> Lookup
+                </a>
+                <button onclick="openSettings()" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Settings">
+                    <i class="fas fa-sliders-h text-lg"></i>
+                </button>
+            </div>
         </header>
 
+        <!-- DEDICATED NAVIGATION TABS -->
+        <nav class="flex w-full justify-between bg-white rounded-xl shadow-sm p-1 border border-slate-200 items-center overflow-x-auto no-scrollbar mb-6 no-print glass-morphism">
+            <button onclick="switchTab('search')" id="tab-search" class="px-3 md:px-5 py-3 rounded-lg font-black text-xs md:text-sm transition-all tab-active whitespace-nowrap flex-1 text-center tracking-wide">SEARCH & LOG</button>
+            <button onclick="switchTab('print')" id="tab-print" class="px-3 md:px-5 py-3 rounded-lg font-black text-xs md:text-sm transition-all text-slate-400 hover:text-slate-600 whitespace-nowrap flex-1 text-center tracking-wide">PRINT QUEUE</button>
+            <button onclick="switchTab('history')" id="tab-history" class="px-3 md:px-5 py-3 rounded-lg font-black text-xs md:text-sm transition-all text-slate-400 hover:text-slate-600 whitespace-nowrap flex-1 text-center tracking-wide">FULL LOG</button>
+            <button onclick="switchTab('inventory')" id="tab-inventory" class="px-3 md:px-5 py-3 rounded-lg font-black text-xs md:text-sm transition-all text-slate-400 hover:text-slate-600 whitespace-nowrap flex-1 text-center tracking-wide">INVENTORY MANAGER</button>
+            <button onclick="switchTab('issues')" id="tab-issues" class="px-3 md:px-5 py-3 rounded-lg font-black text-xs md:text-sm transition-all text-slate-400 hover:text-slate-600 whitespace-nowrap flex-1 text-center tracking-wide">REPRINTS & ISSUES</button>
+        </nav>
+
         <section id="section-search" class="tab-content">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <!-- Left: Search Box -->
-                <div class="glass-morphism rounded-2xl shadow-xl p-8 flex flex-col justify-center overflow-hidden relative">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
+                
+                <!-- Left: Search Box (7 columns on desktop) -->
+                <div class="md:col-span-7 glass-morphism rounded-2xl shadow-xl p-8 flex flex-col justify-center overflow-hidden relative">
                     <div class="w-full">
                         <label class="block text-center text-slate-500 uppercase tracking-widest text-xs font-black mb-4">Enter Cabin Number</label>
                         <div class="flex flex-col gap-4">
-                            <!-- Changed to type="text" for alphanumeric support -->
-                            <input type="text" id="cabinSearch" placeholder="e.g. 10245 or VIP" 
+                            <!-- Changed type to text to support alphanumeric cabins like VIP -->
+                            <input type="text" id="cabinSearch" placeholder="E.g. 10245 or VIP" 
                                    class="w-full min-w-0 text-3xl font-bold text-center py-4 rounded-2xl border-2 border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all uppercase">
                             
                             <div class="w-full h-px bg-slate-200 my-2"></div>
                             <label class="block text-center text-slate-500 uppercase tracking-widest text-[10px] font-black">Retail Items (Optional)</label>
 
-                            <!-- Dynamic Items Container -->
-                            <div id="retail-items-container" class="space-y-3">
-                                <!-- Populated by JS -->
-                            </div>
+                            <div id="retail-items-container" class="space-y-3"></div>
 
                             <button type="button" onclick="addRetailRow()" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-bold text-sm hover:border-blue-400 hover:text-blue-500 transition-colors flex items-center justify-center gap-2">
                                 <i class="fas fa-plus"></i> Add Another Retail Item
@@ -528,43 +244,39 @@
                             </button>
                         </div>
                     </div>
-
-                    <div id="notFoundArea" class="hidden mt-8 p-4 bg-red-50 border-2 border-dashed border-red-200 rounded-2xl text-red-600 font-bold text-center text-sm">
-                        Please enter a valid Cabin Number or Text.
-                    </div>
                 </div>
 
-                <!-- Right: Interactive Sticker Sheet Selector -->
-                <div class="glass-morphism rounded-2xl shadow-xl p-6 flex flex-col gap-6 relative">
-                    <div class="flex-1 w-full">
-                        <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                <!-- Right: Interactive Sticker Sheet Selector (5 columns on desktop) -->
+                <div class="md:col-span-5 glass-morphism rounded-2xl shadow-xl p-6 flex flex-col justify-between">
+                    <div class="w-full mb-4">
+                        <h4 class="font-black text-slate-800 text-lg flex items-center gap-2 mb-1">
                             <i class="fas fa-border-all text-blue-500"></i>
                             Sticker Sheet Layout
                         </h4>
-                        <p class="text-xs text-slate-500 mb-4">Click the grid to select where the first label should print. <strong class="text-blue-600">Click a queued label to add Special Instructions.</strong></p>
-
-                        <div class="grid grid-cols-2 gap-3 text-sm mb-6">
-                            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm text-center flex flex-col items-center justify-center">
-                                <span class="block text-slate-400 font-bold text-[10px] uppercase mb-1">Skipping</span>
-                                <input type="number" id="skipInput" onchange="updateSkipFromInput(this)" class="w-16 text-center font-black text-slate-700 border-b-2 border-slate-200 focus:border-blue-500 outline-none" min="0" value="0">
-                            </div>
-                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 shadow-sm text-center flex flex-col items-center justify-center">
-                                <span class="block text-blue-400 font-bold text-[10px] uppercase mb-1">Queue</span>
-                                <span class="text-xl font-black text-blue-700"><span id="lblQueueSize">0</span> Labels</span>
-                            </div>
-                        </div>
-
-                        <button id="quickPrintBtn" class="w-full bg-blue-600 text-white px-4 py-3 rounded-xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2 transform active:scale-95 mb-4">
-                            <i class="fas fa-print"></i>
-                            PRINT LABELS
-                        </button>
+                        <p class="text-xs text-slate-500 font-medium">Click the grid to select where the first label should print. <span class="text-blue-500 font-bold">Click a queued label to add Special Instructions.</span></p>
                     </div>
 
-                    <!-- Multiple Sheets Wrapper -->
-                    <div class="w-full overflow-x-auto pb-4 custom-scrollbar" id="stickerSheetsWrapper">
-                        <div class="flex gap-6" id="stickerSheetsContainer">
-                            <!-- Sheets dynamically populated by Javascript -->
+                    <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center">
+                            <span class="block text-slate-400 font-black text-[10px] uppercase tracking-widest mb-1">Skipping</span>
+                            <div class="flex items-center gap-1">
+                                <input type="number" id="manualSkipInput" onchange="updateStickerOffset(this.value)" min="0" value="0" class="w-16 text-center font-black text-xl text-slate-800 bg-white border border-slate-300 rounded p-1 outline-none focus:border-blue-500">
+                            </div>
                         </div>
+                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-200 shadow-sm flex flex-col items-center justify-center">
+                            <span class="block text-blue-400 font-black text-[10px] uppercase tracking-widest mb-1">Queue</span>
+                            <span class="text-2xl font-black text-blue-700"><span id="lblQueueSize">0</span> Labels</span>
+                        </div>
+                    </div>
+
+                    <button id="quickPrintBtn" class="w-full bg-blue-600 text-white px-4 py-3 rounded-xl font-black hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2 transform active:scale-95 mb-6">
+                        <i class="fas fa-print"></i>
+                        PRINT LABELS
+                    </button>
+
+                    <!-- Horizontal Scrolling Container for Multiple Sticker Sheets -->
+                    <div class="w-full overflow-x-auto pb-4 custom-scrollbar flex gap-6 justify-start items-center p-2 rounded-xl bg-slate-50 border border-slate-100 min-h-[260px]" id="stickerSheetContainer">
+                        <!-- Sheets Populated by Javascript -->
                     </div>
                 </div>
             </div>
@@ -581,9 +293,8 @@
                         <button id="clearQueueBtn" class="flex-1 md:flex-none border border-red-200 text-red-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-50 transition-all">
                             Clear Queue
                         </button>
-                        <button id="downloadPDF" class="flex-1 md:flex-none bg-blue-600 text-white px-8 py-3 rounded-xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all flex items-center gap-2 transform active:scale-95">
-                            <i class="fas fa-print"></i>
-                            PRINT LABELS
+                        <button id="downloadPDF" class="flex-1 md:flex-none bg-blue-600 text-white px-8 py-3 rounded-xl font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2 transform active:scale-95">
+                            <i class="fas fa-print"></i> PRINT LABELS
                         </button>
                     </div>
                 </div>
@@ -592,14 +303,14 @@
                     <table class="w-full">
                         <thead class="bg-slate-50 text-left border-b border-slate-200">
                             <tr>
-                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase">Cabin</th>
-                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase text-center">Details</th>
-                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase text-right">Action</th>
+                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase tracking-widest">Cabin</th>
+                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Details & Items</th>
+                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody id="queueBody" class="divide-y divide-slate-50 bg-white"></tbody>
                     </table>
-                    <div id="emptyQueue" class="p-20 text-center text-slate-300 italic font-medium bg-slate-50">The print queue is empty.</div>
+                    <div id="emptyQueue" class="p-20 text-center text-slate-400 italic font-medium bg-slate-50">The print queue is empty.</div>
                 </div>
             </div>
         </section>
@@ -608,44 +319,44 @@
             <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden">
                 <div class="p-6 bg-white border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
-                        <h3 class="font-black text-slate-800">Full Delivery & Sales Log</h3>
-                        <p class="text-sm text-slate-500">Permanent record of all saved deliveries</p>
+                        <h3 class="font-black text-slate-800 text-xl">Full Delivery Log</h3>
+                        <p class="text-sm text-slate-500">Permanent record of all saved deliveries.</p>
                     </div>
                     <div class="flex-1 md:mx-6 w-full mt-4 md:mt-0">
                         <div class="relative">
-                            <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
-                            <input type="text" id="logSearchInput" oninput="updateUI()" placeholder="Search logs (Cabin, Item, Date)..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:border-blue-500 outline-none text-sm transition-all shadow-sm">
+                            <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                            <input type="text" id="logSearchInput" oninput="updateUI()" placeholder="Search logs (Cabin, Item, Date, Instruction)..." class="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-sm transition-all shadow-sm font-medium">
                         </div>
                     </div>
                     <div class="flex gap-2 w-full md:w-auto mt-4 md:mt-0">
-                        <button id="clearLogBtn" class="flex-1 md:flex-none border border-red-200 text-red-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-50 transition-all">
+                        <button id="clearLogBtn" class="flex-1 md:flex-none border border-red-200 text-red-600 px-4 py-3 rounded-xl font-bold text-sm hover:bg-red-50 transition-all">
                             Delete History
                         </button>
-                        <button id="downloadExcel" class="flex-1 md:flex-none bg-slate-800 text-white px-6 py-2 rounded-lg font-black text-sm hover:bg-black transition-all">
+                        <button id="downloadExcel" class="flex-1 md:flex-none bg-slate-800 text-white px-6 py-3 rounded-xl font-black text-sm hover:bg-black transition-all shadow-md">
                             EXPORT EXCEL
                         </button>
                     </div>
                 </div>
-                <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+                <div class="overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">
                     <table class="w-full">
                         <thead class="bg-slate-50 text-left sticky top-0 z-10 shadow-sm border-b border-slate-200">
                             <tr>
-                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase">Timestamp</th>
-                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase">Cabin</th>
-                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase text-center">Retail / Notes</th>
-                                <th class="px-6 py-3 text-xs font-black text-slate-400 uppercase text-right">Actions</th>
+                                <th class="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Timestamp</th>
+                                <th class="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Cabin</th>
+                                <th class="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Items & Instructions</th>
+                                <th class="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="logBody" class="bg-white"></tbody>
                     </table>
-                    <div id="emptyLog" class="p-20 text-center text-slate-300 italic font-medium bg-slate-50">No deliveries found.</div>
+                    <div id="emptyLog" class="p-20 text-center text-slate-400 italic font-medium bg-slate-50">No deliveries found.</div>
                 </div>
             </div>
         </section>
 
-        <!-- (Inventory and Issues Sections remain exactly as previous working versions) -->
         <section id="section-inventory" class="tab-content hidden">
             <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden p-6 md:p-8">
+                
                 <div class="mb-8 p-6 bg-blue-50 border border-blue-100 rounded-2xl transition-colors">
                     <h3 class="text-lg font-black text-blue-900 mb-4"><i class="fas fa-plus-circle mr-2"></i>Add Retail Item</h3>
                     <form id="addItemForm" class="flex flex-col md:flex-row gap-4 items-end">
@@ -657,22 +368,30 @@
                             <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Category</label>
                             <input type="text" id="newItemCategory" required placeholder="e.g. Frames" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
                         </div>
+                        <div class="w-full md:w-32">
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Total Stock</label>
+                            <input type="number" id="newItemStock" min="0" value="0" required class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                        </div>
                         <button type="submit" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-md active:scale-95">
                             Add Item
                         </button>
                     </form>
                 </div>
 
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-black text-slate-800 text-xl">Retail Catalog</h3>
+                <div class="flex flex-col mb-4">
+                    <h3 class="font-black text-slate-800 text-2xl">Inventory & Retail Catalog</h3>
+                    <p class="text-sm text-slate-500">Manage items, set total stock, and view real-time remaining quantities based on your delivery logs.</p>
                 </div>
 
-                <div class="border border-slate-200 rounded-xl overflow-hidden">
+                <div class="border border-slate-200 rounded-xl overflow-hidden overflow-x-auto">
                     <table class="w-full text-left">
                         <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs font-black uppercase tracking-widest">
                             <tr>
                                 <th class="p-4">Item Name</th>
                                 <th class="p-4 text-center">Category</th>
+                                <th class="p-4 text-center text-blue-600" title="Set your initial inventory quantity here">Total Stock</th>
+                                <th class="p-4 text-center text-red-500" title="Automatically calculated from Delivery Logs">Total Issued</th>
+                                <th class="p-4 text-center text-emerald-600" title="Remaining Inventory">Remaining</th>
                                 <th class="p-4 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -684,6 +403,7 @@
 
         <section id="section-issues" class="tab-content hidden">
             <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden p-6 md:p-8">
+                <!-- Add New Issue Form -->
                 <div class="mb-8 p-6 bg-red-50 border border-red-100 rounded-2xl transition-colors">
                     <h3 class="text-lg font-black text-red-900 mb-4"><i class="fas fa-exclamation-triangle mr-2"></i>Log Reprint Issue</h3>
                     <form id="addIssueForm" class="flex flex-col md:flex-row gap-4 items-end flex-wrap">
@@ -693,8 +413,7 @@
                         </div>
                         <div class="flex-1 min-w-[150px]">
                             <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Cabin Number</label>
-                            <!-- Updated to text input -->
-                            <input type="text" id="issueCabin" required placeholder="e.g. 10245 or VIP" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all uppercase">
+                            <input type="text" id="issueCabin" required placeholder="E.g. VIP" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all uppercase">
                         </div>
                         <div class="flex-[2] min-w-[200px]">
                             <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Issue Description</label>
@@ -722,9 +441,6 @@
                         <button id="downloadIssuesExcel" class="flex-1 md:flex-none bg-slate-800 text-white px-6 py-2 rounded-lg font-black text-sm hover:bg-black transition-all">
                             EXPORT EXCEL
                         </button>
-                        <button id="downloadIssuesPDF" class="flex-1 md:flex-none bg-blue-600 text-white px-6 py-2 rounded-lg font-black text-sm hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">
-                            EXPORT PDF
-                        </button>
                     </div>
                 </div>
 
@@ -747,19 +463,16 @@
             </div>
         </section>
 
-        <!-- Copyright Footer -->
         <footer class="mt-8 text-center text-slate-400 text-sm font-medium no-print">
             &copy; 2026 Created by Roswell Relova
         </footer>
-
     </div>
 
     <!-- SETTINGS MODAL -->
     <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity">
         <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md transform transition-all max-h-[90vh] overflow-y-auto theme-border">
             <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
-                <i class="fas fa-cog text-blue-500"></i>
-                System Settings
+                <i class="fas fa-cog text-blue-500"></i> System Settings
             </h2>
             
             <div class="space-y-6">
@@ -767,17 +480,6 @@
                 <div>
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">Visual & Appearance</h4>
                     <div class="space-y-4">
-                        <div class="flex flex-col gap-2">
-                            <label class="font-bold text-slate-800 text-sm">Application Theme</label>
-                            <select id="settingTheme" onchange="toggleTheme(this)" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none text-sm cursor-pointer transition-colors bg-white">
-                                <option value="day">Day Mode (Standard)</option>
-                                <option value="night">Night Mode (Dark)</option>
-                                <option value="rog">ROG Mode (Gamer)</option>
-                                <option value="legion">Legion Mode (Ice Blue)</option>
-                                <option value="reading">Reading Mode (Sepia)</option>
-                            </select>
-                        </div>
-                        
                         <div class="flex flex-col gap-2">
                             <label class="font-bold text-slate-800 text-sm">Notification Bar Text Size</label>
                             <select id="settingNotifSize" onchange="toggleNotifSize(this)" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none text-sm cursor-pointer transition-colors bg-white">
@@ -793,16 +495,13 @@
                 <div>
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">Print Options</h4>
                     
-                    <!-- NEW: Label Header Text -->
-                    <div class="space-y-4 mb-4">
-                        <div class="flex flex-col gap-2">
-                            <label class="font-bold text-slate-800 text-sm">Label Header Text</label>
-                            <input type="text" id="settingLabelHeader" oninput="toggleLabelHeader(this)" placeholder="e.g. CABIN NUMBER" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none text-sm transition-all bg-white">
-                            <span class="block text-[10px] text-slate-500 mt-1">Changes the text at the top of every printed label. Defaults to "CABIN NUMBER".</span>
-                        </div>
+                    <div class="mb-4">
+                        <label class="font-bold text-slate-800 text-sm block mb-1">Label Header Text</label>
+                        <input type="text" id="settingLabelHeader" oninput="toggleLabelHeader(this)" placeholder="e.g. CABIN NUMBER" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none text-sm transition-all bg-white uppercase">
+                        <span class="block text-[10px] text-slate-500 mt-1">Text printed at the very top of every label.</span>
                     </div>
 
-                    <label class="flex items-start gap-4 p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors">
+                    <label class="flex items-start gap-4 p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors mb-4">
                         <div class="mt-1">
                             <input type="checkbox" id="settingShowArea" onchange="toggleShowArea(this)" class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
                         </div>
@@ -812,14 +511,14 @@
                         </div>
                     </label>
 
-                    <div class="mt-4 p-4 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors">
+                    <div class="p-4 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors">
                         <label class="block font-bold text-slate-800 mb-2 text-sm">Special Note (Optional)</label>
                         <input type="text" id="settingGlobalNote" oninput="toggleGlobalNote(this)" placeholder="e.g. Have a great cruise!" maxlength="40" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none transition-all text-sm">
                         <span class="block text-xs text-slate-500 mt-2">Automatically print this message at the bottom center of every label.</span>
                     </div>
                 </div>
 
-                <!-- System Links & Data Management unchanged -->
+                <!-- System Links -->
                 <div>
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">System Links</h4>
                     <div class="flex flex-col gap-2">
@@ -828,6 +527,7 @@
                     </div>
                 </div>
 
+                <!-- Data Management -->
                 <div>
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-1">Data Management</h4>
                     <div class="flex gap-2">
@@ -850,9 +550,27 @@
         </div>
     </div>
 
-    <!-- CUSTOM REUSABLE MODAL (Replaces alert/confirm) -->
+    <!-- SPECIAL INSTRUCTION MODAL -->
+    <div id="instructionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[70] flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-sm transform transition-all text-center theme-border">
+            <div class="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fas fa-comment-dots"></i>
+            </div>
+            <h3 class="text-xl font-black text-slate-800 mb-2">Special Instruction</h3>
+            <p class="text-slate-500 text-sm mb-6 font-medium">Add a note that will print directly on this sticker (e.g., "Missing Frame").</p>
+            
+            <input type="text" id="instructionInput" placeholder="Enter instruction..." class="w-full p-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-center font-bold mb-6">
+            
+            <div class="flex gap-3">
+                <button onclick="closeInstructionModal()" class="flex-1 px-4 py-3 rounded-xl font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Cancel</button>
+                <button onclick="saveInstruction()" class="flex-1 px-4 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 active:scale-95">Save Note</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM REUSABLE CONFIRM/ALERT MODAL -->
     <div id="customModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4 transition-opacity">
-        <div id="customModalContent" class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-sm transform transition-all scale-100 text-center theme-border">
+        <div id="customModalContent" class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-sm transform transition-all text-center theme-border">
             <div id="customModalIcon" class="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mx-auto mb-4">
                 <i class="fas fa-info-circle"></i>
             </div>
@@ -871,13 +589,11 @@
             <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
                 <i class="fas fa-edit text-blue-500"></i> Edit Delivery Log
             </h2>
-            
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Cabin Number</label>
-                    <input type="text" id="editCabinInput" class="w-full text-2xl font-bold text-center py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all uppercase">
+                    <input type="text" id="editCabinInput" class="w-full text-2xl font-bold text-center py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none transition-all uppercase">
                 </div>
-                
                 <div class="w-full h-px bg-slate-200 my-4"></div>
                 <label class="block text-center text-slate-500 uppercase tracking-widest text-[10px] font-black">Retail Items</label>
                 <div id="edit-retail-items-container" class="space-y-3"></div>
@@ -885,7 +601,6 @@
                     <i class="fas fa-plus"></i> Add Retail Item
                 </button>
             </div>
-
             <div class="mt-8 flex gap-3">
                 <button onclick="closeEditModal()" class="flex-1 px-6 py-4 rounded-xl font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Cancel</button>
                 <button onclick="saveEditLog()" class="flex-1 px-6 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 active:scale-95">Save Changes</button>
@@ -899,7 +614,6 @@
             <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
                 <i class="fas fa-edit text-blue-500"></i> Edit Logged Issue
             </h2>
-            
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Order Number</label>
@@ -918,7 +632,6 @@
                     <input type="text" id="editIssueStaff" class="w-full text-lg font-bold p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none transition-all">
                 </div>
             </div>
-
             <div class="mt-8 flex gap-3">
                 <button onclick="closeEditIssueModal()" class="flex-1 px-6 py-4 rounded-xl font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Cancel</button>
                 <button onclick="saveEditIssue()" class="flex-1 px-6 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 active:scale-95">Save Changes</button>
@@ -926,55 +639,22 @@
         </div>
     </div>
 
-    <!-- SPECIAL INSTRUCTION MODAL -->
-    <div id="specialInstructionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity">
-        <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-sm transform transition-all text-center theme-border">
-            <h3 class="text-xl font-black text-slate-800 mb-2">Special Instruction</h3>
-            <p class="text-xs text-slate-500 mb-4">Add a custom note to this label (e.g. VIP, Delivery Time)</p>
-            <input type="text" id="specialInstInput" placeholder="e.g. VIP, Early Delivery" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 outline-none transition-all mb-6 text-center font-bold">
-            
-            <div class="flex gap-3">
-                <button onclick="closeSpecialInstructionModal()" class="flex-1 px-4 py-3 rounded-xl font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-colors">Cancel</button>
-                <button onclick="saveSpecialInstruction()" class="flex-1 px-4 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 active:scale-95">Save Note</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         const defaultInventory = [
-            { id: 1, name: 'Aqua Seascape', category: 'Photo Spot' },
-            { id: 2, name: 'TILEPIX', category: 'Frames' },
-            { id: 3, name: 'Basic Gallery Frame', category: 'Frames' },
-            { id: 4, name: 'PHOTO SPOT - WHITE', category: 'Photo Spot' },
-            { id: 5, name: 'PHOTO SPOT - BLUE', category: 'Photo Spot' },
-            { id: 6, name: 'Light UP Frame', category: 'Frames' },
-            { id: 7, name: 'Note Book', category: 'Small Gifts' },
-            { id: 8, name: 'Mug', category: 'Small Gifts' },
-            { id: 9, name: 'Bottle Opener', category: 'Small Gifts' },
-            { id: 10, name: 'Fridge Magnet', category: 'Small Gifts' },
-            { id: 11, name: 'Keychain', category: 'Small Gifts' },
-            { id: 12, name: 'Acrylic 4x6', category: 'Small Gifts' },
-            { id: 13, name: 'Porthole White', category: 'Portholes' },
-            { id: 14, name: 'Porthole Green (Rustic)', category: 'Portholes' },
-            { id: 15, name: 'Porthole Silver', category: 'Portholes' },
-            { id: 16, name: 'Metal Frame V', category: 'Frames' },
-            { id: 17, name: 'Metal Frame H', category: 'Frames' },
-            { id: 18, name: 'Shell Horizontal Frame', category: 'Frames' },
-            { id: 19, name: 'Shell Vertical Frame', category: 'Frames' },
-            { id: 20, name: 'Black Frame H', category: 'Frames' },
-            { id: 21, name: 'Black Frame V', category: 'Frames' },
-            { id: 22, name: 'Compass Collection Folio', category: 'Photo Spot' },
-            { id: 23, name: 'Compass Collection Album', category: 'Photo Spot' },
-            { id: 24, name: 'Compass Collection Frame', category: 'Photo Spot' },
-            { id: 25, name: 'Monkey', category: 'Towel Art' },
-            { id: 26, name: 'Elephant', category: 'Towel Art' },
-            { id: 27, name: 'Porthole Mini', category: 'Portholes' }
+            { id: 1, name: 'Aqua Seascape', category: 'Photo Spot', stock: 0 },
+            { id: 2, name: 'TILEPIX', category: 'Frames', stock: 0 },
+            { id: 3, name: 'Basic Gallery Frame', category: 'Frames', stock: 0 },
+            { id: 4, name: 'PHOTO SPOT - WHITE', category: 'Photo Spot', stock: 0 },
+            { id: 5, name: 'PHOTO SPOT - BLUE', category: 'Photo Spot', stock: 0 },
+            { id: 6, name: 'Light UP Frame', category: 'Frames', stock: 0 },
+            { id: 7, name: 'Note Book', category: 'Small Gifts', stock: 0 },
+            { id: 8, name: 'Mug', category: 'Small Gifts', stock: 0 },
+            { id: 9, name: 'Bottle Opener', category: 'Small Gifts', stock: 0 }
         ];
 
-        // Basic map of decks to areas for matching valid numeric cabins
         const rawMapData = {
-            16: { 1: "16166,16168", 2: "16776,16778" }, 
-            // Abbreviated for space, assume full map logic here normally
+            16: { 1: "16166,16168,16170", 2: "16776,16778,16780" },
+            15: { 7: "15224,15226,15228", 8: "15808,15810,15812" }
         };
 
         const cabinDatabase = [];
@@ -990,7 +670,6 @@
         let deliveryHistory = JSON.parse(localStorage.getItem('fullDeliveryHistory')) || [];
         let printQueue = JSON.parse(localStorage.getItem('currentPrintQueue')) || [];
         let issuesLog = JSON.parse(localStorage.getItem('reprintIssuesLog')) || [];
-        
         let stickerOffset = parseInt(localStorage.getItem('stickerSheetOffset') || '0');
         
         let appSettings = JSON.parse(localStorage.getItem('appSettings') || '{}');
@@ -999,13 +678,13 @@
         if (typeof appSettings.theme === 'undefined') appSettings.theme = "day";
         if (typeof appSettings.notificationSize === 'undefined') appSettings.notificationSize = "normal";
         if (typeof appSettings.lookupUrl === 'undefined') appSettings.lookupUrl = "http://10.76.50.193/photoweb/Forms/OrderLookup.aspx";
-        if (typeof appSettings.labelHeaderText === 'undefined') appSettings.labelHeaderText = "CABIN NUMBER"; // New setting
+        if (typeof appSettings.labelHeader === 'undefined') appSettings.labelHeader = "CABIN NUMBER";
         
         let currentSelection = null;
         let pendingConfirmAction = null;
         let editingLogId = null;
         let editingIssueId = null;
-        let currentSpecialInstIndex = null;
+        let currentInstructionIndex = null;
 
         function saveState() {
             localStorage.setItem('labRetailInventory', JSON.stringify(inventoryItems));
@@ -1019,18 +698,25 @@
         function applySettings() {
             document.body.className = `bg-slate-50 min-h-screen font-sans text-slate-900 transition-colors duration-300 theme-${appSettings.theme}`;
             
+            const tickerEl = document.getElementById('tickerText');
+            const baseClasses = 'animate-ticker transition-all duration-300 font-bold';
+            const sizeMap = { 'small': 'text-sm', 'normal': 'text-base', 'large': 'text-xl font-black' };
+            
+            tickerEl.className = `${baseClasses} ${sizeMap[appSettings.notificationSize]}`;
+            if (printQueue.length > 0) {
+                tickerEl.classList.add('neon-glow-warning');
+                tickerEl.classList.remove('neon-glow');
+            } else {
+                tickerEl.classList.add('neon-glow');
+                tickerEl.classList.remove('neon-glow-warning');
+            }
+            
             document.getElementById('settingShowArea').checked = appSettings.showArea;
             document.getElementById('settingGlobalNote').value = appSettings.globalNote;
-            
-            // Sync both theme dropdowns
-            document.getElementById('settingTheme').value = appSettings.theme;
-            if (document.getElementById('quickThemeSelect')) {
-                document.getElementById('quickThemeSelect').value = appSettings.theme;
-            }
-
+            document.getElementById('settingLabelHeader').value = appSettings.labelHeader;
             document.getElementById('settingNotifSize').value = appSettings.notificationSize;
             document.getElementById('settingLookupUrl').value = appSettings.lookupUrl;
-            document.getElementById('settingLabelHeader').value = appSettings.labelHeaderText;
+            document.getElementById('quickThemeSelector').value = appSettings.theme;
 
             const lookupBtn = document.getElementById('navLookupLink');
             if (appSettings.lookupUrl && appSettings.lookupUrl.trim() !== '') {
@@ -1041,8 +727,6 @@
             } else {
                 lookupBtn.classList.add('hidden');
             }
-            
-            updateTicker();
         }
 
         function showCustomAlert(title, message) {
@@ -1075,134 +759,203 @@
             document.getElementById('customModal').classList.remove('hidden');
         }
 
-        window.closeCustomModal = function() {
-            document.getElementById('customModal').classList.add('hidden');
-            pendingConfirmAction = null;
-        };
+        window.closeCustomModal = () => { document.getElementById('customModal').classList.add('hidden'); pendingConfirmAction = null; };
+        window.confirmCustomModal = () => { if (pendingConfirmAction) pendingConfirmAction(); closeCustomModal(); };
 
-        window.confirmCustomModal = function() {
-            if (pendingConfirmAction) pendingConfirmAction();
-            closeCustomModal();
-        };
+        window.openSettings = () => document.getElementById('settingsModal').classList.remove('hidden');
+        window.closeSettings = () => document.getElementById('settingsModal').classList.add('hidden');
 
-        window.openSettings = function() { document.getElementById('settingsModal').classList.remove('hidden'); };
-        window.closeSettings = function() { document.getElementById('settingsModal').classList.add('hidden'); };
+        window.toggleShowArea = (el) => { appSettings.showArea = el.checked; saveState(); };
+        window.toggleGlobalNote = (el) => { appSettings.globalNote = el.value; saveState(); };
+        window.toggleLabelHeader = (el) => { appSettings.labelHeader = el.value; saveState(); };
+        window.toggleTheme = (el) => { appSettings.theme = el.value; saveState(); applySettings(); };
+        window.toggleNotifSize = (el) => { appSettings.notificationSize = el.value; saveState(); applySettings(); };
+        window.toggleLookupUrl = (el) => { appSettings.lookupUrl = el.value; saveState(); applySettings(); };
 
-        window.toggleShowArea = function(el) { appSettings.showArea = el.checked; saveState(); };
-        window.toggleGlobalNote = function(el) { appSettings.globalNote = el.value; saveState(); };
-        window.toggleTheme = function(el) { appSettings.theme = el.value; saveState(); applySettings(); };
-        window.toggleNotifSize = function(el) { appSettings.notificationSize = el.value; saveState(); applySettings(); };
-        window.toggleLookupUrl = function(el) { appSettings.lookupUrl = el.value; saveState(); applySettings(); };
-        window.toggleLabelHeader = function(el) { appSettings.labelHeaderText = el.value; saveState(); };
-
-        window.updateSkipFromInput = function(el) {
-            let val = parseInt(el.value);
-            if (isNaN(val) || val < 0) val = 0;
-            stickerOffset = val;
+        window.updateStickerOffset = function(val) {
+            let offset = parseInt(val);
+            if (isNaN(offset) || offset < 0) offset = 0;
+            stickerOffset = offset;
             saveState();
             updateUI();
         };
 
+        window.openSpecialInstructionModal = function(queueIndex) {
+            currentInstructionIndex = queueIndex;
+            const existingNote = printQueue[queueIndex].specialInstruction || "";
+            document.getElementById('instructionInput').value = existingNote;
+            document.getElementById('instructionModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('instructionInput').focus(), 100);
+        };
+
+        window.closeInstructionModal = function() {
+            document.getElementById('instructionModal').classList.add('hidden');
+            currentInstructionIndex = null;
+        };
+
+        window.saveInstruction = function() {
+            if (currentInstructionIndex !== null) {
+                const note = document.getElementById('instructionInput').value.trim();
+                printQueue[currentInstructionIndex].specialInstruction = note;
+                
+                const logEntry = deliveryHistory.find(e => String(e.id) === String(printQueue[currentInstructionIndex].id));
+                if (logEntry) logEntry.specialInstruction = note;
+                
+                saveState();
+                updateUI();
+            }
+            closeInstructionModal();
+        };
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`section-${tabName}`).classList.remove('hidden');
+            
+            document.querySelectorAll('nav button').forEach(b => {
+                b.classList.remove('tab-active', 'text-blue-800');
+                b.classList.add('text-slate-400');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('tab-active');
+            updateUI();
+        };
+
+        window.addRetailRow = function() {
+            const container = document.getElementById('retail-items-container');
+            const row = document.createElement('div');
+            row.className = 'retail-item-row flex gap-2 w-full';
+            row.innerHTML = `
+                <div class="relative flex-1">
+                    <select class="retailSelect w-full text-center py-3 px-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-bold text-slate-700 text-sm md:text-base cursor-pointer appearance-none bg-white" onchange="toggleRowQty(this)">
+                        <option value="">-- Standard Delivery (No Retail Item) --</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500"><i class="fas fa-chevron-down"></i></div>
+                </div>
+                <input type="number" class="retailQty w-24 hidden text-center py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-bold text-slate-700 shadow-sm" value="1" min="1" title="Quantity Taken">
+                <button type="button" class="remove-item-btn bg-red-50 text-red-500 px-4 rounded-xl hover:bg-red-100 transition-colors" onclick="removeRetailRow(this)"><i class="fas fa-times"></i></button>
+            `;
+            const select = row.querySelector('.retailSelect');
+            inventoryItems.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.innerText = item.name;
+                select.appendChild(opt);
+            });
+            container.appendChild(row);
+            updateRemoveButtons();
+        };
+
+        window.removeRetailRow = (btn) => { btn.closest('.retail-item-row').remove(); updateRemoveButtons(); };
+        window.toggleRowQty = (selectEl) => {
+            const row = selectEl.closest('.retail-item-row');
+            if(!row) return; 
+            const qtyInput = row.querySelector('.retailQty');
+            if (qtyInput) {
+                if (selectEl.value !== "") qtyInput.classList.remove('hidden');
+                else { qtyInput.classList.add('hidden'); qtyInput.value = 1; }
+            }
+        };
+
+        function updateRemoveButtons() {
+            const rows = document.querySelectorAll('.retail-item-row');
+            rows.forEach((row) => {
+                const btn = row.querySelector('.remove-item-btn');
+                if (rows.length === 1) btn.classList.add('hidden');
+                else btn.classList.remove('hidden');
+            });
+        }
+
         function renderStickerSheet() {
-            const container = document.getElementById('stickerSheetsContainer');
-            if(!container) return;
+            const container = document.getElementById('stickerSheetContainer');
             container.innerHTML = '';
             
-            const cols = 2;
-            const rows = 5;
-            const labelsPerSheet = cols * rows;
             const queueSize = printQueue.length;
+            const totalLabelsNeeded = stickerOffset + queueSize;
+            const totalSheets = Math.max(1, Math.ceil(totalLabelsNeeded / 10));
             
-            document.getElementById('skipInput').value = stickerOffset;
+            document.getElementById('manualSkipInput').value = stickerOffset;
             document.getElementById('lblQueueSize').innerText = queueSize;
-            
-            const totalSlotsNeeded = stickerOffset + queueSize;
-            const sheetsNeeded = Math.max(1, Math.ceil(totalSlotsNeeded / labelsPerSheet));
-            
-            for (let sheetIndex = 0; sheetIndex < sheetsNeeded; sheetIndex++) {
-                const sheetEl = document.createElement('div');
-                sheetEl.className = 'shrink-0 bg-white p-2 rounded-xl shadow-md border border-slate-200 w-[160px] h-[220px] flex flex-col gap-1 relative select-none';
-                sheetEl.style.display = 'grid';
-                sheetEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-                sheetEl.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+            for (let s = 0; s < totalSheets; s++) {
+                const sheetDiv = document.createElement('div');
+                sheetDiv.className = 'shrink-0 bg-white p-2 rounded-xl shadow-md border border-slate-200 w-[160px] flex flex-col gap-1 relative select-none grid grid-cols-2 grid-rows-5 h-[240px]';
                 
-                for (let i = 0; i < labelsPerSheet; i++) {
-                    const globalIndex = (sheetIndex * labelsPerSheet) + i;
+                for (let i = 0; i < 10; i++) {
+                    const globalIndex = (s * 10) + i;
                     const cell = document.createElement('div');
-                    cell.className = 'sticker-cell rounded flex flex-col items-center justify-center text-[10px] font-bold overflow-hidden p-1 text-center leading-tight';
+                    cell.className = 'sticker-cell rounded flex items-center justify-center text-[10px] font-bold text-center px-1 overflow-hidden';
                     
                     if (globalIndex < stickerOffset) {
                         cell.classList.add('used');
                         cell.title = "Click to set print start position here";
                         cell.onclick = () => { stickerOffset = globalIndex; saveState(); updateUI(); };
-                    } else if (globalIndex >= stickerOffset && globalIndex < stickerOffset + queueSize) {
+                    } else if (globalIndex >= stickerOffset && globalIndex < totalLabelsNeeded) {
                         cell.classList.add('active');
                         const printIndex = globalIndex - stickerOffset;
-                        const qItem = printQueue[printIndex];
-                        
-                        let innerHTML = `<span>${qItem.cabin}</span>`;
-                        if (qItem.specialInstruction) {
-                            innerHTML += `<span class="text-[8px] text-red-500 truncate w-full mt-0.5"><i class="fas fa-comment-dots"></i></span>`;
+                        const labelItem = printQueue[printIndex];
+                        let innerHtml = `<span>${labelItem.cabin}</span>`;
+                        if (labelItem.specialInstruction) {
+                            innerHtml += `<br><i class="fas fa-comment-dots mt-1 text-red-500"></i>`;
                         }
-                        cell.innerHTML = innerHTML;
-                        
-                        cell.title = `Printing Cabin ${qItem.cabin}. Click to add Special Instruction.`;
-                        cell.onclick = () => { openSpecialInstructionModal(printIndex); };
+                        cell.innerHTML = innerHtml;
+                        cell.title = `Printing Cabin ${labelItem.cabin} (Click to add Note)`;
+                        cell.onclick = () => openSpecialInstructionModal(printIndex);
                     } else {
                         cell.title = "Click to set print start position here";
                         cell.onclick = () => { stickerOffset = globalIndex; saveState(); updateUI(); };
                     }
-                    
-                    sheetEl.appendChild(cell);
+                    sheetDiv.appendChild(cell);
                 }
-                container.appendChild(sheetEl);
+                container.appendChild(sheetDiv);
             }
         }
 
-        window.openSpecialInstructionModal = function(queueIndex) {
-            currentSpecialInstIndex = queueIndex;
-            const item = printQueue[queueIndex];
-            document.getElementById('specialInstInput').value = item.specialInstruction || "";
-            document.getElementById('specialInstructionModal').classList.remove('hidden');
-            document.getElementById('specialInstInput').focus();
-        };
-
-        window.closeSpecialInstructionModal = function() {
-            document.getElementById('specialInstructionModal').classList.add('hidden');
-            currentSpecialInstIndex = null;
-        };
-
-        window.saveSpecialInstruction = function() {
-            if(currentSpecialInstIndex !== null) {
-                const val = document.getElementById('specialInstInput').value.trim();
-                const qItem = printQueue[currentSpecialInstIndex];
-                qItem.specialInstruction = val;
-                
-                // Sync with history log
-                const histItem = deliveryHistory.find(h => h.id === qItem.id);
-                if(histItem) histItem.specialInstruction = val;
-                
-                saveState();
-                updateUI();
-            }
-            closeSpecialInstructionModal();
-        };
-
         function updateUI() {
-            // Update dropdowns
-            document.querySelectorAll('.retailSelect, .editRetailSelect').forEach(selectEl => {
-                const currentVal = selectEl.value;
-                selectEl.innerHTML = '<option value="">-- Standard Delivery (No Retail Item) --</option>';
-                inventoryItems.forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item.id;
-                    opt.innerText = item.name;
-                    selectEl.appendChild(opt);
-                });
-                selectEl.value = currentVal;
+            applySettings(); // sync styles & glow
+
+            // Pre-calculate Inventory Usage from Full Log
+            const usageTally = {};
+            deliveryHistory.forEach(h => {
+                if (h.items && h.items.length > 0) {
+                    h.items.forEach(i => {
+                        usageTally[i.id] = (usageTally[i.id] || 0) + i.qty;
+                    });
+                }
             });
 
-            // Update queue table
+            // Update Inventory Tab Table
+            const invBody = document.getElementById('inventoryTableBody');
+            invBody.innerHTML = '';
+            inventoryItems.forEach(item => {
+                const usedQty = usageTally[item.id] || 0;
+                const totalStock = item.stock || 0;
+                const remaining = totalStock - usedQty;
+                
+                let remainingClass = "text-emerald-600";
+                if (remaining <= 5 && remaining > 0) remainingClass = "text-yellow-600 drop-shadow-sm";
+                if (remaining <= 0) remainingClass = "text-red-600 drop-shadow-sm";
+
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 transition-colors";
+                row.innerHTML = `
+                    <td class="px-4 py-4 font-black text-slate-800">${item.name}</td>
+                    <td class="px-4 py-4 text-center text-slate-500 font-medium">
+                        <span class="bg-slate-100 px-3 py-1 rounded-full text-xs uppercase tracking-widest">${item.category}</span>
+                    </td>
+                    <td class="px-4 py-4 text-center">
+                        <input type="number" onchange="updateItemStock(${item.id}, this.value)" value="${totalStock}" min="0" class="w-20 text-center p-2 rounded-lg border border-slate-300 focus:border-blue-500 outline-none transition-colors font-bold text-slate-700 bg-white shadow-inner">
+                    </td>
+                    <td class="px-4 py-4 text-center font-black text-red-500 text-lg">${usedQty}</td>
+                    <td class="px-4 py-4 text-center font-black ${remainingClass} text-xl">${remaining}</td>
+                    <td class="px-4 py-4 text-right">
+                        <button onclick="deleteInventoryItem(${item.id})" class="text-slate-400 hover:text-red-500 p-2 rounded transition-colors" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                invBody.appendChild(row);
+            });
+
+            // Update Print Queue
             const qBody = document.getElementById('queueBody');
             qBody.innerHTML = '';
             document.getElementById('queueCount').innerText = printQueue.length;
@@ -1212,20 +965,19 @@
                 const row = document.createElement('tr');
                 row.className = "hover:bg-slate-50 transition-colors";
                 
-                let detailHtml = '';
-                if (item.items && item.items.length > 0) {
-                    detailHtml += item.items.map(i => `<span class="bg-red-50 text-red-600 px-2 py-1 rounded-md font-black text-xs border border-red-100 flex items-center gap-1 w-max mx-auto mb-1"><i class="fas fa-tag text-[10px]"></i> ${i.qty}x ${i.name}</span>`).join('');
-                } else {
-                    detailHtml += `<span class="bg-slate-50 text-slate-400 px-3 py-1 rounded-md font-bold text-sm border border-slate-100 flex items-center justify-center w-max mx-auto mb-1">Standard</span>`;
-                }
+                let displayValue = (item.items && item.items.length > 0)
+                    ? item.items.map(i => `<span class="bg-slate-100 text-slate-700 px-2 py-1 rounded-md font-black text-xs border border-slate-200 flex items-center gap-1 w-max mb-1 mx-auto"><i class="fas fa-tag text-[10px]"></i> ${i.qty}x ${i.name}</span>`).join('')
+                    : `<span class="text-slate-400 font-bold text-sm flex items-center justify-center w-max mx-auto">Standard Label</span>`;
+
                 if (item.specialInstruction) {
-                    detailHtml += `<span class="bg-yellow-50 text-yellow-700 px-2 py-1 rounded-md font-bold text-xs border border-yellow-200 flex items-center gap-1 w-max mx-auto"><i class="fas fa-comment-dots"></i> ${item.specialInstruction}</span>`;
+                    displayValue += `<div class="mt-2 text-red-600 font-black text-xs bg-red-50 border border-red-200 px-2 py-1 rounded-md w-max mx-auto"><i class="fas fa-comment-dots mr-1"></i>${item.specialInstruction}</div>`;
                 }
 
                 row.innerHTML = `
-                    <td class="px-6 py-4 font-black text-slate-800 text-lg">${item.cabin}</td>
-                    <td class="px-6 py-4 text-center flex flex-col items-center justify-center">${detailHtml}</td>
-                    <td class="px-6 py-4 text-right">
+                    <td class="px-6 py-4 font-black text-blue-600 text-xl tracking-wider uppercase">${item.cabin}</td>
+                    <td class="px-6 py-4 text-center flex flex-col items-center">${displayValue}</td>
+                    <td class="px-6 py-4 text-right whitespace-nowrap">
+                        <button onclick="openSpecialInstructionModal(${idx})" class="text-slate-400 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition-all font-bold text-sm mr-2" title="Add special note"><i class="fas fa-comment-dots"></i></button>
                         <button onclick="removeFromQueue(${idx})" class="text-red-400 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-all font-bold text-sm">Remove</button>
                     </td>
                 `;
@@ -1234,10 +986,11 @@
 
             renderStickerSheet();
 
-            // Log table
+            // Update Full Log
             const lBody = document.getElementById('logBody');
             lBody.innerHTML = '';
-            const logSearchTerm = (document.getElementById('logSearchInput') ? document.getElementById('logSearchInput').value : "").toLowerCase().trim();
+            const logSearchInput = document.getElementById('logSearchInput');
+            const logSearchTerm = logSearchInput ? logSearchInput.value.toLowerCase().trim() : "";
             
             let filteredHistory = [...deliveryHistory].reverse();
             if (logSearchTerm) {
@@ -1245,35 +998,31 @@
                     const timeStr = new Date(item.timestamp).toLocaleString().toLowerCase();
                     const cabinStr = String(item.cabin).toLowerCase();
                     const itemsStr = item.items ? item.items.map(i => i.name).join(' ').toLowerCase() : "standard label";
-                    const instStr = item.specialInstruction ? item.specialInstruction.toLowerCase() : "";
-                    return cabinStr.includes(logSearchTerm) || timeStr.includes(logSearchTerm) || itemsStr.includes(logSearchTerm) || instStr.includes(logSearchTerm);
+                    const noteStr = item.specialInstruction ? item.specialInstruction.toLowerCase() : "";
+                    return cabinStr.includes(logSearchTerm) || timeStr.includes(logSearchTerm) || itemsStr.includes(logSearchTerm) || noteStr.includes(logSearchTerm);
                 });
             }
 
             document.getElementById('emptyLog').classList.toggle('hidden', filteredHistory.length > 0);
+            
             filteredHistory.forEach(item => {
                 const row = document.createElement('tr');
                 row.className = "border-b border-slate-50 hover:bg-slate-50";
                 
-                let displayValue = '';
-                if (item.items && item.items.length > 0) {
-                    displayValue += item.items.map(i => `<div class="text-red-600 font-bold text-sm mb-1"><i class="fas fa-tag text-[10px] mr-1"></i>${i.qty}x ${i.name}</div>`).join('');
-                } else {
-                    displayValue += `<span class="text-slate-400 font-medium text-sm block">Standard</span>`;
-                }
-                if(item.specialInstruction) {
-                    displayValue += `<div class="text-yellow-600 font-bold text-xs mt-1"><i class="fas fa-comment-dots mr-1"></i>${item.specialInstruction}</div>`;
+                let displayValue = (item.items && item.items.length > 0)
+                    ? item.items.map(i => `<div class="text-slate-700 font-bold text-sm mb-1"><i class="fas fa-tag text-[10px] mr-1 text-slate-400"></i>${i.qty}x ${i.name}</div>`).join('')
+                    : `<span class="text-slate-400 font-medium text-sm">Standard</span>`;
+
+                if (item.specialInstruction) {
+                    displayValue += `<div class="mt-1 text-red-600 font-bold text-xs"><i class="fas fa-comment-dots mr-1"></i>${item.specialInstruction}</div>`;
                 }
 
                 row.innerHTML = `
                     <td class="px-6 py-4 text-xs text-slate-400 font-medium">${new Date(item.timestamp).toLocaleString()}</td>
-                    <td class="px-6 py-4 font-bold text-slate-700">${item.cabin}</td>
+                    <td class="px-6 py-4 font-black text-slate-700 uppercase tracking-wide text-lg">${item.cabin}</td>
                     <td class="px-6 py-4 text-center">${displayValue}</td>
-                    <td class="px-6 py-4 text-right">
-                        <button onclick="openEditModal('${item.id}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors mr-1" title="Edit Entry">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="deleteLogEntry('${item.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Delete Entry">
+                    <td class="px-6 py-4 text-right whitespace-nowrap">
+                        <button onclick="deleteLogEntry('${item.id}')" class="text-slate-300 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Delete Entry">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
@@ -1281,37 +1030,28 @@
                 lBody.appendChild(row);
             });
 
-            updateTicker();
+            if (typeof updateTicker === 'function') updateTicker();
         }
 
         function handleSearch() {
             const searchInput = document.getElementById('cabinSearch').value.trim();
             if(!searchInput) return;
             
-            // Allow Alphanumeric input by using string ID
-            const cabinId = searchInput.toUpperCase();
             const errEl = document.getElementById('notFoundArea');
+            if (errEl) errEl.classList.add('hidden');
             
-            if (cabinId.length > 0) {
-                let deckNum = null;
-                let areaNum = null;
-                
-                // Still try to extract numeric mapping if it happens to be a valid number
-                const num = parseInt(cabinId);
-                if (!isNaN(num)) {
-                    deckNum = Math.floor(num / 1000);
-                    const found = cabinDatabase.find(c => c.cabin === num);
-                    areaNum = found ? found.area : null;
-                }
+            const num = parseInt(searchInput);
+            let deckNum = null;
+            let areaNum = null;
 
-                currentSelection = { cabin: cabinId, deck: deckNum, area: areaNum };
-                errEl.classList.add('hidden');
-                
-                addToLog(true);
-            } else {
-                currentSelection = null;
-                errEl.classList.remove('hidden');
+            if (!isNaN(num) && num > 0) {
+                deckNum = Math.floor(num / 1000);
+                const found = cabinDatabase.find(c => c.cabin === num);
+                areaNum = found ? found.area : null;
             }
+
+            currentSelection = { cabin: searchInput.toUpperCase(), deck: deckNum, area: areaNum };
+            addToLog(true);
         }
 
         function addToLog(addToPrint = false) {
@@ -1323,14 +1063,11 @@
                 const qty = parseInt(row.querySelector('.retailQty').value) || 1;
                 
                 if (selectId !== "") {
-                    const invItem = inventoryItems.find(i => String(i.id) === String(selectId));
+                    const invItem = inventoryItems.find(i => i.id == selectId);
                     if (invItem) {
-                        const existing = itemsToLog.find(i => String(i.id) === String(selectId));
-                        if (existing) {
-                            existing.qty += qty;
-                        } else {
-                            itemsToLog.push({ id: invItem.id, name: invItem.name, qty: qty });
-                        }
+                        const existing = itemsToLog.find(i => i.id == selectId);
+                        if (existing) existing.qty += qty;
+                        else itemsToLog.push({ id: invItem.id, name: invItem.name, qty: qty });
                     }
                 }
             });
@@ -1366,117 +1103,9 @@
             document.getElementById('cabinSearch').focus();
         }
 
-        window.removeFromQueue = function(idx) {
-            printQueue.splice(idx, 1);
-            saveState();
-            updateUI();
-        }
-
-        // Add/Remove retail rows logic
-        window.addRetailRow = function() {
-            const container = document.getElementById('retail-items-container');
-            const row = document.createElement('div');
-            row.className = 'retail-item-row flex gap-2 w-full';
-            row.innerHTML = `
-                <div class="relative flex-1">
-                    <select class="retailSelect w-full text-center py-3 px-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-bold text-slate-700 text-sm md:text-base cursor-pointer appearance-none bg-white" onchange="toggleRowQty(this)"></select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                </div>
-                <input type="number" class="retailQty w-24 hidden text-center py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none font-bold text-slate-700 shadow-sm" value="1" min="1" title="Quantity Taken">
-                <button type="button" class="remove-item-btn bg-red-50 text-red-500 px-4 rounded-xl hover:bg-red-100 transition-colors" onclick="removeRetailRow(this)"><i class="fas fa-times"></i></button>
-            `;
-            container.appendChild(row);
-            
-            // Populate select manually right after insertion to avoid UI flash
-            const selectEl = row.querySelector('.retailSelect');
-            selectEl.innerHTML = '<option value="">-- Standard Delivery (No Retail Item) --</option>';
-            inventoryItems.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item.id;
-                opt.innerText = item.name;
-                selectEl.appendChild(opt);
-            });
-            
-            updateRemoveButtons();
-        };
-
-        window.removeRetailRow = function(btn) {
-            btn.closest('.retail-item-row').remove();
-            updateRemoveButtons();
-        };
-
-        window.toggleRowQty = function(selectEl) {
-            const qtyInput = selectEl.closest('.retail-item-row').querySelector('.retailQty');
-            if (selectEl.value !== "") {
-                qtyInput.classList.remove('hidden');
-            } else {
-                qtyInput.classList.add('hidden');
-                qtyInput.value = 1;
-            }
-        };
-
-        function updateRemoveButtons() {
-            const rows = document.querySelectorAll('.retail-item-row');
-            rows.forEach((row) => {
-                const btn = row.querySelector('.remove-item-btn');
-                if (rows.length === 1) btn.classList.add('hidden');
-                else btn.classList.remove('hidden');
-            });
-        }
-
-        // Edit log entry functions...
-        window.openEditModal = function(id) {
-            const entry = deliveryHistory.find(e => String(e.id) === String(id));
-            if (!entry) return;
-            editingLogId = id;
-            document.getElementById('editCabinInput').value = entry.cabin;
-            
-            document.getElementById('edit-retail-items-container').innerHTML = '';
-            if (entry.items && entry.items.length > 0) {
-                // Populate existing items
-            }
-            document.getElementById('editLogModal').classList.remove('hidden');
-        };
-
-        window.closeEditModal = function() {
-            document.getElementById('editLogModal').classList.add('hidden');
-            editingLogId = null;
-        };
-
-        window.saveEditLog = function() {
-            if (!editingLogId) return;
-            const newCabin = document.getElementById('editCabinInput').value.trim().toUpperCase();
-            if (!newCabin) {
-                showCustomAlert("Invalid Entry", "Please enter a valid cabin number or text.");
-                return;
-            }
-
-            const entry = deliveryHistory.find(e => String(e.id) === String(editingLogId));
-            if (!entry) return;
-            entry.cabin = newCabin; // Stored safely as String
-
-            const queueEntry = printQueue.find(e => String(e.id) === String(editingLogId));
-            if (queueEntry) queueEntry.cabin = newCabin;
-
-            saveState();
-            updateUI();
-            closeEditModal();
-        };
-
-        window.deleteLogEntry = function(id) {
-            showCustomConfirm('Delete Log', 'Are you sure?', 'Delete', 'bg-red-600 hover:bg-red-700', () => {
-                deliveryHistory = deliveryHistory.filter(e => String(e.id) !== String(id));
-                printQueue = printQueue.filter(e => String(e.id) !== String(id));
-                saveState();
-                updateUI();
-            });
-        };
-
         function printLabels() {
             if (printQueue.length === 0) {
-                showCustomAlert("Empty Queue", "The print queue is empty! Please search and add cabins before printing.");
+                showCustomAlert("Empty Queue", "The print queue is empty! Please log cabins before printing.");
                 return;
             }
             
@@ -1492,7 +1121,10 @@
 
             printQueue.forEach((item, index) => {
                 const effectiveIndex = index + stickerOffset;
-                if (index > 0 && effectiveIndex % labelsPerPage === 0) doc.addPage();
+                
+                if (index > 0 && effectiveIndex % labelsPerPage === 0) {
+                    doc.addPage();
+                }
                 
                 const pageIndex = effectiveIndex % labelsPerPage;
                 const col = pageIndex % 2;
@@ -1501,45 +1133,32 @@
                 const x = leftMargin + (col * (labelWidth + horizontalGap));
                 const y = topMargin + (row * labelHeight);
 
-                // Use the customizable header from settings
-                const headerText = appSettings.labelHeaderText && appSettings.labelHeaderText.trim() !== '' ? appSettings.labelHeaderText.trim() : "CABIN NUMBER";
-                
-                doc.setTextColor(54, 117, 196); 
-                doc.setFont("helvetica", "normal");
-                doc.setFontSize(14);
-                doc.text(headerText.toUpperCase(), x + 2, y + 0.35, { align: "center" });
+                // Custom Header
+                let headerText = appSettings.labelHeader !== undefined ? appSettings.labelHeader : "CABIN NUMBER";
+                if (headerText.trim() !== "") {
+                    doc.setTextColor(54, 117, 196); 
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(14);
+                    doc.text(headerText.toUpperCase(), x + 2, y + 0.35, { align: "center" });
+                }
 
+                // Auto-scaling Cabin Text
+                doc.setTextColor(0, 0, 0);
                 doc.setFont("helvetica", "bold");
-                
-                // Ultra-safe conversion to string for JS PDF text-width measurements
-                let cabinText = String(item.cabin || "");
+                let cabinStr = item.cabin.toString().toUpperCase();
                 let cabinFontSize = 60;
                 doc.setFontSize(cabinFontSize);
                 
-                try {
-                    if (typeof doc.getTextWidth === 'function') {
-                        while (doc.getTextWidth(cabinText) > 3.6 && cabinFontSize > 20) {
-                            cabinFontSize -= 2;
-                            doc.setFontSize(cabinFontSize);
-                        }
-                    } else {
-                        // Fallback for jsPDF safety
-                        let widthEstimate = (doc.getStringUnitWidth(cabinText) * cabinFontSize) / doc.internal.scaleFactor;
-                        while (widthEstimate > 3.6 && cabinFontSize > 20) {
-                            cabinFontSize -= 2;
-                            doc.setFontSize(cabinFontSize);
-                            widthEstimate = (doc.getStringUnitWidth(cabinText) * cabinFontSize) / doc.internal.scaleFactor;
-                        }
-                    }
-                } catch(e) {
-                    console.warn("Font scaling disabled due to jsPDF error", e);
+                // Scale down if string is too wide
+                let cabinWidth = doc.getStringUnitWidth(cabinStr) * cabinFontSize / doc.internal.scaleFactor;
+                while (cabinWidth > 3.6 && cabinFontSize > 20) {
+                    cabinFontSize -= 2;
+                    doc.setFontSize(cabinFontSize);
+                    cabinWidth = doc.getStringUnitWidth(cabinStr) * cabinFontSize / doc.internal.scaleFactor;
                 }
-                
-                let yOffset = 1.15;
-                if (cabinFontSize < 40) yOffset -= 0.1;
-                
-                doc.text(cabinText, x + 2, y + yOffset, { align: "center" });
+                doc.text(cabinStr, x + 2, y + 1.15, { align: "center" });
 
+                // Area Logic
                 if (appSettings.showArea && item.area) {
                     doc.setTextColor(54, 117, 196); 
                     doc.setFont("helvetica", "bold");
@@ -1547,6 +1166,7 @@
                     doc.text(`AREA ${item.area}`, x + 3.85, y + 1.8, { align: "right" });
                 }
 
+                // Retail Items
                 if (item.items && item.items.length > 0) {
                     const displayName = item.items.map(i => `${i.qty}x ${i.name}`).join('\n');
                     doc.setTextColor(220, 38, 38); 
@@ -1554,22 +1174,22 @@
                     let fontSize = 10;
                     doc.setFontSize(fontSize);
                     let noteLines = doc.splitTextToSize(displayName.toUpperCase(), 2.0); 
-                    
                     while (noteLines.length * (fontSize * 0.016) > 0.50 && fontSize > 6) {
-                        fontSize -= 0.5;
-                        doc.setFontSize(fontSize);
+                        fontSize -= 0.5; doc.setFontSize(fontSize);
                         noteLines = doc.splitTextToSize(displayName.toUpperCase(), 2.0);
                     }
                     doc.text(noteLines, x + 0.15, y + 1.35, { align: "left" });
                 }
 
+                // Special Manual Instruction
                 if (item.specialInstruction && item.specialInstruction.trim() !== '') {
-                    doc.setTextColor(234, 179, 8); // Deep yellow/amber
-                    doc.setFont("helvetica", "bolditalic");
+                    doc.setTextColor(220, 38, 38); 
+                    doc.setFont("helvetica", "bold");
                     doc.setFontSize(10);
-                    doc.text(item.specialInstruction.trim().toUpperCase(), x + 2.0, y + 1.7, { align: "center" });
+                    doc.text(`*** ${item.specialInstruction.toUpperCase()} ***`, x + 2.0, y + 1.7, { align: "center" });
                 }
 
+                // Global Bottom Note
                 if (appSettings.globalNote && appSettings.globalNote.trim() !== '') {
                     doc.setTextColor(54, 117, 196); 
                     doc.setFont("helvetica", "bolditalic");
@@ -1579,38 +1199,95 @@
             });
 
             doc.save(`Labels_${new Date().getTime()}.pdf`);
-            
             printQueue = [];
             stickerOffset = 0;
             saveState();
             updateUI();
         }
 
-        document.getElementById('downloadPDF').addEventListener('click', printLabels);
-        document.getElementById('quickPrintBtn').addEventListener('click', printLabels);
+        window.removeFromQueue = (idx) => { printQueue.splice(idx, 1); saveState(); updateUI(); }
+        window.deleteLogEntry = (id) => {
+            showCustomConfirm('Delete Log', 'Permanently delete this delivery record?', 'Delete', 'bg-red-600 hover:bg-red-700 shadow-red-200', () => {
+                deliveryHistory = deliveryHistory.filter(e => String(e.id) !== String(id));
+                printQueue = printQueue.filter(e => String(e.id) !== String(id));
+                saveState(); updateUI();
+            }, '<i class="fas fa-trash-alt"></i>', 'bg-red-100 text-red-600');
+        };
+        
+        window.updateItemStock = function(id, newVal) {
+            const item = inventoryItems.find(i => String(i.id) === String(id));
+            if (item) {
+                let stock = parseInt(newVal);
+                if (isNaN(stock) || stock < 0) stock = 0;
+                item.stock = stock;
+                saveState();
+                updateUI();
+            }
+        };
+
+        document.getElementById('addItemForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('newItemName').value;
+            const category = document.getElementById('newItemCategory').value || 'Uncategorized';
+            const stock = parseInt(document.getElementById('newItemStock').value) || 0;
+            inventoryItems.push({ id: Date.now(), name: name, category: category, stock: stock });
+            saveState(); updateUI(); this.reset();
+        });
+
+        window.deleteInventoryItem = (id) => {
+            showCustomConfirm('Delete Item', 'Remove this item from the inventory catalog?', 'Delete', 'bg-red-600 hover:bg-red-700 shadow-red-200', () => {
+                inventoryItems = inventoryItems.filter(i => String(i.id) !== String(id));
+                saveState(); updateUI();
+            }, '<i class="fas fa-trash-alt"></i>', 'bg-red-100 text-red-600');
+        };
+
         document.getElementById('searchBtn').addEventListener('click', handleSearch);
         document.getElementById('cabinSearch').addEventListener('keypress', e => e.key === 'Enter' && handleSearch());
-        
-        window.switchTab = function(tabName) {
-            document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
-            document.getElementById(`section-${tabName}`).classList.remove('hidden');
-            
-            document.querySelectorAll('nav button').forEach(b => {
-                b.classList.remove('tab-active', 'text-blue-800');
-                b.classList.add('text-slate-400');
+        document.getElementById('downloadPDF').addEventListener('click', printLabels);
+        document.getElementById('quickPrintBtn').addEventListener('click', printLabels);
+
+        document.getElementById('clearQueueBtn').addEventListener('click', () => {
+            if (printQueue.length === 0) return;
+            showCustomConfirm('Clear Queue', 'Clear the current print queue? (Log remains unaffected)', 'Clear Queue', 'bg-red-600 hover:bg-red-700 shadow-red-200', () => {
+                printQueue = []; saveState(); updateUI();
+            }, '<i class="fas fa-eraser"></i>', 'bg-red-100 text-red-600');
+        });
+
+        document.getElementById('clearLogBtn').addEventListener('click', () => {
+            if (deliveryHistory.length === 0) return;
+            showCustomConfirm('Delete History', 'DANGER: Delete ENTIRE delivery log history?', 'Delete History', 'bg-red-600 hover:bg-red-700 shadow-red-200', () => {
+                deliveryHistory = []; saveState(); updateUI();
+            }, '<i class="fas fa-fire"></i>', 'bg-red-100 text-red-600');
+        });
+
+        document.getElementById('downloadExcel').addEventListener('click', () => {
+            if (deliveryHistory.length === 0 && inventoryItems.length === 0) { showCustomAlert('Empty Data', 'No data to export.'); return; }
+            const wb = XLSX.utils.book_new();
+            const logData = [];
+            deliveryHistory.forEach(h => {
+                const timeStr = new Date(h.timestamp).toLocaleString();
+                const cabinStr = h.cabin;
+                const areaStr = h.area ? h.area : 'N/A';
+                const instStr = h.specialInstruction || '';
+                
+                if (h.items && h.items.length > 0) {
+                    h.items.forEach(i => {
+                        logData.push({ 'Date/Time': timeStr, 'Cabin': cabinStr, 'Area': areaStr, 'Item': i.name, 'Usage (Qty)': i.qty, 'Instruction': instStr });
+                    });
+                } else {
+                    logData.push({ 'Date/Time': timeStr, 'Cabin': cabinStr, 'Area': areaStr, 'Item': 'Standard Label', 'Usage (Qty)': '-', 'Instruction': instStr });
+                }
             });
-            document.getElementById(`tab-${tabName}`).classList.add('tab-active');
-            updateUI();
-        };
+            const wsLog = logData.length > 0 ? XLSX.utils.json_to_sheet(logData) : XLSX.utils.aoa_to_sheet([['Date/Time', 'Cabin', 'Area', 'Item', 'Usage (Qty)', 'Instruction']]);
+            XLSX.utils.book_append_sheet(wb, wsLog, "Transaction Log");
+            XLSX.writeFile(wb, `Delivery_Log_${new Date().toISOString().split('T')[0]}.xlsx`);
+        });
 
         function updateClock() {
             const now = new Date();
-            const timeOpts = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            const dateOpts = { weekday: 'short', month: 'short', day: 'numeric' };
-            document.getElementById('digitalClockText').innerText = `${now.toLocaleDateString(undefined, dateOpts)}  |  ${now.toLocaleTimeString(undefined, timeOpts)}`;
+            document.getElementById('digitalClockText').innerText = `${now.toLocaleDateString(undefined, {weekday:'short', month:'short', day:'numeric'})}  |  ${now.toLocaleTimeString(undefined, {hour:'2-digit', minute:'2-digit', second:'2-digit'})}`;
         }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(updateClock, 1000); updateClock();
 
         function updateTicker() {
             const queueSize = printQueue.length;
@@ -1618,25 +1295,12 @@
             const todayLogs = deliveryHistory.filter(h => new Date(h.timestamp).toLocaleDateString() === todayStr).length;
             
             let msgs = [];
-            if (queueSize > 0) msgs.push(`⚠️ ACTION REQUIRED: ${queueSize} label(s) pending in the Print Queue!`);
+            if (queueSize > 0) msgs.push(`⚠️ ACTION REQUIRED: ${queueSize} label(s) pending in Print Queue!`);
             else msgs.push(`✅ System Status: All clear. No pending prints.`);
+            msgs.push(`📦 Deliveries Today: ${todayLogs}`);
+            msgs.push(`💡 Tip: Click queued labels on the grid to add Special Instructions.`);
             
-            msgs.push(`📦 Total Deliveries Logged Today: ${todayLogs}`);
-            msgs.push(`💡 Tip: Click any queued label on the Sticker Layout to add a Special Instruction note.`);
-            
-            const tickerEl = document.getElementById('tickerText');
-            tickerEl.innerText = msgs.join('   •   ');
-            
-            // Sizing mapping based on settings
-            const sizeMap = { 'small': 'text-xs', 'normal': 'text-base font-bold', 'large': 'text-xl font-black tracking-wide' };
-            const sizeClass = sizeMap[appSettings.notificationSize] || 'text-sm';
-            
-            // Dynamic glowing effect
-            if (queueSize > 0) {
-                tickerEl.className = `animate-ticker text-yellow-300 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)] transition-all duration-300 ${sizeClass}`;
-            } else {
-                tickerEl.className = `animate-ticker text-cyan-300 drop-shadow-[0_0_8px_rgba(103,232,249,0.8)] transition-all duration-300 ${sizeClass}`;
-            }
+            document.getElementById('tickerText').innerText = msgs.join('   •   ');
         }
 
         // Init App
