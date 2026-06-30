@@ -1229,8 +1229,13 @@
                     displayValue += `<div class="mt-2 text-red-600 font-black text-xs bg-red-50 border border-red-200 px-2 py-1 rounded-md w-max mx-auto"><i class="fas fa-comment-dots mr-1"></i>${item.specialInstruction}</div>`;
                 }
 
+                let areaTag = item.area ? `<div class="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-widest"><i class="fas fa-map-marker-alt text-blue-400 mr-1"></i>Area ${item.area}</div>` : '';
+
                 row.innerHTML = `
-                    <td class="px-6 py-4 font-black text-blue-600 text-xl tracking-wider uppercase">${item.cabin}</td>
+                    <td class="px-6 py-4 font-black text-blue-600 text-xl tracking-wider uppercase">
+                        ${item.cabin}
+                        ${areaTag}
+                    </td>
                     <td class="px-6 py-4 text-center flex flex-col items-center">${displayValue}</td>
                     <td class="px-6 py-4 text-right whitespace-nowrap">
                         <button onclick="openSpecialInstructionModal(${idx})" class="text-slate-400 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition-all font-bold text-sm mr-2" title="Add special note"><i class="fas fa-comment-dots"></i></button>
@@ -1255,7 +1260,8 @@
                     const cabinStr = String(item.cabin).toLowerCase();
                     const itemsStr = item.items ? item.items.map(i => i.name).join(' ').toLowerCase() : "standard label";
                     const noteStr = item.specialInstruction ? item.specialInstruction.toLowerCase() : "";
-                    return cabinStr.includes(logSearchTerm) || timeStr.includes(logSearchTerm) || itemsStr.includes(logSearchTerm) || noteStr.includes(logSearchTerm);
+                    const areaStr = item.area ? String(item.area).toLowerCase() : "";
+                    return cabinStr.includes(logSearchTerm) || timeStr.includes(logSearchTerm) || itemsStr.includes(logSearchTerm) || noteStr.includes(logSearchTerm) || areaStr.includes(logSearchTerm);
                 });
             }
 
@@ -1272,10 +1278,15 @@
                 if (item.specialInstruction) {
                     displayValue += `<div class="mt-1 text-red-600 font-bold text-xs"><i class="fas fa-comment-dots mr-1"></i>${item.specialInstruction}</div>`;
                 }
+                
+                let logAreaTag = item.area ? `<div class="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-widest"><i class="fas fa-map-marker-alt text-blue-400 mr-1"></i>Area ${item.area}</div>` : '';
 
                 row.innerHTML = `
                     <td class="px-6 py-4 text-xs text-slate-400 font-medium">${new Date(item.timestamp).toLocaleString()}</td>
-                    <td class="px-6 py-4 font-black text-slate-700 uppercase tracking-wide text-lg">${item.cabin}</td>
+                    <td class="px-6 py-4 font-black text-slate-700 uppercase tracking-wide text-lg">
+                        ${item.cabin}
+                        ${logAreaTag}
+                    </td>
                     <td class="px-6 py-4 text-center">${displayValue}</td>
                     <td class="px-6 py-4 text-right whitespace-nowrap">
                         <button onclick="deleteLogEntry('${item.id}')" class="text-slate-300 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Delete Entry">
