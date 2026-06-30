@@ -154,6 +154,42 @@
         body.theme-legion .bg-blue-50 { background-color: #0b2233 !important; border-color: #10334a !important; }
         body.theme-legion .sticker-cell.active { background-color: #0f3044 !important; border-color: #00e5ff !important; color: #99f5ff !important; box-shadow: 0 0 8px rgba(0,229,255,0.4); }
 
+        /* RAZER BLADE MODE */
+        body.theme-razer { background-color: #0a0a0a !important; color: #4ade80 !important; }
+        body.theme-razer .bg-white, body.theme-razer .bg-slate-50 { background-color: #111111 !important; border-color: #14532d !important; }
+        body.theme-razer .text-slate-800, body.theme-razer .text-slate-900, body.theme-razer .text-slate-700 { color: #22c55e !important; }
+        body.theme-razer .text-blue-900, body.theme-razer .text-blue-700 { color: #16a34a !important; }
+        body.theme-razer .text-slate-500, body.theme-razer .text-slate-400, body.theme-razer .text-slate-600 { color: #15803d !important; }
+        body.theme-razer .border-slate-200, body.theme-razer .border-slate-100, body.theme-razer .border-slate-300 { border-color: #14532d !important; }
+        body.theme-razer .glass-morphism { background: rgba(10, 10, 10, 0.98) !important; border-color: #166534 !important; box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.1); }
+        body.theme-razer input:not([type="checkbox"]), body.theme-razer select { background-color: #050505 !important; color: #4ade80 !important; border-color: #14532d !important; }
+        body.theme-razer input::placeholder { color: #14532d !important; }
+        body.theme-razer .hover\:bg-slate-50:hover { background-color: #052e16 !important; }
+        body.theme-razer .tab-active { border-bottom-color: #22c55e !important; color: #22c55e !important; }
+        body.theme-razer .bg-blue-600 { background-color: #16a34a !important; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4) !important; color: #000 !important;}
+        body.theme-razer .bg-blue-600:hover { background-color: #22c55e !important; color: #000 !important;}
+        body.theme-razer .bg-blue-50 { background-color: #052e16 !important; border-color: #14532d !important; }
+        body.theme-razer .bg-red-50 { background-color: #450a0a !important; border-color: #7f1d1d !important; }
+        body.theme-razer .sticker-cell.active { background-color: #052e16 !important; border-color: #22c55e !important; color: #4ade80 !important; box-shadow: 0 0 8px rgba(34,197,94,0.4); }
+
+        /* ALIENWARE MODE */
+        body.theme-alienware { background-color: #050508 !important; color: #e2e8f0 !important; }
+        body.theme-alienware .bg-white, body.theme-alienware .bg-slate-50 { background-color: #0b0e14 !important; border-color: #1e1b4b !important; }
+        body.theme-alienware .text-slate-800, body.theme-alienware .text-slate-900, body.theme-alienware .text-slate-700 { color: #8b5cf6 !important; }
+        body.theme-alienware .text-blue-900, body.theme-alienware .text-blue-700 { color: #a855f7 !important; }
+        body.theme-alienware .text-slate-500, body.theme-alienware .text-slate-400, body.theme-alienware .text-slate-600 { color: #64748b !important; }
+        body.theme-alienware .border-slate-200, body.theme-alienware .border-slate-100, body.theme-alienware .border-slate-300 { border-color: #2e1065 !important; }
+        body.theme-alienware .glass-morphism { background: rgba(8, 10, 15, 0.98) !important; border-color: #3b0764 !important; }
+        body.theme-alienware input:not([type="checkbox"]), body.theme-alienware select { background-color: #050508 !important; color: #d8b4fe !important; border-color: #3b0764 !important; }
+        body.theme-alienware input::placeholder { color: #4c1d95 !important; }
+        body.theme-alienware .hover\:bg-slate-50:hover { background-color: #1e1b4b !important; }
+        body.theme-alienware .tab-active { border-bottom-color: #a855f7 !important; color: #a855f7 !important; }
+        body.theme-alienware .bg-blue-600 { background-color: #7e22ce !important; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4) !important; color: white !important;}
+        body.theme-alienware .bg-blue-600:hover { background-color: #9333ea !important; color: white !important; }
+        body.theme-alienware .bg-blue-50 { background-color: #1e1b4b !important; border-color: #3b0764 !important; }
+        body.theme-alienware .bg-red-50 { background-color: #2a0826 !important; border-color: #6a1a41 !important; }
+        body.theme-alienware .sticker-cell.active { background-color: #2e1065 !important; border-color: #a855f7 !important; color: #d8b4fe !important; box-shadow: 0 0 8px rgba(168,85,247,0.4); }
+
         /* PRINT MEDIA OVERRIDE */
         @media print {
             body { background-color: white !important; color: black !important; }
@@ -204,6 +240,20 @@
             100% { box-shadow: inset 0 0 0px rgba(0, 229, 255, 0); background-color: transparent; }
         }
         .effect-log-legion { animation: flash-legion 0.6s ease-out both; }
+        
+        @keyframes pulse-razer {
+            0% { box-shadow: inset 0 0 0px rgba(34, 197, 94, 0); background-color: rgba(34, 197, 94, 0); border-color: inherit; }
+            40% { box-shadow: inset 0 0 80px rgba(34, 197, 94, 0.6); background-color: rgba(34, 197, 94, 0.1); border-color: #22c55e;}
+            100% { box-shadow: inset 0 0 0px rgba(34, 197, 94, 0); background-color: transparent; }
+        }
+        .effect-log-razer { animation: pulse-razer 0.6s ease-in-out both; }
+
+        @keyframes alien-abduct {
+            0% { transform: translateY(0) scale(1); filter: hue-rotate(0deg); box-shadow: 0 0 0 rgba(168, 85, 247, 0); }
+            50% { transform: translateY(-5px) scale(1.02); filter: hue-rotate(45deg); box-shadow: 0 20px 60px rgba(168, 85, 247, 0.5); border-color: #a855f7;}
+            100% { transform: translateY(0) scale(1); filter: hue-rotate(0deg); box-shadow: 0 0 0 rgba(168, 85, 247, 0); }
+        }
+        .effect-log-alienware { animation: alien-abduct 0.8s ease-in-out both; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen font-sans text-slate-900 transition-colors duration-300 theme-day">
@@ -243,6 +293,8 @@
                         <option value="reading">Sepia Mode</option>
                         <option value="rog">ROG (Gamer)</option>
                         <option value="legion">Legion (Ice Blue)</option>
+                        <option value="razer">Razer (Chroma)</option>
+                        <option value="alienware">Alienware</option>
                     </select>
                 </div>
                 <a href="#" id="navLookupLink" target="_blank" class="px-3 py-1.5 rounded-lg text-blue-500 hover:text-blue-700 hover:bg-blue-50 transition-all flex items-center justify-center font-bold text-sm" title="Order Lookup Tool">
@@ -716,6 +768,17 @@
             synths.legionBoot = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 2.5, modulationIndex: 5, oscillator: { type: "sine" }, envelope: { attack: 0.05, decay: 0.2, sustain: 0.2, release: 3 } }).connect(legionVerb);
             synths.legionSuccess = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 3, modulationIndex: 2, oscillator: { type: "sine" }, envelope: { attack: 0.01, decay: 0.3, sustain: 0.1, release: 2 } }).connect(legionVerb);
 
+            // Razer Synths (Sharp, Tech, Glitchy)
+            synths.razerClick = new Tone.Synth({ oscillator: { type: "sawtooth" }, envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.01 } }).toDestination();
+            synths.razerBoot = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 1.5, modulationIndex: 3.5, oscillator: { type: "square" }, envelope: { attack: 0.05, decay: 0.3, sustain: 0.1, release: 1 } }).toDestination();
+            synths.razerSuccess = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "sawtooth" }, envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.5 } }).toDestination();
+
+            // Alienware Synths (Ethereal, Deep Space, Sci-Fi)
+            const alienVerb = new Tone.Reverb(4).toDestination();
+            synths.alienClick = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 2, oscillator: { type: "sine" }, envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 } }).connect(alienVerb);
+            synths.alienBoot = new Tone.PolySynth(Tone.AMSynth, { harmonicity: 2.5, oscillator: { type: "triangle" }, envelope: { attack: 0.5, decay: 1, sustain: 0.5, release: 3 } }).connect(alienVerb);
+            synths.alienSuccess = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 0.8, modulationIndex: 5, oscillator: { type: "sine" }, envelope: { attack: 0.1, decay: 0.4, sustain: 0.2, release: 1.5 } }).connect(alienVerb);
+
             audioInit = true;
         }
 
@@ -729,6 +792,8 @@
                 const time = Tone.now();
                 if (appSettings.theme === 'rog') synths.rogClick.triggerAttackRelease("C1", "16n", time);
                 else if (appSettings.theme === 'legion') synths.legionClick.triggerAttackRelease("32n", time);
+                else if (appSettings.theme === 'razer') synths.razerClick.triggerAttackRelease("G3", "32n", time);
+                else if (appSettings.theme === 'alienware') synths.alienClick.triggerAttackRelease("C2", "32n", time);
                 else synths.click.triggerAttackRelease("C4", "32n", time);
             } catch (e) {
                 console.debug("Audio scheduling skipped for rapid click to prevent overlap crash.");
@@ -744,6 +809,10 @@
                     synths.rogSuccess.triggerAttackRelease("C0", "4n", time + 0.15);
                 } else if (appSettings.theme === 'legion') {
                     synths.legionSuccess.triggerAttackRelease(["E5", "B5", "E6"], "8n", time);
+                } else if (appSettings.theme === 'razer') {
+                    synths.razerSuccess.triggerAttackRelease(["C4", "E4", "G4", "C5"], "8n", time);
+                } else if (appSettings.theme === 'alienware') {
+                    synths.alienSuccess.triggerAttackRelease(["A3", "E4", "A4"], "4n", time);
                 } else {
                     synths.success.triggerAttackRelease(["C5", "E5", "G5"], "8n", time);
                 }
@@ -762,6 +831,12 @@
                     synths.legionBoot.triggerAttackRelease("C6", "8n", time);
                     synths.legionBoot.triggerAttackRelease("E6", "8n", time + 0.15);
                     synths.legionBoot.triggerAttackRelease("G6", "1m", time + 0.3);
+                } else if (theme === 'razer') {
+                    synths.razerBoot.triggerAttackRelease("E2", "8n", time);
+                    synths.razerBoot.triggerAttackRelease("E3", "8n", time + 0.1);
+                    synths.razerBoot.triggerAttackRelease("E4", "2n", time + 0.2);
+                } else if (theme === 'alienware') {
+                    synths.alienBoot.triggerAttackRelease(["C3", "G3", "D4"], "1m", time);
                 }
             } catch (e) {
                 console.debug("Audio scheduling skipped for rapid boot sequence.");
@@ -1085,10 +1160,22 @@
                 overlay.style.clipPath = 'polygon(0 50%, 100% 50%, 100% 50%, 0 50%)'; // Start flat horizontal line
                 text.innerHTML = '<i class="fas fa-biohazard text-8xl text-red-600 mb-4 animate-pulse drop-shadow-[0_0_20px_rgba(255,0,0,1)]"></i><span class="text-red-600 glitch-text drop-shadow-[0_0_15px_rgba(255,0,0,1)]">ROG OVERRIDE</span>';
                 scanline.className = 'animate-scanline-fast';
+                scanline.style.background = 'linear-gradient(to bottom, transparent, rgba(255, 0, 0, 0.2) 10%, rgba(255, 0, 0, 0.8) 50%, rgba(255, 0, 0, 0.2) 90%, transparent)';
             } else if (newTheme === 'legion') {
                 overlay.style.backgroundColor = '#0b111a';
                 overlay.style.clipPath = 'circle(0% at 50% 50%)'; // Start center dot
                 text.innerHTML = '<i class="fas fa-snowflake text-8xl text-cyan-400 mb-4 animate-pulse drop-shadow-[0_0_20px_rgba(0,255,255,1)]"></i><span class="text-cyan-400 drop-shadow-[0_0_15px_rgba(0,255,255,1)]">LEGION PROTOCOL</span>';
+                scanline.className = 'hidden';
+            } else if (newTheme === 'razer') {
+                overlay.style.backgroundColor = '#050505';
+                overlay.style.clipPath = 'polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%)'; // Vertical slit
+                text.innerHTML = '<i class="fas fa-spider text-8xl text-green-500 mb-4 animate-pulse drop-shadow-[0_0_20px_rgba(34,197,94,1)]"></i><span class="text-green-500 drop-shadow-[0_0_15px_rgba(34,197,94,1)] glitch-text">CHROMA SYNC</span>';
+                scanline.className = 'animate-scanline-fast';
+                scanline.style.background = 'linear-gradient(to bottom, transparent, rgba(34, 197, 94, 0.2) 10%, rgba(34, 197, 94, 0.8) 50%, rgba(34, 197, 94, 0.2) 90%, transparent)';
+            } else if (newTheme === 'alienware') {
+                overlay.style.backgroundColor = '#050508';
+                overlay.style.clipPath = 'polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)'; // Center diamond grow
+                text.innerHTML = '<i class="fab fa-galactic-republic text-8xl text-purple-500 mb-4 animate-pulse drop-shadow-[0_0_30px_rgba(168,85,247,1)]"></i><span class="text-purple-500 drop-shadow-[0_0_20px_rgba(168,85,247,1)] tracking-[0.4em]">EXTRATERRESTRIAL</span>';
                 scanline.className = 'hidden';
             } else {
                 overlay.style.backgroundColor = newTheme === 'night' ? '#0f172a' : (newTheme === 'reading' ? '#fef3c7' : '#ffffff');
@@ -1107,6 +1194,10 @@
             overlay.style.transition = 'clip-path 0.6s cubic-bezier(0.77, 0, 0.17, 1)';
             if (newTheme === 'rog') {
                 overlay.style.clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 100%)';
+            } else if (newTheme === 'razer') {
+                overlay.style.clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 100%)'; // Slit opens wide
+            } else if (newTheme === 'alienware') {
+                overlay.style.clipPath = 'polygon(50% -50%, 150% 50%, 50% 150%, -50% 50%)'; // Diamond expands
             } else {
                 overlay.style.clipPath = 'circle(150% at 50% 50%)';
             }
@@ -1122,6 +1213,10 @@
             setTimeout(() => {
                 if (newTheme === 'rog') {
                     overlay.style.clipPath = 'polygon(0 50%, 100% 50%, 100% 50%, 0 50%)';
+                } else if (newTheme === 'razer') {
+                    overlay.style.clipPath = 'polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%)';
+                } else if (newTheme === 'alienware') {
+                    overlay.style.clipPath = 'polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)';
                 } else {
                     overlay.style.clipPath = 'circle(0% at 50% 50%)';
                 }
@@ -1470,6 +1565,12 @@
             } else if (appSettings.theme === 'legion') {
                 searchBoxContainer.classList.add('effect-log-legion');
                 setTimeout(() => searchBoxContainer.classList.remove('effect-log-legion'), 600);
+            } else if (appSettings.theme === 'razer') {
+                searchBoxContainer.classList.add('effect-log-razer');
+                setTimeout(() => searchBoxContainer.classList.remove('effect-log-razer'), 600);
+            } else if (appSettings.theme === 'alienware') {
+                searchBoxContainer.classList.add('effect-log-alienware');
+                setTimeout(() => searchBoxContainer.classList.remove('effect-log-alienware'), 800);
             }
 
             const searchBtn = document.getElementById('searchBtn');
