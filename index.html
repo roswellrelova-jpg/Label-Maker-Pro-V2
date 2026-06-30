@@ -707,13 +707,13 @@
             // ROG Synths (Aggressive, Distorted, Bass-heavy)
             const rogDist = new Tone.Distortion(0.8).toDestination();
             synths.rogClick = new Tone.MembraneSynth({ pitchDecay: 0.2, octaves: 4, oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 0.1 } }).connect(rogDist);
-            synths.rogBoot = new Tone.FMSynth({ harmonicity: 0.5, modulationIndex: 10, oscillator: { type: "sawtooth" }, envelope: { attack: 0.1, decay: 0.5, sustain: 0.2, release: 2 } }).connect(rogDist);
-            synths.rogSuccess = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 6, oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.4, sustain: 0, release: 1 } }).connect(rogDist);
+            synths.rogBoot = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 0.5, modulationIndex: 10, oscillator: { type: "sawtooth" }, envelope: { attack: 0.1, decay: 0.5, sustain: 0.2, release: 2 } }).connect(rogDist);
+            synths.rogSuccess = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.05, octaves: 6, oscillator: { type: "square" }, envelope: { attack: 0.01, decay: 0.4, sustain: 0, release: 1 } }).connect(rogDist);
 
             // Legion Synths (Icy, High-pitched, Reverb, Crystalline)
             const legionVerb = new Tone.Reverb(2.5).toDestination();
             synths.legionClick = new Tone.MetalSynth({ frequency: 1500, envelope: { attack: 0.001, decay: 0.05, release: 0.01 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }).connect(legionVerb);
-            synths.legionBoot = new Tone.FMSynth({ harmonicity: 2.5, modulationIndex: 5, oscillator: { type: "sine" }, envelope: { attack: 0.05, decay: 0.2, sustain: 0.2, release: 3 } }).connect(legionVerb);
+            synths.legionBoot = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 2.5, modulationIndex: 5, oscillator: { type: "sine" }, envelope: { attack: 0.05, decay: 0.2, sustain: 0.2, release: 3 } }).connect(legionVerb);
             synths.legionSuccess = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 3, modulationIndex: 2, oscillator: { type: "sine" }, envelope: { attack: 0.01, decay: 0.3, sustain: 0.1, release: 2 } }).connect(legionVerb);
 
             audioInit = true;
@@ -725,31 +725,46 @@
 
         function playClick() {
             if (!audioInit) return;
-            if (appSettings.theme === 'rog') synths.rogClick.triggerAttackRelease("C1", "16n");
-            else if (appSettings.theme === 'legion') synths.legionClick.triggerAttackRelease("32n");
-            else synths.click.triggerAttackRelease("C4", "32n");
+            try {
+                const time = Tone.now();
+                if (appSettings.theme === 'rog') synths.rogClick.triggerAttackRelease("C1", "16n", time);
+                else if (appSettings.theme === 'legion') synths.legionClick.triggerAttackRelease("32n", time);
+                else synths.click.triggerAttackRelease("C4", "32n", time);
+            } catch (e) {
+                console.debug("Audio scheduling skipped for rapid click to prevent overlap crash.");
+            }
         }
 
         function playSuccess() {
             if (!audioInit) return;
-            if (appSettings.theme === 'rog') {
-                synths.rogSuccess.triggerAttackRelease("C1", "8n");
-                setTimeout(() => synths.rogSuccess.triggerAttackRelease("C0", "4n"), 150);
-            } else if (appSettings.theme === 'legion') {
-                synths.legionSuccess.triggerAttackRelease(["E5", "B5", "E6"], "8n");
-            } else {
-                synths.success.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            try {
+                const time = Tone.now();
+                if (appSettings.theme === 'rog') {
+                    synths.rogSuccess.triggerAttackRelease("C1", "8n", time);
+                    synths.rogSuccess.triggerAttackRelease("C0", "4n", time + 0.15);
+                } else if (appSettings.theme === 'legion') {
+                    synths.legionSuccess.triggerAttackRelease(["E5", "B5", "E6"], "8n", time);
+                } else {
+                    synths.success.triggerAttackRelease(["C5", "E5", "G5"], "8n", time);
+                }
+            } catch (e) {
+                console.debug("Audio scheduling skipped for rapid success to prevent overlap crash.");
             }
         }
 
         function playBootSequence(theme) {
             if (!audioInit) return;
-            if (theme === 'rog') {
-                synths.rogBoot.triggerAttackRelease("C1", "1m");
-            } else if (theme === 'legion') {
-                synths.legionBoot.triggerAttackRelease("C6", "8n");
-                setTimeout(() => synths.legionBoot.triggerAttackRelease("E6", "8n"), 150);
-                setTimeout(() => synths.legionBoot.triggerAttackRelease("G6", "1m"), 300);
+            try {
+                const time = Tone.now();
+                if (theme === 'rog') {
+                    synths.rogBoot.triggerAttackRelease("C1", "1m", time);
+                } else if (theme === 'legion') {
+                    synths.legionBoot.triggerAttackRelease("C6", "8n", time);
+                    synths.legionBoot.triggerAttackRelease("E6", "8n", time + 0.15);
+                    synths.legionBoot.triggerAttackRelease("G6", "1m", time + 0.3);
+                }
+            } catch (e) {
+                console.debug("Audio scheduling skipped for rapid boot sequence.");
             }
         }
 
@@ -890,6 +905,56 @@
         window.toggleGlobalNote = (el) => { appSettings.globalNote = el.value; saveState(); };
         window.toggleLabelHeader = (el) => { appSettings.labelHeader = el.value; saveState(); };
         
+        // --- BACKUP & RESTORE LOGIC ---
+        window.exportBackup = function() {
+            const backupObj = {
+                labRetailInventory: inventoryItems,
+                fullDeliveryHistory: deliveryHistory,
+                currentPrintQueue: printQueue,
+                reprintIssuesLog: issuesLog,
+                stickerSheetOffset: stickerOffset,
+                appSettings: appSettings
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `LabelMakerPro_Backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(dlAnchorElem);
+            dlAnchorElem.click();
+            document.body.removeChild(dlAnchorElem);
+        };
+
+        window.triggerRestore = function() {
+            document.getElementById('backupUpload').click();
+        };
+
+        window.restoreBackup = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    if (backup.labRetailInventory) inventoryItems = backup.labRetailInventory;
+                    if (backup.fullDeliveryHistory) deliveryHistory = backup.fullDeliveryHistory;
+                    if (backup.currentPrintQueue) printQueue = backup.currentPrintQueue;
+                    if (backup.reprintIssuesLog) issuesLog = backup.reprintIssuesLog;
+                    if (typeof backup.stickerSheetOffset !== 'undefined') stickerOffset = backup.stickerSheetOffset;
+                    if (backup.appSettings) appSettings = backup.appSettings;
+                    
+                    saveState();
+                    applySettings();
+                    updateUI();
+                    showCustomAlert("Restore Successful", "Your system data has been completely restored from the backup file.");
+                    closeSettings();
+                } catch (err) {
+                    showCustomAlert("Restore Failed", "The selected file is invalid or corrupted. Please make sure it's a valid Label Maker JSON backup.");
+                }
+                event.target.value = ''; // Reset input so the same file can be selected again if needed
+            };
+            reader.readAsText(file);
+        };
+
         window.toggleTheme = function(el) {
             const newTheme = el.value;
             if (appSettings.theme === newTheme) return; // Ignore if clicking current theme
