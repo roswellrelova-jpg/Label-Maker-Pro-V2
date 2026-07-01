@@ -865,8 +865,8 @@
 
         const rawMapData = {
             16: {
-                1: "16166,16168,16170,16172,16174,16176,16178,16180,16182,16184,16186,16188,16190,16192,16194,16195,16196,16198,16200",
-                2: "16776,16778,16780,16782,16783,16784,16785,16786,16787,16788,16789,16790,16791,16792,16793,16794,16795,16796,16798,16800",
+                1: "16166,16168,16170,16172,16174,16176,16178,16180,16182,16184,16186,16188,16190,16192,16194,16196,16198,16200",
+                2: "16776,16778,16780,16782,16784,16786,16788,16790,16792,16794,16796,16798,16800",
                 3: "16140,16141,16142,16143,16144,16145,16146,16148,16150,16152,16154,16155,16156,16157,16158,16159,16160,16161,16162,16164",
                 4: "16744,16746,16748,16750,16751,16752,16753,16754,16755,16756,16757,16758,16759,16760,16761,16762,16764,16766,16768,16770,16772,16774",
                 5: "16100,16102,16104,16106,16108,16110,16112,16114,16116,16118,16120,16122,16124,16126,16128,16130,16132,16134,16136,16138,16139",
@@ -1500,6 +1500,29 @@
                 lBody.appendChild(row);
             });
 
+            // Update Issues Log Table
+            const iBody = document.getElementById('issuesTableBody');
+            iBody.innerHTML = '';
+            document.getElementById('emptyIssues').classList.toggle('hidden', issuesLog.length > 0);
+
+            [...issuesLog].reverse().forEach((issue) => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 transition-colors border-b border-slate-50";
+                row.innerHTML = `
+                    <td class="p-4 text-xs text-slate-500 font-medium whitespace-nowrap">${new Date(issue.timestamp).toLocaleString()}</td>
+                    <td class="p-4 font-bold text-slate-700">${issue.order}</td>
+                    <td class="p-4 font-black text-blue-600 uppercase">${issue.cabin}</td>
+                    <td class="p-4 text-slate-600 text-sm font-medium">${issue.description}</td>
+                    <td class="p-4 text-slate-500 text-sm font-bold">${issue.staff}</td>
+                    <td class="p-4 text-right whitespace-nowrap">
+                        <button onclick="deleteIssue('${issue.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition-colors" title="Delete Issue">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                iBody.appendChild(row);
+            });
+
             if (typeof updateTicker === 'function') updateTicker();
         }
 
@@ -1729,10 +1752,65 @@
             }, '<i class="fas fa-trash-alt"></i>', 'bg-red-100 text-red-600');
         };
 
+        window.deleteIssue = (id) => {
+            showCustomConfirm('Delete Issue', 'Remove this issue from the log?', 'Delete', 'bg-red-600 hover:bg-red-700 shadow-red-200', () => {
+                issuesLog = issuesLog.filter(i => String(i.id) !== String(id));
+                saveState(); updateUI();
+            }, '<i class="fas fa-trash-alt"></i>', 'bg-red-100 text-red-600');
+        };
+
         document.getElementById('searchBtn').addEventListener('click', handleSearch);
         document.getElementById('cabinSearch').addEventListener('keypress', e => e.key === 'Enter' && handleSearch());
         document.getElementById('downloadPDF').addEventListener('click', printLabels);
         document.getElementById('quickPrintBtn').addEventListener('click', printLabels);
+
+        document.getElementById('addIssueForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const order = document.getElementById('issueOrder').value.trim();
+            const cabin = document.getElementById('issueCabin').value.trim().toUpperCase();
+            const desc = document.getElementById('issueDesc').value.trim();
+            const staff = document.getElementById('issueStaff').value.trim();
+            
+            if(!order || !cabin || !desc || !staff) return;
+
+            const newIssue = {
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+                timestamp: new Date().toISOString(),
+                order: order,
+                cabin: cabin,
+                description: desc,
+                staff: staff
+            };
+
+            issuesLog.push(newIssue);
+            saveState();
+            updateUI();
+            this.reset();
+            
+            if(typeof playSuccess === 'function') playSuccess();
+        });
+
+        document.getElementById('clearIssuesBtn').addEventListener('click', () => {
+            if (issuesLog.length === 0) return;
+            showCustomConfirm('Clear Issues', 'Delete ALL logged issues?', 'Clear All', 'bg-red-600 hover:bg-red-700 shadow-red-200', () => {
+                issuesLog = []; saveState(); updateUI();
+            }, '<i class="fas fa-eraser"></i>', 'bg-red-100 text-red-600');
+        });
+
+        document.getElementById('downloadIssuesExcel').addEventListener('click', () => {
+            if (issuesLog.length === 0) { showCustomAlert('Empty Data', 'No issues to export.'); return; }
+            const wb = XLSX.utils.book_new();
+            const data = issuesLog.map(i => ({
+                'Date/Time': new Date(i.timestamp).toLocaleString(),
+                'Order #': i.order,
+                'Cabin #': i.cabin,
+                'Issue Description': i.description,
+                'Staff': i.staff
+            }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            XLSX.utils.book_append_sheet(wb, ws, "Issues Log");
+            XLSX.writeFile(wb, `Issues_Log_${new Date().toISOString().split('T')[0]}.xlsx`);
+        });
 
         document.getElementById('clearQueueBtn').addEventListener('click', () => {
             if (printQueue.length === 0) return;
