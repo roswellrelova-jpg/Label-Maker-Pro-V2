@@ -51,6 +51,7 @@
             color: #facc15 !important;
         }
 
+        /* STREAMING_CHUNK:Styling scrollbars and grid elements... -->
         /* Hide scrollbar for navigation */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -90,6 +91,7 @@
         }
         .sticker-cell.used:hover { opacity: 0.8; cursor: pointer; }
 
+        /* STREAMING_CHUNK:Defining application themes and overrides... -->
         /* --- THEME OVERRIDES --- */
         
         /* NIGHT MODE (Improved) */
@@ -197,6 +199,7 @@
             .no-print { display: none !important; }
         }
 
+        /* STREAMING_CHUNK:Setting up animations and interaction effects... -->
         /* ADVANCED THEME TRANSITIONS */
         #theme-transition-overlay { 
             will-change: clip-path, background-color; 
@@ -502,7 +505,7 @@
             <div class="glass-morphism rounded-2xl shadow-xl overflow-hidden p-6 md:p-8">
                 <!-- Add New Issue Form -->
                 <div class="mb-8 p-6 bg-red-50 border border-red-100 rounded-2xl transition-colors">
-                    <h3 class="text-lg font-black text-red-900 mb-4"><i class="fas fa-exclamation-triangle mr-2"></i>Log Reprint Issue</h3>
+                    <h3 class="text-lg font-black text-red-900 mb-4"><i class="fas fa-exclamation-triangle mr-2"></i>Report Printing Issue / Reprint</h3>
                     <form id="addIssueForm" class="flex flex-col md:flex-row gap-4 items-end flex-wrap">
                         <div class="flex-1 min-w-[150px]">
                             <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Order Number</label>
@@ -521,7 +524,7 @@
                             <input type="text" id="issueStaff" required placeholder="Name" class="w-full p-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
                         </div>
                         <button type="submit" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-md active:scale-95 whitespace-nowrap">
-                            Log Issue
+                            Submit Issue
                         </button>
                     </form>
                 </div>
@@ -545,7 +548,7 @@
                     <table class="w-full text-left">
                         <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs font-black uppercase tracking-widest sticky top-0 z-10 shadow-sm">
                             <tr>
-                                <th class="p-4 w-12 text-center"><i class="fas fa-check text-slate-300"></i></th>
+                                <th class="p-4 text-center">Status</th>
                                 <th class="p-4">Date / Time</th>
                                 <th class="p-4">Order #</th>
                                 <th class="p-4">Cabin #</th>
@@ -556,7 +559,7 @@
                         </thead>
                         <tbody id="issuesTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
                     </table>
-                    <div id="emptyIssues" class="p-10 text-center text-slate-300 italic font-medium bg-slate-50">No issues logged yet.</div>
+                    <div id="emptyIssues" class="p-10 text-center text-slate-300 italic font-medium bg-slate-50">No printing issues reported yet.</div>
                 </div>
             </div>
         </section>
@@ -1509,22 +1512,29 @@
             [...issuesLog].reverse().forEach((issue) => {
                 const isResolved = issue.resolved || false;
                 const rowClass = isResolved 
-                    ? "bg-slate-100/50 opacity-60 line-through transition-colors border-b border-slate-200" 
+                    ? "bg-slate-50/50 opacity-75 transition-colors border-b border-slate-200" 
                     : "hover:bg-slate-50 transition-colors border-b border-slate-50";
+
+                const statusBadge = isResolved 
+                    ? `<span class="bg-green-100 text-green-700 px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border border-green-200"><i class="fas fa-check mr-1"></i> Solved</span>` 
+                    : `<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border border-yellow-200"><i class="fas fa-clock mr-1"></i> Pending</span>`;
+
+                const resolveBtn = isResolved
+                    ? `<button onclick="toggleIssueStatus('${issue.id}')" class="text-slate-400 hover:text-slate-600 hover:bg-slate-200 px-3 py-2 rounded-lg transition-all font-bold text-xs mr-2 no-underline inline-block" style="text-decoration: none;" title="Reopen Issue"><i class="fas fa-undo mr-1"></i> Reopen</button>`
+                    : `<button onclick="toggleIssueStatus('${issue.id}')" class="text-green-600 hover:text-green-700 hover:bg-green-100 px-3 py-2 rounded-lg transition-all font-bold text-xs mr-2 no-underline inline-block" style="text-decoration: none;" title="Mark as Solved"><i class="fas fa-check-circle mr-1"></i> Mark Solved</button>`;
 
                 const row = document.createElement('tr');
                 row.className = rowClass;
                 row.innerHTML = `
-                    <td class="p-4 text-center">
-                        <input type="checkbox" ${isResolved ? 'checked' : ''} onchange="toggleIssueStatus('${issue.id}')" class="w-5 h-5 rounded border-slate-300 text-green-600 focus:ring-green-500 cursor-pointer accent-green-600">
-                    </td>
-                    <td class="p-4 text-xs text-slate-500 font-medium whitespace-nowrap">${new Date(issue.timestamp).toLocaleString()}</td>
-                    <td class="p-4 font-bold ${isResolved ? 'text-slate-500' : 'text-slate-700'}">${issue.order}</td>
-                    <td class="p-4 font-black ${isResolved ? 'text-slate-500' : 'text-blue-600'} uppercase">${issue.cabin}</td>
-                    <td class="p-4 ${isResolved ? 'text-slate-500' : 'text-slate-600'} text-sm font-medium">${issue.description}</td>
+                    <td class="p-4 text-center">${statusBadge}</td>
+                    <td class="p-4 text-xs text-slate-500 font-medium whitespace-nowrap ${isResolved ? 'line-through' : ''}">${new Date(issue.timestamp).toLocaleString()}</td>
+                    <td class="p-4 font-bold ${isResolved ? 'text-slate-400 line-through' : 'text-slate-700'}">${issue.order}</td>
+                    <td class="p-4 font-black ${isResolved ? 'text-slate-400 line-through' : 'text-blue-600'} uppercase">${issue.cabin}</td>
+                    <td class="p-4 ${isResolved ? 'text-slate-400 line-through' : 'text-slate-600'} text-sm font-medium">${issue.description}</td>
                     <td class="p-4 ${isResolved ? 'text-slate-400' : 'text-slate-500'} text-sm font-bold">${issue.staff}</td>
                     <td class="p-4 text-right whitespace-nowrap">
-                        <button onclick="deleteIssue('${issue.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition-colors no-underline inline-block" style="text-decoration: none;" title="Delete Issue">
+                        ${resolveBtn}
+                        <button onclick="deleteIssue('${issue.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded transition-colors no-underline inline-block" style="text-decoration: none;" title="Delete Issue">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
