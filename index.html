@@ -545,6 +545,7 @@
                     <table class="w-full text-left">
                         <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs font-black uppercase tracking-widest sticky top-0 z-10 shadow-sm">
                             <tr>
+                                <th class="p-4 w-12 text-center"><i class="fas fa-check text-slate-300"></i></th>
                                 <th class="p-4">Date / Time</th>
                                 <th class="p-4">Order #</th>
                                 <th class="p-4">Cabin #</th>
@@ -1506,16 +1507,24 @@
             document.getElementById('emptyIssues').classList.toggle('hidden', issuesLog.length > 0);
 
             [...issuesLog].reverse().forEach((issue) => {
+                const isResolved = issue.resolved || false;
+                const rowClass = isResolved 
+                    ? "bg-slate-100/50 opacity-60 line-through transition-colors border-b border-slate-200" 
+                    : "hover:bg-slate-50 transition-colors border-b border-slate-50";
+
                 const row = document.createElement('tr');
-                row.className = "hover:bg-slate-50 transition-colors border-b border-slate-50";
+                row.className = rowClass;
                 row.innerHTML = `
+                    <td class="p-4 text-center">
+                        <input type="checkbox" ${isResolved ? 'checked' : ''} onchange="toggleIssueStatus('${issue.id}')" class="w-5 h-5 rounded border-slate-300 text-green-600 focus:ring-green-500 cursor-pointer accent-green-600">
+                    </td>
                     <td class="p-4 text-xs text-slate-500 font-medium whitespace-nowrap">${new Date(issue.timestamp).toLocaleString()}</td>
-                    <td class="p-4 font-bold text-slate-700">${issue.order}</td>
-                    <td class="p-4 font-black text-blue-600 uppercase">${issue.cabin}</td>
-                    <td class="p-4 text-slate-600 text-sm font-medium">${issue.description}</td>
-                    <td class="p-4 text-slate-500 text-sm font-bold">${issue.staff}</td>
+                    <td class="p-4 font-bold ${isResolved ? 'text-slate-500' : 'text-slate-700'}">${issue.order}</td>
+                    <td class="p-4 font-black ${isResolved ? 'text-slate-500' : 'text-blue-600'} uppercase">${issue.cabin}</td>
+                    <td class="p-4 ${isResolved ? 'text-slate-500' : 'text-slate-600'} text-sm font-medium">${issue.description}</td>
+                    <td class="p-4 ${isResolved ? 'text-slate-400' : 'text-slate-500'} text-sm font-bold">${issue.staff}</td>
                     <td class="p-4 text-right whitespace-nowrap">
-                        <button onclick="deleteIssue('${issue.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition-colors" title="Delete Issue">
+                        <button onclick="deleteIssue('${issue.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition-colors no-underline inline-block" style="text-decoration: none;" title="Delete Issue">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
@@ -1759,6 +1768,16 @@
             }, '<i class="fas fa-trash-alt"></i>', 'bg-red-100 text-red-600');
         };
 
+        window.toggleIssueStatus = function(id) {
+            const issue = issuesLog.find(i => String(i.id) === String(id));
+            if (issue) {
+                issue.resolved = !issue.resolved;
+                saveState();
+                updateUI();
+                if(issue.resolved && typeof playSuccess === 'function') playSuccess();
+            }
+        };
+
         document.getElementById('searchBtn').addEventListener('click', handleSearch);
         document.getElementById('cabinSearch').addEventListener('keypress', e => e.key === 'Enter' && handleSearch());
         document.getElementById('downloadPDF').addEventListener('click', printLabels);
@@ -1779,7 +1798,8 @@
                 order: order,
                 cabin: cabin,
                 description: desc,
-                staff: staff
+                staff: staff,
+                resolved: false
             };
 
             issuesLog.push(newIssue);
@@ -1801,6 +1821,7 @@
             if (issuesLog.length === 0) { showCustomAlert('Empty Data', 'No issues to export.'); return; }
             const wb = XLSX.utils.book_new();
             const data = issuesLog.map(i => ({
+                'Status': i.resolved ? 'Resolved' : 'Pending',
                 'Date/Time': new Date(i.timestamp).toLocaleString(),
                 'Order #': i.order,
                 'Cabin #': i.cabin,
@@ -1829,6 +1850,8 @@
         document.getElementById('downloadExcel').addEventListener('click', () => {
             if (deliveryHistory.length === 0 && inventoryItems.length === 0) { showCustomAlert('Empty Data', 'No data to export.'); return; }
             const wb = XLSX.utils.book_new();
+            
+            // 1. Generate Transaction Log Sheet
             const logData = [];
             deliveryHistory.forEach(h => {
                 const timeStr = new Date(h.timestamp).toLocaleString();
@@ -1846,6 +1869,39 @@
             });
             const wsLog = logData.length > 0 ? XLSX.utils.json_to_sheet(logData) : XLSX.utils.aoa_to_sheet([['Date/Time', 'Cabin', 'Area', 'Item', 'Usage (Qty)', 'Instruction']]);
             XLSX.utils.book_append_sheet(wb, wsLog, "Transaction Log");
+
+            // 2. Generate Tally By Item Sheet
+            const tallyData = [];
+            const usageTally = {};
+            
+            // Calculate total items issued
+            deliveryHistory.forEach(h => {
+                if (h.items && h.items.length > 0) {
+                    h.items.forEach(i => {
+                        usageTally[i.id] = (usageTally[i.id] || 0) + i.qty;
+                    });
+                }
+            });
+
+            // Map against inventory
+            inventoryItems.forEach(item => {
+                const usedQty = usageTally[item.id] || 0;
+                const totalStock = item.stock || 0;
+                const remaining = totalStock - usedQty;
+                
+                tallyData.push({
+                    'Item Name': item.name,
+                    'Category': item.category,
+                    'Total Stock': totalStock,
+                    'Total Issued': usedQty,
+                    'Remaining Inventory': remaining
+                });
+            });
+
+            const wsTally = tallyData.length > 0 ? XLSX.utils.json_to_sheet(tallyData) : XLSX.utils.aoa_to_sheet([['Item Name', 'Category', 'Total Stock', 'Total Issued', 'Remaining Inventory']]);
+            XLSX.utils.book_append_sheet(wb, wsTally, "Tally by Item");
+
+            // Trigger Download
             XLSX.writeFile(wb, `Delivery_Log_${new Date().toISOString().split('T')[0]}.xlsx`);
         });
 
