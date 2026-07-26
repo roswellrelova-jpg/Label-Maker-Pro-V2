@@ -197,6 +197,26 @@
             .no-print { display: none !important; }
         }
 
+        /* PENDING ISSUE NOTIFICATION — pulse from small to large */
+        @keyframes issue-pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.85), 0 0 0 0 rgba(239,68,68,0.4); transform: scale(1); }
+            50%  { box-shadow: 0 0 0 8px rgba(239,68,68,0.2), 0 0 24px 6px rgba(239,68,68,0.25); transform: scale(1.035); }
+            100% { box-shadow: 0 0 0 0 rgba(239,68,68,0), 0 0 0 0 rgba(239,68,68,0); transform: scale(1); }
+        }
+        @keyframes issue-icon-spin {
+            0%, 100% { transform: rotate(-8deg) scale(1.1); }
+            50%       { transform: rotate(8deg) scale(1); }
+        }
+        #pendingIssuesBanner {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        #pendingIssuesBanner.has-issues {
+            animation: issue-pulse 1.8s ease-in-out infinite;
+        }
+        #pendingIssuesBanner .issue-icon {
+            animation: issue-icon-spin 1.8s ease-in-out infinite;
+        }
+
         /* ADVANCED THEME TRANSITIONS */
         #theme-transition-overlay { 
             will-change: clip-path, background-color; 
@@ -258,22 +278,40 @@
 </head>
 <body class="bg-slate-50 min-h-screen font-sans text-slate-900 transition-colors duration-300 theme-day">
     
-    <!-- TOP NOTIFICATION & CLOCK BAR -->
-    <div class="bg-slate-900 text-slate-200 border-b border-slate-700 shadow-sm relative z-50 no-print">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between text-xs font-medium tracking-wide gap-3">
-            <div class="flex items-center gap-2 text-cyan-400 font-bold shrink-0 bg-slate-800/80 border border-slate-700 px-3 py-1 rounded-lg shadow-inner">
+    <!-- TOP NOTIFICATION BAR — Pending Issues Only -->
+    <div class="bg-slate-900 border-b border-slate-700 shadow-sm relative z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-2.5 flex items-center justify-between gap-3">
+
+            <!-- Clock -->
+            <div class="flex items-center gap-2 text-cyan-400 font-bold shrink-0 bg-slate-800/80 border border-slate-700 px-3 py-1.5 rounded-lg text-xs">
                 <i class="far fa-clock"></i>
                 <span id="digitalClockText">--:--:--</span>
             </div>
-            
-            <div class="overflow-hidden flex-1 relative h-8 flex items-center mask-image-linear">
-                <div class="w-full absolute whitespace-nowrap flex items-center">
-                    <span id="tickerText" class="animate-ticker text-cyan-400 font-bold text-base neon-glow transition-all duration-300">System loading...</span>
+
+            <!-- Pending Issues Notification — hidden when no open issues -->
+            <div id="pendingIssuesBanner"
+                 class="hidden flex-1 flex items-center justify-center gap-3 bg-red-600 border border-red-500 rounded-xl px-5 py-2 cursor-pointer select-none"
+                 onclick="switchTab('issues')"
+                 title="Click to view pending issues">
+                <i class="fas fa-exclamation-triangle text-white text-base issue-icon shrink-0"></i>
+                <div class="flex items-center gap-2 flex-wrap justify-center">
+                    <span class="text-white font-black text-sm tracking-wide uppercase">PENDING ISSUE</span>
+                    <span id="pendingIssueCount" class="bg-white text-red-600 font-black text-xs px-2.5 py-0.5 rounded-full min-w-[1.5rem] text-center">0</span>
+                    <span id="pendingIssuePreview" class="text-red-100 font-semibold text-xs hidden sm:inline truncate max-w-xs"></span>
                 </div>
+                <span class="text-red-200 text-[10px] font-bold uppercase tracking-widest shrink-0 hidden md:inline">Click to review →</span>
             </div>
 
-            <button onclick="openReportIssueModal()" class="shrink-0 flex items-center gap-2 bg-red-700 hover:bg-red-600 text-white font-black text-xs px-3 py-1.5 rounded-lg transition-all active:scale-95 shadow-md border border-red-600 whitespace-nowrap" title="Report Printing Issue / Reprint">
-                <i class="fas fa-exclamation-triangle"></i>
+            <!-- All-clear state — shown when no open issues -->
+            <div id="allClearBanner" class="flex-1 flex items-center justify-center">
+                <span class="text-slate-500 text-xs font-medium tracking-wide">No pending issues</span>
+            </div>
+
+            <!-- Report Issue button — always visible -->
+            <button onclick="openReportIssueModal()" 
+                    class="shrink-0 flex items-center gap-2 bg-slate-700 hover:bg-red-700 text-slate-300 hover:text-white font-black text-xs px-3 py-1.5 rounded-lg transition-all active:scale-95 border border-slate-600 hover:border-red-500 whitespace-nowrap"
+                    title="Report Printing Issue / Reprint">
+                <i class="fas fa-plus"></i>
                 <span class="hidden sm:inline">REPORT ISSUE</span>
             </button>
         </div>
@@ -1138,19 +1176,6 @@
         function applySettings() {
             document.body.className = `bg-slate-50 min-h-screen font-sans text-slate-900 transition-colors duration-300 theme-${appSettings.theme}`;
             
-            const tickerEl = document.getElementById('tickerText');
-            const baseClasses = 'animate-ticker transition-all duration-300 font-bold';
-            const sizeMap = { 'small': 'text-sm', 'normal': 'text-base', 'large': 'text-xl font-black' };
-            
-            tickerEl.className = `${baseClasses} ${sizeMap[appSettings.notificationSize]}`;
-            if (printQueue.length > 0) {
-                tickerEl.classList.add('neon-glow-warning');
-                tickerEl.classList.remove('neon-glow');
-            } else {
-                tickerEl.classList.add('neon-glow');
-                tickerEl.classList.remove('neon-glow-warning');
-            }
-            
             document.getElementById('settingShowArea').checked = appSettings.showArea;
             document.getElementById('settingGlobalNote').value = appSettings.globalNote;
             document.getElementById('settingLabelHeader').value = appSettings.labelHeader;
@@ -1167,6 +1192,8 @@
             } else {
                 lookupBtn.classList.add('hidden');
             }
+
+            updateIssueBanner();
         }
 
         function showCustomAlert(title, message) {
@@ -1670,7 +1697,7 @@
                 iBody.appendChild(row);
             });
 
-            if (typeof updateTicker === 'function') updateTicker();
+            updateIssueBanner();
         }
 
         function handleSearch() {
@@ -2053,11 +2080,6 @@
             closeReportIssueModal();
             
             if(typeof playSuccess === 'function') playSuccess();
-            // Also show a brief ticker notification
-            const t = document.getElementById('tickerText');
-            const prev = t.innerText;
-            t.innerText = `⚠️ Issue logged: Order ${order} — Cabin ${cabin}`;
-            setTimeout(() => updateTicker(), 3000);
         });
 
         document.getElementById('clearIssuesBtn').addEventListener('click', () => {
@@ -2195,26 +2217,32 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
-        function updateTicker() {
-            const queueSize = printQueue.length;
-            const todayStr = new Date().toLocaleDateString();
-            const todayLogs = deliveryHistory.filter(h => new Date(h.timestamp).toLocaleDateString() === todayStr).length;
-            const totalLabelsNeeded = stickerOffset + queueSize;
-            const sheetsNeeded = queueSize > 0 ? Math.ceil(totalLabelsNeeded / 10) : 0;
-            const openIssues = issuesLog.filter(i => !i.resolved).length;
+        function updateIssueBanner() {
+            const openIssues = issuesLog.filter(i => !i.resolved);
+            const count = openIssues.length;
+            const banner = document.getElementById('pendingIssuesBanner');
+            const allClear = document.getElementById('allClearBanner');
+            const countEl = document.getElementById('pendingIssueCount');
+            const previewEl = document.getElementById('pendingIssuePreview');
 
-            let msgs = [];
-            if (queueSize > 0) {
-                msgs.push(`⚠️ ACTION REQUIRED: ${queueSize} label(s) pending in Print Queue!`);
-                if (sheetsNeeded > 1) msgs.push(`🗂️ HEADS UP: Labels will span ${sheetsNeeded} sticker sheets — load next sheet before printing!`);
+            if (count > 0) {
+                // Show banner, hide all-clear
+                banner.classList.remove('hidden');
+                banner.classList.add('has-issues', 'flex');
+                allClear.classList.add('hidden');
+
+                countEl.innerText = count;
+
+                // Preview: show cabin + description of most recent open issue
+                const latest = [...openIssues].reverse()[0];
+                previewEl.innerText = `${latest.cabin} — ${latest.description}`;
+                previewEl.classList.remove('hidden');
             } else {
-                msgs.push(`✅ System Status: All clear. No pending prints.`);
+                // Hide banner, show all-clear
+                banner.classList.add('hidden');
+                banner.classList.remove('has-issues', 'flex');
+                allClear.classList.remove('hidden');
             }
-            msgs.push(`📦 Deliveries Today: ${todayLogs}`);
-            if (openIssues > 0) msgs.push(`🔴 ${openIssues} open issue(s) pending in Reprints & Issues tab.`);
-            msgs.push(`💡 Tip: Click queued labels on the grid to add Special Instructions.`);
-            
-            document.getElementById('tickerText').innerText = msgs.join('   •   ');
         }
 
         // Init App
