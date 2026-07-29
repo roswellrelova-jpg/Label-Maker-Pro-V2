@@ -1593,17 +1593,53 @@
 
                 let areaTag = item.area ? `<div class="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-widest"><i class="fas fa-map-marker-alt text-blue-400 mr-1"></i>Area ${item.area}</div>` : '';
 
+                const reprintBadge = item.isReprint
+                    ? `<div class="text-[10px] text-red-600 font-black mt-1 uppercase tracking-widest"><i class="fas fa-redo mr-1"></i>Reprint</div>`
+                    : '';
+
+                const addItemBtn = item.isReprint
+                    ? `<button onclick="document.getElementById('add-item-panel-${idx}').classList.toggle('hidden')" class="text-blue-500 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-lg transition-all font-bold text-xs mr-1" title="Add retail item"><i class="fas fa-plus-circle mr-1"></i>Add item</button>`
+                    : '';
+
                 row.innerHTML = `
                     <td class="px-6 py-4 font-black text-blue-600 text-xl tracking-wider uppercase">
                         ${item.cabin}
                         ${areaTag}
+                        ${reprintBadge}
                     </td>
                     <td class="px-6 py-4 text-center flex flex-col items-center">${displayValue}</td>
                     <td class="px-6 py-4 text-right whitespace-nowrap">
+                        ${addItemBtn}
                         <button onclick="openSpecialInstructionModal(${idx})" class="text-slate-400 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg transition-all font-bold text-sm mr-2" title="Add special note"><i class="fas fa-comment-dots"></i></button>
                         <button onclick="removeFromQueue(${idx})" class="text-red-400 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-all font-bold text-sm">Remove</button>
                     </td>
                 `;
+                qBody.appendChild(row);
+
+                // Inject the add-item panel row right after (for reprint entries)
+                if (item.isReprint) {
+                    const panelRow = document.createElement('tr');
+                    panelRow.id = `add-item-panel-${idx}`;
+                    panelRow.className = 'hidden bg-blue-50 border-t border-blue-100';
+                    panelRow.innerHTML = `<td colspan="3" class="px-6 py-3">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="text-xs font-black text-blue-700 uppercase tracking-wide"><i class="fas fa-tag mr-1"></i>Add retail item</span>
+                            <select id="add-item-select-${idx}" class="text-sm border border-slate-300 rounded-lg px-2 py-1.5 bg-white focus:border-blue-500 outline-none font-medium">
+                                <option value="">No item</option>
+                                ${inventoryItems.map(inv => `<option value="${inv.id}">${inv.name} (${inv.category})</option>`).join('')}
+                            </select>
+                            <div class="flex items-center gap-1">
+                                <span class="text-xs text-slate-500 font-bold">Qty</span>
+                                <input type="number" id="add-item-qty-${idx}" min="1" value="1" class="w-14 text-center text-sm border border-slate-300 rounded-lg px-1 py-1.5 bg-white focus:border-blue-500 outline-none font-bold">
+                            </div>
+                            <button onclick="confirmAddItemToQueue(${idx})" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg font-black text-xs transition-all active:scale-95 shadow-sm shadow-blue-200">Add to label</button>
+                            <button onclick="document.getElementById('add-item-panel-${idx}').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 px-2 py-1.5 rounded-lg font-bold text-xs transition-all">Cancel</button>
+                        </div>
+                    </td>`;
+                    qBody.appendChild(panelRow);
+                    // Skip the original appendChild at the end since we already did it
+                    return;
+                }
                 qBody.appendChild(row);
             });
 
@@ -1907,6 +1943,38 @@
         }
 
         window.removeFromQueue = (idx) => { printQueue.splice(idx, 1); saveState(); updateUI(); }
+
+        window.confirmAddItemToQueue = function(idx) {
+            const selectEl = document.getElementById(`add-item-select-${idx}`);
+            const qtyEl = document.getElementById(`add-item-qty-${idx}`);
+            if (!selectEl || !qtyEl) return;
+
+            const selectId = selectEl.value;
+            const qty = parseInt(qtyEl.value) || 1;
+
+            if (!selectId) {
+                // No item selected — just close the panel
+                const panel = document.getElementById(`add-item-panel-${idx}`);
+                if (panel) panel.classList.add('hidden');
+                return;
+            }
+
+            const invItem = inventoryItems.find(i => String(i.id) === String(selectId));
+            if (!invItem) return;
+
+            if (!printQueue[idx].items) printQueue[idx].items = [];
+
+            const existing = printQueue[idx].items.find(i => String(i.id) === String(selectId));
+            if (existing) {
+                existing.qty += qty;
+            } else {
+                printQueue[idx].items.push({ id: invItem.id, name: invItem.name, qty: qty });
+            }
+
+            saveState();
+            updateUI();
+            if (typeof playSuccess === 'function') playSuccess();
+        };
         window.deleteLogEntry = (id) => {
             showCustomConfirm('Delete Log', 'Permanently delete this delivery record?', 'Delete', 'bg-red-600 hover:bg-red-700 shadow-red-200', () => {
                 deliveryHistory = deliveryHistory.filter(e => String(e.id) !== String(id));
@@ -1951,12 +2019,58 @@
 
         window.toggleIssueStatus = function(id) {
             const issue = issuesLog.find(i => String(i.id) === String(id));
-            if (issue) {
-                issue.resolved = !issue.resolved;
+            if (!issue) return;
+
+            // Reopening — just toggle back, no label
+            if (issue.resolved) {
+                issue.resolved = false;
                 saveState();
                 updateUI();
-                if(issue.resolved && typeof playSuccess === 'function') playSuccess();
+                return;
             }
+
+            // Resolving — mark solved and auto-create a reprint label
+            issue.resolved = true;
+
+            // Look up cabin area from database
+            const cabinNum = parseInt(issue.cabin);
+            let deckNum = null;
+            let areaNum = null;
+            if (!isNaN(cabinNum) && cabinNum > 0) {
+                deckNum = Math.floor(cabinNum / 1000);
+                const found = cabinDatabase.find(c => c.cabin === cabinNum);
+                areaNum = found ? found.area : null;
+            }
+
+            const reprintInstruction = issue.description
+                ? `★ REPRINT — ${issue.description}`
+                : '★ REPRINT';
+
+            const reprintEntry = {
+                id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+                cabin: issue.cabin,
+                deck: deckNum,
+                area: areaNum,
+                items: [],
+                specialInstruction: reprintInstruction,
+                timestamp: new Date().toISOString(),
+                isReprint: true,
+                issueId: issue.id
+            };
+
+            // Option B: write to deliveryHistory immediately
+            // Audit trail exists the moment issue is resolved, even if label isn't printed
+            deliveryHistory.push(Object.assign({}, reprintEntry));
+
+            // Also push to print queue so label can be printed
+            printQueue.push(reprintEntry);
+
+            saveState();
+            updateUI();
+            if (typeof playSuccess === 'function') playSuccess();
+
+            // Switch to print queue tab so user sees the label
+            switchTab('print');
         };
 
         // --- REPORT ISSUE MODAL ---
