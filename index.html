@@ -364,6 +364,26 @@
                 <!-- Left: Search Box (7 columns on desktop) -->
                 <div class="md:col-span-7 glass-morphism rounded-2xl shadow-xl p-8 flex flex-col justify-center overflow-hidden relative">
                     <div class="w-full">
+
+                        <!-- Quick Log Search -->
+                        <div class="mb-5">
+                            <label class="block text-center text-slate-500 uppercase tracking-widest text-[10px] font-black mb-2">Quick Log Search</label>
+                            <div class="relative">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                                <input type="text" id="quickLogSearch" oninput="handleQuickLogSearch(this.value)" placeholder="Search cabin, item, date..." 
+                                       class="w-full pl-10 pr-10 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm font-medium text-slate-700">
+                                <button onclick="clearQuickLogSearch()" id="quickLogSearchClear" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
+                            </div>
+                            <!-- Results Dropdown -->
+                            <div id="quickLogResults" class="hidden mt-2 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden max-h-48 overflow-y-auto z-20 relative">
+                                <div id="quickLogResultsBody"></div>
+                            </div>
+                        </div>
+
+                        <div class="w-full h-px bg-slate-200 mb-5"></div>
+
                         <label class="block text-center text-slate-500 uppercase tracking-widest text-xs font-black mb-4">Enter Cabin Number</label>
                         <div class="flex flex-col gap-4">
                             <!-- Changed type to text to support alphanumeric cabins like VIP -->
@@ -2358,6 +2378,98 @@
                 allClear.classList.remove('hidden');
             }
         }
+
+        // --- QUICK LOG SEARCH (Search & Log Tab) ---
+        window.handleQuickLogSearch = function(query) {
+            const clearBtn = document.getElementById('quickLogSearchClear');
+            const resultsBox = document.getElementById('quickLogResults');
+            const resultsBody = document.getElementById('quickLogResultsBody');
+
+            if (!query.trim()) {
+                clearBtn.classList.add('hidden');
+                resultsBox.classList.add('hidden');
+                resultsBody.innerHTML = '';
+                return;
+            }
+
+            clearBtn.classList.remove('hidden');
+            const term = query.toLowerCase().trim();
+
+            const matched = [...deliveryHistory].reverse().filter(item => {
+                const cabinStr = String(item.cabin).toLowerCase();
+                const timeStr = new Date(item.timestamp).toLocaleString().toLowerCase();
+                const itemsStr = item.items ? item.items.map(i => i.name).join(' ').toLowerCase() : '';
+                const noteStr = item.specialInstruction ? item.specialInstruction.toLowerCase() : '';
+                const areaStr = item.area ? String(item.area).toLowerCase() : '';
+                return cabinStr.includes(term) || timeStr.includes(term) || itemsStr.includes(term) || noteStr.includes(term) || areaStr.includes(term);
+            }).slice(0, 10);
+
+            resultsBody.innerHTML = '';
+
+            if (matched.length === 0) {
+                resultsBody.innerHTML = `<div class="px-4 py-4 text-center text-slate-400 text-sm font-medium italic">No matching log entries found.</div>`;
+            } else {
+                matched.forEach(item => {
+                    const itemsStr = item.items && item.items.length > 0
+                        ? item.items.map(i => `${i.qty}x ${i.name}`).join(', ')
+                        : 'Standard Label';
+                    const areaTag = item.area ? `<span class="ml-2 text-[10px] text-blue-400 font-bold uppercase">Area ${item.area}</span>` : '';
+                    const noteTag = item.specialInstruction ? `<div class="text-red-500 text-[10px] font-bold mt-0.5"><i class="fas fa-comment-dots mr-1"></i>${item.specialInstruction}</div>` : '';
+                    const timeStr = new Date(item.timestamp).toLocaleString(undefined, { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+
+                    const el = document.createElement('div');
+                    el.className = 'flex items-center justify-between px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors';
+                    el.innerHTML = `
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1 flex-wrap">
+                                <span class="font-black text-slate-800 text-sm uppercase">${item.cabin}</span>
+                                ${areaTag}
+                            </div>
+                            <div class="text-xs text-slate-500 font-medium truncate">${itemsStr}</div>
+                            ${noteTag}
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-medium shrink-0 ml-3 text-right">${timeStr}</div>
+                    `;
+                    el.onclick = () => {
+                        document.getElementById('cabinSearch').value = item.cabin;
+                        clearQuickLogSearch();
+                        document.getElementById('cabinSearch').focus();
+                    };
+                    resultsBody.appendChild(el);
+                });
+
+                if (matched.length === 10) {
+                    const more = document.createElement('div');
+                    more.className = 'px-4 py-2 text-center text-xs text-blue-500 font-bold cursor-pointer hover:bg-blue-50 transition-colors';
+                    more.innerHTML = 'See all results in Full Log →';
+                    more.onclick = () => {
+                        document.getElementById('logSearchInput').value = query;
+                        switchTab('history');
+                        updateUI();
+                        clearQuickLogSearch();
+                    };
+                    resultsBody.appendChild(more);
+                }
+            }
+
+            resultsBox.classList.remove('hidden');
+        };
+
+        window.clearQuickLogSearch = function() {
+            document.getElementById('quickLogSearch').value = '';
+            document.getElementById('quickLogSearchClear').classList.add('hidden');
+            document.getElementById('quickLogResults').classList.add('hidden');
+            document.getElementById('quickLogResultsBody').innerHTML = '';
+        };
+
+        // Close quick log results when clicking outside
+        document.addEventListener('click', function(e) {
+            const searchBar = document.getElementById('quickLogSearch');
+            const resultsBox = document.getElementById('quickLogResults');
+            if (searchBar && resultsBox && !searchBar.contains(e.target) && !resultsBox.contains(e.target)) {
+                resultsBox.classList.add('hidden');
+            }
+        });
 
         // Init App
         applySettings();
