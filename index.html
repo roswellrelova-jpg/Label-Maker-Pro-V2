@@ -343,6 +343,9 @@
                 <a href="#" id="navLookupLink" target="_blank" class="px-3 py-1.5 rounded-lg text-blue-500 hover:text-blue-700 hover:bg-blue-50 transition-all flex items-center justify-center font-bold text-sm" title="Order Lookup Tool">
                     <i class="fas fa-external-link-alt mr-1"></i> Lookup
                 </a>
+                <button onclick="openManual()" class="px-3 py-1.5 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 transition-all flex items-center gap-1 font-bold text-sm" title="User Manual">
+                    <i class="fas fa-book-open"></i><span class="hidden sm:inline">Help</span>
+                </button>
                 <button onclick="openSettings()" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Settings">
                     <i class="fas fa-sliders-h text-lg"></i>
                 </button>
@@ -903,6 +906,228 @@
                 <button onclick="closeStickerLogModal()" class="flex-1 bg-slate-800 text-white px-6 py-3 rounded-xl font-black text-sm hover:bg-black transition-all">
                     Close
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ USER MANUAL MODAL ═══════════ -->
+    <div id="manualModal" class="fixed inset-0 z-[1000] flex items-center justify-center p-4 hidden no-print" onclick="if(event.target===this)closeManual()">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200">
+
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-blue-700 to-blue-500 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 rounded-xl p-2"><i class="fas fa-book-open text-white text-lg"></i></div>
+                    <div>
+                        <h2 class="text-white font-black text-lg tracking-tight">Label Maker Pro V4 — User Manual</h2>
+                        <p class="text-blue-100 text-xs font-medium">Precision Area Mapping & Inventory System</p>
+                    </div>
+                </div>
+                <button onclick="closeManual()" class="text-white/70 hover:text-white hover:bg-white/20 rounded-xl p-2 transition-all"><i class="fas fa-times text-lg"></i></button>
+            </div>
+
+            <!-- Tab nav inside modal -->
+            <div class="flex gap-1 px-4 pt-3 pb-0 border-b border-slate-100 overflow-x-auto no-scrollbar shrink-0 bg-slate-50">
+                <button onclick="showManualTab('overview')" id="mtab-overview" class="manual-tab-btn px-3 py-2 text-xs font-black rounded-t-lg whitespace-nowrap border-b-2 border-blue-500 text-blue-700 bg-white">Overview</button>
+                <button onclick="showManualTab('interface')" id="mtab-interface" class="manual-tab-btn px-3 py-2 text-xs font-black rounded-t-lg whitespace-nowrap border-b-2 border-transparent text-slate-400 hover:text-slate-600">Interface</button>
+                <button onclick="showManualTab('delivery')" id="mtab-delivery" class="manual-tab-btn px-3 py-2 text-xs font-black rounded-t-lg whitespace-nowrap border-b-2 border-transparent text-slate-400 hover:text-slate-600">Log Delivery</button>
+                <button onclick="showManualTab('area')" id="mtab-area" class="manual-tab-btn px-3 py-2 text-xs font-black rounded-t-lg whitespace-nowrap border-b-2 border-transparent text-slate-400 hover:text-slate-600">Area Codes</button>
+                <button onclick="showManualTab('sticker')" id="mtab-sticker" class="manual-tab-btn px-3 py-2 text-xs font-black rounded-t-lg whitespace-nowrap border-b-2 border-transparent text-slate-400 hover:text-slate-600">Sticker Sheet</button>
+                <button onclick="showManualTab('retail')" id="mtab-retail" class="manual-tab-btn px-3 py-2 text-xs font-black rounded-t-lg whitespace-nowrap border-b-2 border-transparent text-slate-400 hover:text-slate-600">Retail Items</button>
+                <button onclick="showManualTab('inventory')" id="mtab-inventory" class="manual-tab-btn px-3 py-2 text-xs font-black rounded-t-lg whitespace-nowrap border-b-2 border-transparent text-slate-400 hover:text-slate-600">Inventory</button>
+                <button onclick="showManualTab('log')" id="mtab-log" class="manual-tab-btn px-3 py-2 text-xs font-black rounded-t-lg whitespace-nowrap border-b-2 border-transparent text-slate-400 hover:text-slate-600">Full Log</button>
+                <button onclick="showManualTab('reprints')" id="mtab-reprints" class="manual-tab-btn px-3 py-2 text-xs font-black rounded-t-lg whitespace-nowrap border-b-2 border-transparent text-slate-400 hover:text-slate-600">Reprints</button>
+                <button onclick="showManualTab('tips')" id="mtab-tips" class="manual-tab-btn px-3 py-2 text-xs font-black rounded-t-lg whitespace-nowrap border-b-2 border-transparent text-slate-400 hover:text-slate-600">Tips</button>
+            </div>
+
+            <!-- Scrollable content -->
+            <div class="overflow-y-auto flex-1 px-6 py-5 text-sm text-slate-600 leading-relaxed" id="manualContent">
+
+                <!-- OVERVIEW -->
+                <div id="msec-overview" class="manual-section">
+                    <p class="mb-3"><strong class="text-slate-800">Label Maker Pro V4</strong> is a web-based operations tool for shipboard photography teams. It creates professional cabin delivery labels, tracks retail item sales, and logs every delivery — all in one place.</p>
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-4">
+                        <p class="font-black text-blue-800 text-xs uppercase tracking-widest mb-2">What it does</p>
+                        <ul class="space-y-1.5">
+                            <li class="flex gap-2"><span class="text-blue-400">▸</span><span><strong class="text-slate-700">Prints professional labels</strong> — cabin number, area code, retail items, and special instructions on every sticker</span></li>
+                            <li class="flex gap-2"><span class="text-blue-400">▸</span><span><strong class="text-slate-700">Auto-assigns Area Codes</strong> — no need to remember which deck is which zone</span></li>
+                            <li class="flex gap-2"><span class="text-blue-400">▸</span><span><strong class="text-slate-700">Tracks retail inventory</strong> — every item attached to a delivery is auto-deducted from stock</span></li>
+                            <li class="flex gap-2"><span class="text-blue-400">▸</span><span><strong class="text-slate-700">Logs everything</strong> — full searchable history of all deliveries</span></li>
+                            <li class="flex gap-2"><span class="text-blue-400">▸</span><span><strong class="text-slate-700">Tracks issues</strong> — reprint requests and print errors are flagged until resolved</span></li>
+                        </ul>
+                    </div>
+                    <table class="w-full text-xs border border-slate-200 rounded-xl overflow-hidden">
+                        <thead><tr class="bg-blue-700 text-white"><th class="p-2 text-left">Problem</th><th class="p-2 text-left">Solution</th></tr></thead>
+                        <tbody>
+                            <tr class="border-t border-slate-100"><td class="p-2">Messy handwritten labels</td><td class="p-2">Clean printed stickers every time</td></tr>
+                            <tr class="bg-slate-50 border-t border-slate-100"><td class="p-2">No delivery records</td><td class="p-2">Full Log with timestamps, searchable</td></tr>
+                            <tr class="border-t border-slate-100"><td class="p-2">Lost track of stock</td><td class="p-2">Inventory auto-deducts on every log</td></tr>
+                            <tr class="bg-slate-50 border-t border-slate-100"><td class="p-2">Wasted stickers from wrong start position</td><td class="p-2">Visual grid lets you set exact print start</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- INTERFACE -->
+                <div id="msec-interface" class="manual-section hidden">
+                    <p class="mb-4">The app has <strong class="text-slate-800">5 main tabs</strong> at the top. Each tab handles a specific part of your workflow.</p>
+                    <div class="space-y-3 mb-4">
+                        <div class="flex gap-3 bg-blue-50 border border-blue-100 rounded-xl p-3"><span class="bg-blue-700 text-white text-[10px] font-black px-2 py-1 rounded-lg h-fit whitespace-nowrap">SEARCH & LOG</span><p>Where you spend most of your time. Enter cabin numbers, attach retail items, and log deliveries.</p></div>
+                        <div class="flex gap-3 bg-slate-50 border border-slate-100 rounded-xl p-3"><span class="bg-slate-600 text-white text-[10px] font-black px-2 py-1 rounded-lg h-fit whitespace-nowrap">PRINT QUEUE</span><p>Labels waiting to be printed. Set the sticker start position here, then hit Print Labels.</p></div>
+                        <div class="flex gap-3 bg-slate-50 border border-slate-100 rounded-xl p-3"><span class="bg-slate-600 text-white text-[10px] font-black px-2 py-1 rounded-lg h-fit whitespace-nowrap">FULL LOG</span><p>Complete history of every delivery. Search, filter, and export to Excel.</p></div>
+                        <div class="flex gap-3 bg-amber-50 border border-amber-100 rounded-xl p-3"><span class="bg-amber-600 text-white text-[10px] font-black px-2 py-1 rounded-lg h-fit whitespace-nowrap">INVENTORY</span><p>Your product catalog and stock tracker. Add items, update quantities, see what's running low.</p></div>
+                        <div class="flex gap-3 bg-red-50 border border-red-100 rounded-xl p-3"><span class="bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded-lg h-fit whitespace-nowrap">REPRINTS & ISSUES</span><p>Log and resolve print errors, jams, or incorrect deliveries. A red banner flashes at the top until all issues are cleared.</p></div>
+                    </div>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Top-right controls</p>
+                    <ul class="space-y-1.5">
+                        <li class="flex gap-2"><span class="text-slate-400">▸</span><span><strong class="text-slate-700">Theme selector</strong> — Day, Night, Sepia, ROG, Legion, Razer, Alienware</span></li>
+                        <li class="flex gap-2"><span class="text-slate-400">▸</span><span><strong class="text-slate-700">Lookup</strong> — opens your order management system in a new tab</span></li>
+                        <li class="flex gap-2"><span class="text-slate-400">▸</span><span><strong class="text-emerald-600">Help (this button)</strong> — opens this manual</span></li>
+                        <li class="flex gap-2"><span class="text-slate-400">▸</span><span><strong class="text-slate-700">Settings ⚙️</strong> — configure printer URL, area code ranges, label format</span></li>
+                    </ul>
+                </div>
+
+                <!-- LOG DELIVERY -->
+                <div id="msec-delivery" class="manual-section hidden">
+                    <p class="mb-4">Go to <strong class="text-slate-800">Search & Log</strong> tab for every delivery. Follow these steps:</p>
+                    <div class="space-y-2">
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5">1</span><div><strong class="text-slate-800 block">Enter the Cabin Number</strong><p>Type the cabin number in the large center field. Accepts numbers and text like VIP, STAFF, etc.</p></div></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5">2</span><div><strong class="text-slate-800 block">Add Retail Items (optional)</strong><p>Select from the Retail Items dropdown if the guest purchased a product. Set the quantity. Click "Add Another Retail Item" for multiple products.</p></div></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5">3</span><div><strong class="text-slate-800 block">Click LOG DELIVERY</strong><p>The app auto-assigns an area code, adds a label to the Print Queue, and saves to the Full Log — all at once.</p></div></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5">4</span><div><strong class="text-slate-800 block">Print when ready</strong><p>Switch to Print Queue, set your sticker start position, and click Print Labels.</p></div></div>
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mt-4 flex gap-2 text-xs text-emerald-800 font-medium"><span>✅</span><span><strong>Tip:</strong> Log several cabins first, then print all at once. Batching is faster than printing one at a time.</span></div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 mt-2 flex gap-2 text-xs text-blue-800 font-medium"><span>ℹ️</span><span><strong>Quick Log Search</strong> at the top of this tab lets you check if a cabin was already delivered today before logging again.</span></div>
+                </div>
+
+                <!-- AREA CODES -->
+                <div id="msec-area" class="manual-section hidden">
+                    <p class="mb-3">An <strong class="text-slate-800">Area Code</strong> is a number (e.g., 1, 2, 3…) that identifies which section of the ship a cabin belongs to. It prints large on every label so your team can sort deliveries by zone and walk an efficient route — instead of going back and forth across the entire ship.</p>
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-4">
+                        <p class="font-black text-blue-800 text-xs uppercase tracking-widest mb-2">What prints on the label</p>
+                        <ul class="space-y-1 text-xs">
+                            <li class="flex gap-2"><span class="text-blue-400">▸</span><span><strong>AREA [number]</strong> — large and visible for sorting</span></li>
+                            <li class="flex gap-2"><span class="text-blue-400">▸</span><span><strong>Cabin number</strong> — the guest's cabin</span></li>
+                            <li class="flex gap-2"><span class="text-blue-400">▸</span><span><strong>Retail items</strong> — products included in the delivery</span></li>
+                            <li class="flex gap-2"><span class="text-blue-400">▸</span><span><strong>Special instructions</strong> — added via the sticker grid</span></li>
+                            <li class="flex gap-2"><span class="text-blue-400">▸</span><span><strong>Timestamp</strong> — when the delivery was logged</span></li>
+                        </ul>
+                    </div>
+                    <p class="font-black text-slate-700 mb-2">Setting up Area Codes</p>
+                    <div class="space-y-2">
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">1</span><p>Click the <strong class="text-slate-800">Settings ⚙️</strong> icon (top right)</p></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">2</span><p>Find the <strong class="text-slate-800">Area Mapping</strong> section and define cabin number ranges. Example: 10000–10399 = Area 1, 10400–10799 = Area 2.</p></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">3</span><p>Save. Every new delivery will now auto-assign the correct area code — no manual typing needed.</p></div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-4 flex gap-2 text-xs text-amber-800 font-medium"><span>⚠️</span><span>If a cabin number is outside your defined ranges, no area code will print. Make sure all cabin ranges are covered before the cruise starts.</span></div>
+                </div>
+
+                <!-- STICKER SHEET -->
+                <div id="msec-sticker" class="manual-section hidden">
+                    <p class="mb-3">The <strong class="text-slate-800">sticker sheet grid</strong> (right side of Search & Log tab) shows a visual map of your physical sticker sheet. Each cell = one sticker position. You tell the app where to start printing so you don't waste or overlap stickers from a partially used sheet.</p>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">1</span><div><strong class="text-slate-800 block">Count used positions on your physical sheet</strong><p>How many stickers at the beginning have already been peeled off?</p></div></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">2</span><div><strong class="text-slate-800 block">Set the Skip count — or click the grid</strong><p>Type the number in the Skipping field, or click any cell directly on the grid to set that as the start point.</p></div></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">3</span><div><strong class="text-slate-800 block">Blue cells = will print. Gray = skipped.</strong><p>The grid preview shows exactly what will happen on the sheet before you print.</p></div></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">4</span><div><strong class="text-slate-800 block">Click a blue cell to add Special Instructions</strong><p>Type notes like "Fragile", "Leave at door", or "VIP — Priority." These print on the label.</p></div></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">5</span><div><strong class="text-slate-800 block">Click Print Labels</strong><p>The QUEUE counter (blue box) shows how many labels are waiting. Check this before printing.</p></div></div>
+                    </div>
+                </div>
+
+                <!-- RETAIL ITEMS -->
+                <div id="msec-retail" class="manual-section hidden">
+                    <p class="mb-3">Retail items are products sold to guests alongside photos — frames, albums, packages, etc. Attaching them to a delivery does two things: <strong class="text-slate-800">prints the item on the label</strong> and <strong class="text-slate-800">auto-deducts from your inventory stock</strong>.</p>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">1</span><p>Enter the cabin number as normal.</p></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">2</span><p>Click the <strong class="text-slate-800">Retail Items dropdown</strong> — select the product the guest purchased. It shows the item name and category, e.g., <em>Basic Gallery Frame (FRAMES)</em>.</p></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">3</span><p>Set the <strong class="text-slate-800">quantity</strong> in the field that appears.</p></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">4</span><p>Click <strong class="text-slate-800">"Add Another Retail Item"</strong> if more than one product was sold.</p></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-blue-100 text-blue-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">5</span><p>Click <strong class="text-slate-800">LOG DELIVERY</strong>. Items print on the label and are deducted from inventory.</p></div>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 flex gap-2 text-xs text-blue-800 font-medium"><span>ℹ️</span><span>The dropdown order matches the sort order you set in the Inventory Manager table. Sort by Category to group similar products together in the dropdown.</span></div>
+                </div>
+
+                <!-- INVENTORY -->
+                <div id="msec-inventory" class="manual-section hidden">
+                    <p class="mb-3">The <strong class="text-slate-800">Inventory Manager</strong> tab is your product catalog. Set it up once and the system tracks stock automatically from that point on.</p>
+                    <table class="w-full text-xs border border-slate-200 rounded-xl overflow-hidden mb-4">
+                        <thead><tr class="bg-blue-700 text-white"><th class="p-2 text-left">Column</th><th class="p-2 text-left">What It Means</th><th class="p-2 text-left">Editable?</th></tr></thead>
+                        <tbody>
+                            <tr class="border-t border-slate-100"><td class="p-2 font-bold">Item Name</td><td class="p-2">Product name on labels and dropdowns</td><td class="p-2 text-emerald-600 font-bold">✓ Click to edit</td></tr>
+                            <tr class="bg-slate-50 border-t border-slate-100"><td class="p-2 font-bold">Category</td><td class="p-2">Group (e.g., FRAMES, ALBUMS)</td><td class="p-2 text-emerald-600 font-bold">✓ Click to edit</td></tr>
+                            <tr class="border-t border-slate-100"><td class="p-2 font-bold">Total Stock</td><td class="p-2">Units you started with</td><td class="p-2 text-emerald-600 font-bold">✓ Type new number</td></tr>
+                            <tr class="bg-slate-50 border-t border-slate-100"><td class="p-2 font-bold">Total Issued</td><td class="p-2">Units logged in deliveries</td><td class="p-2 text-slate-400">Auto-calculated</td></tr>
+                            <tr class="border-t border-slate-100"><td class="p-2 font-bold">Remaining</td><td class="p-2"><span class="text-emerald-600 font-bold">Green</span> = OK · <span class="text-amber-500 font-bold">Yellow</span> = ≤5 · <span class="text-red-500 font-bold">Red</span> = 0</td><td class="p-2 text-slate-400">Auto-calculated</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="font-black text-slate-700 text-xs mb-2">Sorting</p>
+                    <p class="mb-3 text-xs">Click any column header to sort. Click again to reverse. The retail dropdown in Search & Log mirrors this sort order automatically.</p>
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 flex gap-2 text-xs text-amber-800 font-medium"><span>⚠️</span><span>When restocking, enter the <strong>new total quantity</strong> — not the amount added. If you had 55 and received 20 more, type 75.</span></div>
+                </div>
+
+                <!-- FULL LOG -->
+                <div id="msec-log" class="manual-section hidden">
+                    <p class="mb-3">The <strong class="text-slate-800">Full Log</strong> tab is a complete timestamped record of every delivery logged. Nothing is deleted unless you choose to remove it.</p>
+                    <div class="space-y-3 mb-4">
+                        <div class="bg-white border border-slate-200 rounded-xl p-3"><p class="font-black text-slate-800 text-xs mb-1">Quick Log Search (Search & Log tab)</p><p class="text-xs">The search bar above the cabin field. Type a cabin, item name, or date. Results appear in a dropdown instantly. Click a result to prefill the cabin field.</p></div>
+                        <div class="bg-white border border-slate-200 rounded-xl p-3"><p class="font-black text-slate-800 text-xs mb-1">Full Log Search Bar</p><p class="text-xs">Inside the Full Log tab. Searches the entire history. Best for audits, end-of-shift reviews, or finding a specific delivery.</p></div>
+                        <div class="bg-white border border-slate-200 rounded-xl p-3"><p class="font-black text-slate-800 text-xs mb-1">Export to Excel</p><p class="text-xs">Use the Export button to download all log entries as a spreadsheet — for reports or sending to your photo manager.</p></div>
+                        <div class="bg-white border border-slate-200 rounded-xl p-3"><p class="font-black text-slate-800 text-xs mb-1">Edit or Delete an Entry</p><p class="text-xs">Each row has action buttons. Edit to correct a mistake; delete if the entry was logged in error. Deleted entries are removed from inventory calculations too.</p></div>
+                    </div>
+                </div>
+
+                <!-- REPRINTS -->
+                <div id="msec-reprints" class="manual-section hidden">
+                    <p class="mb-3">Use the <strong class="text-slate-800">Reprints & Issues</strong> tab when something goes wrong with a print job.</p>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Common Reasons to Report</p>
+                    <ul class="space-y-1 mb-4 text-xs">
+                        <li class="flex gap-2"><span class="text-red-400">▸</span>Label printed in the wrong sticker position</li>
+                        <li class="flex gap-2"><span class="text-red-400">▸</span>Wrong cabin number or item on the label</li>
+                        <li class="flex gap-2"><span class="text-red-400">▸</span>Printer jammed and some labels were skipped</li>
+                        <li class="flex gap-2"><span class="text-red-400">▸</span>Guest delivery was incorrect and needs a replacement</li>
+                    </ul>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-red-100 text-red-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">1</span><p>Click <strong class="text-slate-800">Report Issue</strong> (always visible in the top bar — no need to leave your current tab).</p></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-red-100 text-red-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">2</span><p>Enter the cabin number, describe the problem, and submit.</p></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-red-100 text-red-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">3</span><p>A <strong class="text-red-600">red banner</strong> appears at the top of every screen until all issues are resolved.</p></div>
+                        <div class="flex gap-3 items-start bg-white border border-slate-200 rounded-xl p-3"><span class="bg-red-100 text-red-700 font-black text-xs w-6 h-6 rounded-lg flex items-center justify-center shrink-0">4</span><p>After fixing it, go to Reprints & Issues and click <strong class="text-slate-800">Mark Resolved</strong>. The banner disappears when all are cleared.</p></div>
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex gap-2 text-xs text-emerald-800 font-medium"><span>✅</span><span>Always clear all issues at the end of every shift. The red banner is your team's signal that something still needs attention.</span></div>
+                </div>
+
+                <!-- TIPS -->
+                <div id="msec-tips" class="manual-section hidden">
+                    <p class="font-black text-slate-700 mb-2">Daily Workflow</p>
+                    <div class="space-y-1.5 mb-4 text-xs">
+                        <div class="flex gap-2"><span class="bg-blue-700 text-white font-black text-[10px] px-1.5 rounded">START</span><span>Check Reprints & Issues — resolve anything from the previous shift first.</span></div>
+                        <div class="flex gap-2"><span class="bg-blue-700 text-white font-black text-[10px] px-1.5 rounded">WORK</span><span>Log deliveries in batches, then print all labels at once.</span></div>
+                        <div class="flex gap-2"><span class="bg-blue-700 text-white font-black text-[10px] px-1.5 rounded">WORK</span><span>Always attach retail items at time of logging — not after the fact.</span></div>
+                        <div class="flex gap-2"><span class="bg-blue-700 text-white font-black text-[10px] px-1.5 rounded">END</span><span>Export Full Log to Excel. Check Inventory for yellow/red items and notify your manager.</span></div>
+                    </div>
+                    <p class="font-black text-slate-700 text-xs mb-2">Keyboard Shortcuts (in editable fields)</p>
+                    <table class="w-full text-xs border border-slate-200 rounded-xl overflow-hidden mb-4">
+                        <thead><tr class="bg-slate-700 text-white"><th class="p-2 text-left">Key</th><th class="p-2 text-left">Action</th></tr></thead>
+                        <tbody>
+                            <tr class="border-t border-slate-100"><td class="p-2 font-mono font-bold">Enter</td><td class="p-2">Save the edit</td></tr>
+                            <tr class="bg-slate-50 border-t border-slate-100"><td class="p-2 font-mono font-bold">Esc</td><td class="p-2">Cancel and restore original value</td></tr>
+                            <tr class="border-t border-slate-100"><td class="p-2 font-mono font-bold">Tab</td><td class="p-2">Move to next input field</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="font-black text-slate-700 text-xs mb-2">Stock Color Guide</p>
+                    <div class="space-y-1.5 text-xs">
+                        <div class="flex gap-2 items-center"><span class="w-3 h-3 rounded-full bg-emerald-500 shrink-0"></span><span><strong class="text-slate-700">Green</strong> — More than 5 units. Stock is healthy.</span></div>
+                        <div class="flex gap-2 items-center"><span class="w-3 h-3 rounded-full bg-amber-500 shrink-0"></span><span><strong class="text-slate-700">Yellow</strong> — 5 units or fewer. Plan to reorder.</span></div>
+                        <div class="flex gap-2 items-center"><span class="w-3 h-3 rounded-full bg-red-500 shrink-0"></span><span><strong class="text-slate-700">Red</strong> — Zero. Stop logging this item until restocked.</span></div>
+                    </div>
+                </div>
+
+            </div><!-- /manualContent -->
+
+            <!-- Footer nav -->
+            <div class="flex justify-between items-center px-6 py-3 border-t border-slate-100 bg-slate-50 shrink-0">
+                <button id="manualPrevBtn" onclick="navigateManual(-1)" class="text-xs font-bold text-slate-400 hover:text-blue-600 flex items-center gap-1 transition-colors"><i class="fas fa-chevron-left"></i> Previous</button>
+                <span id="manualPageIndicator" class="text-[10px] font-black text-slate-400 uppercase tracking-widest"></span>
+                <button id="manualNextBtn" onclick="navigateManual(1)" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors">Next <i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
     </div>
@@ -2548,6 +2773,52 @@
                 allClear.classList.remove('hidden');
             }
         }
+
+        // --- USER MANUAL MODAL ---
+        const manualTabs = ['overview','interface','delivery','area','sticker','retail','inventory','log','reprints','tips'];
+        const manualLabels = ['Overview','Interface','Log Delivery','Area Codes','Sticker Sheet','Retail Items','Inventory','Full Log','Reprints','Tips'];
+        let manualCurrentIdx = 0;
+
+        window.openManual = function() {
+            document.getElementById('manualModal').classList.remove('hidden');
+            showManualTab(manualTabs[manualCurrentIdx]);
+        };
+
+        window.closeManual = function() {
+            document.getElementById('manualModal').classList.add('hidden');
+        };
+
+        window.showManualTab = function(tab) {
+            manualCurrentIdx = manualTabs.indexOf(tab);
+            // Show/hide sections
+            manualTabs.forEach(t => {
+                document.getElementById('msec-' + t).classList.toggle('hidden', t !== tab);
+                const btn = document.getElementById('mtab-' + t);
+                if (t === tab) {
+                    btn.classList.add('border-blue-500','text-blue-700','bg-white');
+                    btn.classList.remove('border-transparent','text-slate-400');
+                } else {
+                    btn.classList.remove('border-blue-500','text-blue-700','bg-white');
+                    btn.classList.add('border-transparent','text-slate-400');
+                }
+            });
+            // Scroll content to top
+            document.getElementById('manualContent').scrollTop = 0;
+            // Update footer
+            document.getElementById('manualPageIndicator').textContent = manualLabels[manualCurrentIdx] + ' (' + (manualCurrentIdx+1) + ' / ' + manualTabs.length + ')';
+            document.getElementById('manualPrevBtn').classList.toggle('invisible', manualCurrentIdx === 0);
+            document.getElementById('manualNextBtn').classList.toggle('invisible', manualCurrentIdx === manualTabs.length - 1);
+        };
+
+        window.navigateManual = function(dir) {
+            const next = manualCurrentIdx + dir;
+            if (next >= 0 && next < manualTabs.length) showManualTab(manualTabs[next]);
+        };
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeManual();
+        });
 
         // --- QUICK LOG SEARCH (Search & Log Tab) ---
         window.handleQuickLogSearch = function(query) {
