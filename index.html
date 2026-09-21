@@ -2254,7 +2254,7 @@
             getSortedInventoryItems().forEach(item => {
                 const opt = document.createElement('option');
                 opt.value = item.id;
-                opt.innerText = item.category ? `${item.name} (${item.category})` : item.name;
+                opt.innerText = item.name;
                 select.appendChild(opt);
             });
             container.appendChild(row);
@@ -2299,7 +2299,7 @@
                 getSortedInventoryItems().forEach(item => {
                     const opt = document.createElement('option');
                     opt.value = item.id;
-                    opt.innerText = item.category ? `${item.name} (${item.category})` : item.name;
+                    opt.innerText = item.name;
                     select.appendChild(opt);
                 });
                 // Restore previously selected value if it still exists
