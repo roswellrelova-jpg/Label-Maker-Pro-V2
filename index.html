@@ -190,7 +190,237 @@
         body.theme-alienware .bg-red-50 { background-color: #2a0826 !important; border-color: #6a1a41 !important; }
         body.theme-alienware .sticker-cell.active { background-color: #2e1065 !important; border-color: #a855f7 !important; color: #d8b4fe !important; box-shadow: 0 0 8px rgba(168,85,247,0.4); }
 
-        /* PRINT MEDIA OVERRIDE */
+        /* ═══════ FULL UI CUSTOMIZER ═══════ */
+        :root {
+            --ui-accent:        #2563eb;
+            --ui-accent-hover:  #1d4ed8;
+            --ui-accent-text:   #ffffff;
+            --ui-bg:            #f8fafc;
+            --ui-card-bg:       #ffffff;
+            --ui-card-border:   #e2e8f0;
+            --ui-text-primary:  #1e293b;
+            --ui-text-secondary:#64748b;
+            --ui-radius:        16px;
+            --ui-font:          'Segoe UI', system-ui, sans-serif;
+            --ui-font-size:     15px;
+            --ui-spacing:       1.5rem;
+            --ui-shadow:        0 4px 24px 0 rgba(30,41,59,0.08);
+            --ui-topbar-bg:     #0f172a;
+            --ui-topbar-text:   #f1f5f9;
+            --ui-header-size:   2rem;
+            --ui-btn-radius:    14px;
+            --ui-input-radius:  14px;
+        }
+
+        /* Apply CSS vars to key elements */
+        body {
+            font-family: var(--ui-font) !important;
+            font-size: var(--ui-font-size) !important;
+            background-color: var(--ui-bg) !important;
+            color: var(--ui-text-primary) !important;
+        }
+        body:not([class*="theme-night"]):not([class*="theme-rog"]):not([class*="theme-legion"]):not([class*="theme-razer"]):not([class*="theme-alienware"]):not([class*="theme-reading"]) .glass-morphism {
+            background: var(--ui-card-bg) !important;
+            border-color: var(--ui-card-border) !important;
+            border-radius: var(--ui-radius) !important;
+            box-shadow: var(--ui-shadow) !important;
+        }
+        .ui-accent-bg { background-color: var(--ui-accent) !important; }
+        .ui-accent-bg:hover { background-color: var(--ui-accent-hover) !important; }
+        #searchBtn, #quickPrintBtn, #downloadPDF {
+            background-color: var(--ui-accent) !important;
+            border-radius: var(--ui-btn-radius) !important;
+        }
+        #searchBtn:hover, #quickPrintBtn:hover, #downloadPDF:hover {
+            background-color: var(--ui-accent-hover) !important;
+        }
+        #cabinSearch, .retailSelect, input[type="text"], input[type="number"], select {
+            border-radius: var(--ui-input-radius) !important;
+        }
+        /* Top bar */
+        .ui-topbar { background-color: var(--ui-topbar-bg) !important; color: var(--ui-topbar-text) !important; }
+
+        /* customizer panel */
+        #uiCustomizerPanel {
+            position: fixed;
+            top: 0; right: 0; bottom: 0;
+            width: 320px;
+            max-width: 95vw;
+            background: #fff;
+            border-left: 1px solid #e2e8f0;
+            box-shadow: -8px 0 40px rgba(0,0,0,0.12);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        #uiCustomizerPanel.open { transform: translateX(0); }
+        #uiCustomizerPanel .cp-header {
+            background: linear-gradient(135deg,#1e40af,#3b82f6);
+            color: white;
+            padding: 18px 20px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        #uiCustomizerPanel .cp-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+        #uiCustomizerPanel .cp-body::-webkit-scrollbar { width: 4px; }
+        #uiCustomizerPanel .cp-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .cp-section { margin-bottom: 20px; }
+        .cp-section-title {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .cp-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        .cp-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            gap: 8px;
+        }
+        .cp-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            min-width: 100px;
+        }
+        .cp-color-swatch {
+            width: 36px; height: 28px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            overflow: hidden;
+            padding: 0;
+            background: none;
+        }
+        .cp-color-swatch input[type="color"] {
+            width: 200%;
+            height: 200%;
+            margin: -25% 0 0 -25%;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            opacity: 0;
+            position: absolute;
+        }
+        .cp-color-wrap {
+            position: relative;
+            width: 36px; height: 28px;
+        }
+        .cp-color-preview {
+            width: 36px; height: 28px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+        }
+        .cp-color-input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        .cp-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 4px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            outline: none;
+        }
+        .cp-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        .cp-slider-val {
+            font-size: 11px;
+            font-weight: 700;
+            color: #3b82f6;
+            min-width: 36px;
+            text-align: right;
+        }
+        .cp-select {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 5px 8px;
+            outline: none;
+        }
+        .cp-preset-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .cp-preset {
+            height: 32px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 0;
+        }
+        .cp-preset:hover { transform: scale(1.08); border-color: #94a3b8; }
+        .cp-preset.active { border-color: #1e40af; box-shadow: 0 0 0 2px #bfdbfe; }
+        .cp-footer {
+            border-top: 1px solid #e2e8f0;
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+            background: #f8fafc;
+        }
+        .cp-btn {
+            flex: 1;
+            padding: 9px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 900;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s;
+        }
+        .cp-btn-primary { background: #2563eb; color: white; }
+        .cp-btn-primary:hover { background: #1d4ed8; }
+        .cp-btn-secondary { background: #f1f5f9; color: #475569; border: 1.5px solid #e2e8f0; }
+        .cp-btn-secondary:hover { background: #e2e8f0; }
+        /* backdrop */
+        #uiCustomizerBackdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.25);
+            z-index: 1999;
+        }
+        #uiCustomizerBackdrop.open { display: block; }
         @media print {
             body { background-color: white !important; color: black !important; }
             .glass-morphism, * { background: white !important; border-color: #ccc !important; color: black !important; box-shadow: none !important; }
@@ -346,6 +576,9 @@
                 <button onclick="openManual()" class="px-3 py-1.5 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 transition-all flex items-center gap-1 font-bold text-sm" title="User Manual">
                     <i class="fas fa-book-open"></i><span class="hidden sm:inline">Help</span>
                 </button>
+                <button onclick="openUICustomizer()" class="px-3 py-1.5 rounded-lg text-purple-600 hover:text-purple-700 hover:bg-purple-50 transition-all flex items-center gap-1 font-bold text-sm" title="Customize UI">
+                    <i class="fas fa-palette"></i><span class="hidden sm:inline">Customize</span>
+                </button>
                 <button onclick="openSettings()" class="px-3 py-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Settings">
                     <i class="fas fa-sliders-h text-lg"></i>
                 </button>
@@ -365,12 +598,101 @@
             <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
                 
                 <!-- Left: Search Box (7 columns on desktop) -->
-                <div class="md:col-span-7 glass-morphism rounded-2xl shadow-xl p-8 flex flex-col justify-center overflow-hidden relative">
+                <div class="md:col-span-7 glass-morphism rounded-2xl shadow-xl overflow-hidden relative">
+
+                    <!-- Layout Options Bar -->
+                    <div class="flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-100">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Search & Log</span>
+                        <button onclick="toggleLayoutPanel()" id="layoutPanelToggle" class="flex items-center gap-1.5 text-[10px] font-black text-slate-400 hover:text-blue-600 transition-colors px-2 py-1 rounded-lg hover:bg-blue-50" title="Customize layout">
+                            <i class="fas fa-sliders-h text-xs"></i> Layout
+                        </button>
+                    </div>
+
+                    <!-- Collapsible Layout Panel -->
+                    <div id="layoutPanel" class="hidden bg-white border-b border-slate-100 px-4 py-3">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Customize Sections</p>
+                        <div class="grid grid-cols-1 gap-2">
+
+                            <!-- Quick Log Search control -->
+                            <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2 border border-slate-200">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-search text-blue-400 text-xs w-4"></i>
+                                    <span class="text-xs font-bold text-slate-600">Quick Log Search</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <select onchange="setLayoutSize('search', this.value)" id="layout-size-search" class="text-[10px] font-bold text-slate-500 bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none">
+                                        <option value="normal">Normal</option>
+                                        <option value="compact">Compact</option>
+                                    </select>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="layout-show-search" onchange="setLayoutVisible('search', this.checked)" checked class="sr-only peer">
+                                        <div class="w-8 h-4 bg-slate-200 peer-checked:bg-blue-500 rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:w-3 after:h-3 after:transition-all peer-checked:after:translate-x-4"></div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Cabin Input control -->
+                            <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2 border border-slate-200">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-door-open text-blue-400 text-xs w-4"></i>
+                                    <span class="text-xs font-bold text-slate-600">Cabin Number Input</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <select onchange="setLayoutSize('cabin', this.value)" id="layout-size-cabin" class="text-[10px] font-bold text-slate-500 bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none">
+                                        <option value="normal">Normal</option>
+                                        <option value="compact">Compact</option>
+                                        <option value="large">Large</option>
+                                    </select>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="layout-show-cabin" onchange="setLayoutVisible('cabin', this.checked)" checked class="sr-only peer">
+                                        <div class="w-8 h-4 bg-slate-200 peer-checked:bg-blue-500 rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:w-3 after:h-3 after:transition-all peer-checked:after:translate-x-4"></div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Retail Items control -->
+                            <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2 border border-slate-200">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-shopping-bag text-blue-400 text-xs w-4"></i>
+                                    <span class="text-xs font-bold text-slate-600">Retail Items</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <select onchange="setLayoutSize('retail', this.value)" id="layout-size-retail" class="text-[10px] font-bold text-slate-500 bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none">
+                                        <option value="normal">Normal</option>
+                                        <option value="compact">Compact</option>
+                                    </select>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="layout-show-retail" onchange="setLayoutVisible('retail', this.checked)" checked class="sr-only peer">
+                                        <div class="w-8 h-4 bg-slate-200 peer-checked:bg-blue-500 rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:w-3 after:h-3 after:transition-all peer-checked:after:translate-x-4"></div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Log Button control -->
+                            <div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2 border border-slate-200">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-paper-plane text-blue-400 text-xs w-4"></i>
+                                    <span class="text-xs font-bold text-slate-600">Log Delivery Button</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <select onchange="setLayoutSize('logbtn', this.value)" id="layout-size-logbtn" class="text-[10px] font-bold text-slate-500 bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none">
+                                        <option value="normal">Normal</option>
+                                        <option value="compact">Compact</option>
+                                        <option value="large">Large</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <button onclick="resetLayout()" class="mt-3 w-full text-[10px] font-black text-slate-400 hover:text-red-500 transition-colors py-1">↺ Reset to defaults</button>
+                    </div>
+
+                    <div class="p-6 flex flex-col justify-center">
                     <div class="w-full">
 
                         <!-- Quick Log Search -->
-                        <div class="mb-5">
-                            <label class="block text-center text-slate-500 uppercase tracking-widest text-[10px] font-black mb-2">Quick Log Search</label>
+                        <div id="section-quicksearch" class="mb-4">
+                            <label id="label-quicksearch" class="block text-center text-slate-500 uppercase tracking-widest text-[10px] font-black mb-2">Quick Log Search</label>
                             <div class="relative">
                                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                                 <input type="text" id="quickLogSearch" oninput="handleQuickLogSearch(this.value)" placeholder="Search cabin, item, date..." 
@@ -385,27 +707,33 @@
                             </div>
                         </div>
 
-                        <div class="w-full h-px bg-slate-200 mb-5"></div>
+                        <div id="divider-search-cabin" class="w-full h-px bg-slate-200 mb-4"></div>
 
-                        <label class="block text-center text-slate-500 uppercase tracking-widest text-xs font-black mb-4">Enter Cabin Number</label>
-                        <div class="flex flex-col gap-4">
-                            <!-- Changed type to text to support alphanumeric cabins like VIP -->
+                        <!-- Cabin Input -->
+                        <div id="section-cabin">
+                            <label id="label-cabin" class="block text-center text-slate-500 uppercase tracking-widest text-xs font-black mb-3">Enter Cabin Number</label>
                             <input type="text" id="cabinSearch" placeholder="E.g. 10245 or VIP" 
                                    class="w-full min-w-0 text-3xl font-bold text-center py-4 rounded-2xl border-2 border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all uppercase">
-                            
-                            <div class="w-full h-px bg-slate-200 my-2"></div>
-                            <label class="block text-center text-slate-500 uppercase tracking-widest text-[10px] font-black">Retail Items (Optional)</label>
+                        </div>
 
+                        <!-- Retail Items -->
+                        <div id="section-retail" class="mt-4">
+                            <div class="w-full h-px bg-slate-200 mb-4"></div>
+                            <label id="label-retail" class="block text-center text-slate-500 uppercase tracking-widest text-[10px] font-black mb-3">Retail Items (Optional)</label>
                             <div id="retail-items-container" class="space-y-3"></div>
-
-                            <button type="button" onclick="addRetailRow()" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-bold text-sm hover:border-blue-400 hover:text-blue-500 transition-colors flex items-center justify-center gap-2">
+                            <button type="button" id="btn-add-retail" onclick="addRetailRow()" class="w-full mt-3 py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-bold text-sm hover:border-blue-400 hover:text-blue-500 transition-colors flex items-center justify-center gap-2">
                                 <i class="fas fa-plus"></i> Add Another Retail Item
                             </button>
+                        </div>
 
-                            <button id="searchBtn" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black text-xl shadow-lg shadow-blue-200 active:scale-95 transition-all flex items-center justify-center gap-2">
+                        <!-- Log Button -->
+                        <div id="section-logbtn" class="mt-4">
+                            <button id="searchBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black text-xl shadow-lg shadow-blue-200 active:scale-95 transition-all flex items-center justify-center gap-2">
                                 LOG DELIVERY
                             </button>
                         </div>
+
+                    </div>
                     </div>
                 </div>
 
@@ -907,6 +1235,201 @@
                     Close
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ UI CUSTOMIZER PANEL ═══════════ -->
+    <div id="uiCustomizerBackdrop" onclick="closeUICustomizer()"></div>
+    <div id="uiCustomizerPanel">
+        <div class="cp-header">
+            <div>
+                <div style="font-size:16px;font-weight:900;letter-spacing:-0.3px;">🎨 UI Customizer</div>
+                <div style="font-size:11px;opacity:0.75;margin-top:2px;">Personalize every part of the app</div>
+            </div>
+            <button onclick="closeUICustomizer()" style="background:rgba(255,255,255,0.15);border:none;color:white;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">✕</button>
+        </div>
+
+        <div class="cp-body">
+
+            <!-- COLOR PRESETS -->
+            <div class="cp-section">
+                <div class="cp-section-title"><i class="fas fa-swatchbook" style="color:#94a3b8"></i> Quick Presets</div>
+                <div class="cp-preset-grid">
+                    <div class="cp-preset" style="background:linear-gradient(135deg,#1e40af,#3b82f6)" title="Ocean Blue" onclick="applyPreset('ocean')"></div>
+                    <div class="cp-preset" style="background:linear-gradient(135deg,#7c3aed,#a855f7)" title="Purple Haze" onclick="applyPreset('purple')"></div>
+                    <div class="cp-preset" style="background:linear-gradient(135deg,#065f46,#10b981)" title="Emerald" onclick="applyPreset('emerald')"></div>
+                    <div class="cp-preset" style="background:linear-gradient(135deg,#9a3412,#f97316)" title="Sunset" onclick="applyPreset('sunset')"></div>
+                    <div class="cp-preset" style="background:linear-gradient(135deg,#1e293b,#475569)" title="Slate Dark" onclick="applyPreset('slatedark')"></div>
+                    <div class="cp-preset" style="background:linear-gradient(135deg,#be123c,#f43f5e)" title="Rose" onclick="applyPreset('rose')"></div>
+                    <div class="cp-preset" style="background:linear-gradient(135deg,#0e7490,#06b6d4)" title="Cyan" onclick="applyPreset('cyan')"></div>
+                    <div class="cp-preset" style="background:linear-gradient(135deg,#f8fafc,#e2e8f0);border:1.5px solid #cbd5e1" title="Clean White" onclick="applyPreset('clean')"></div>
+                </div>
+            </div>
+
+            <!-- ACCENT COLOR -->
+            <div class="cp-section">
+                <div class="cp-section-title"><i class="fas fa-fill-drip" style="color:#94a3b8"></i> Colors</div>
+
+                <div class="cp-row">
+                    <span class="cp-label">Accent / Buttons</span>
+                    <div class="cp-color-wrap">
+                        <div class="cp-color-preview" id="preview-accent"></div>
+                        <input type="color" class="cp-color-input" id="color-accent" oninput="liveColor('accent',this.value)" onchange="liveColor('accent',this.value)">
+                    </div>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Page Background</span>
+                    <div class="cp-color-wrap">
+                        <div class="cp-color-preview" id="preview-bg"></div>
+                        <input type="color" class="cp-color-input" id="color-bg" oninput="liveColor('bg',this.value)" onchange="liveColor('bg',this.value)">
+                    </div>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Card Background</span>
+                    <div class="cp-color-wrap">
+                        <div class="cp-color-preview" id="preview-card"></div>
+                        <input type="color" class="cp-color-input" id="color-card" oninput="liveColor('card',this.value)" onchange="liveColor('card',this.value)">
+                    </div>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Card Border</span>
+                    <div class="cp-color-wrap">
+                        <div class="cp-color-preview" id="preview-border"></div>
+                        <input type="color" class="cp-color-input" id="color-border" oninput="liveColor('border',this.value)" onchange="liveColor('border',this.value)">
+                    </div>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Primary Text</span>
+                    <div class="cp-color-wrap">
+                        <div class="cp-color-preview" id="preview-text"></div>
+                        <input type="color" class="cp-color-input" id="color-text" oninput="liveColor('text',this.value)" onchange="liveColor('text',this.value)">
+                    </div>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Secondary Text</span>
+                    <div class="cp-color-wrap">
+                        <div class="cp-color-preview" id="preview-textSecondary"></div>
+                        <input type="color" class="cp-color-input" id="color-textSecondary" oninput="liveColor('textSecondary',this.value)" onchange="liveColor('textSecondary',this.value)">
+                    </div>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Top Bar</span>
+                    <div class="cp-color-wrap">
+                        <div class="cp-color-preview" id="preview-topbar"></div>
+                        <input type="color" class="cp-color-input" id="color-topbar" oninput="liveColor('topbar',this.value)" onchange="liveColor('topbar',this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- TYPOGRAPHY -->
+            <div class="cp-section">
+                <div class="cp-section-title"><i class="fas fa-font" style="color:#94a3b8"></i> Typography</div>
+                <div class="cp-row">
+                    <span class="cp-label">Font Family</span>
+                    <select class="cp-select" id="sel-font" onchange="liveFont(this.value)">
+                        <option value="'Segoe UI', system-ui, sans-serif">System UI</option>
+                        <option value="'Inter', sans-serif">Inter</option>
+                        <option value="'Poppins', sans-serif">Poppins</option>
+                        <option value="'Roboto', sans-serif">Roboto</option>
+                        <option value="'DM Sans', sans-serif">DM Sans</option>
+                        <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+                        <option value="'Courier New', monospace">Monospace</option>
+                    </select>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Base Font Size</span>
+                    <input type="range" class="cp-slider" id="sl-fontsize" min="12" max="20" step="1" value="15" oninput="liveFontSize(this.value); document.getElementById('val-fontsize').textContent=this.value+'px'">
+                    <span class="cp-slider-val" id="val-fontsize">15px</span>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Header Size</span>
+                    <input type="range" class="cp-slider" id="sl-headersize" min="18" max="48" step="2" value="32" oninput="liveHeaderSize(this.value); document.getElementById('val-headersize').textContent=this.value+'px'">
+                    <span class="cp-slider-val" id="val-headersize">32px</span>
+                </div>
+            </div>
+
+            <!-- SHAPE & SPACING -->
+            <div class="cp-section">
+                <div class="cp-section-title"><i class="fas fa-shapes" style="color:#94a3b8"></i> Shape & Spacing</div>
+                <div class="cp-row">
+                    <span class="cp-label">Card Radius</span>
+                    <input type="range" class="cp-slider" id="sl-radius" min="0" max="32" step="2" value="16" oninput="liveRadius(this.value); document.getElementById('val-radius').textContent=this.value+'px'">
+                    <span class="cp-slider-val" id="val-radius">16px</span>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Button Radius</span>
+                    <input type="range" class="cp-slider" id="sl-btnradius" min="0" max="32" step="2" value="14" oninput="liveBtnRadius(this.value); document.getElementById('val-btnradius').textContent=this.value+'px'">
+                    <span class="cp-slider-val" id="val-btnradius">14px</span>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Input Radius</span>
+                    <input type="range" class="cp-slider" id="sl-inputradius" min="0" max="32" step="2" value="14" oninput="liveInputRadius(this.value); document.getElementById('val-inputradius').textContent=this.value+'px'">
+                    <span class="cp-slider-val" id="val-inputradius">14px</span>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Card Spacing</span>
+                    <input type="range" class="cp-slider" id="sl-spacing" min="8" max="40" step="4" value="24" oninput="liveSpacing(this.value); document.getElementById('val-spacing').textContent=this.value+'px'">
+                    <span class="cp-slider-val" id="val-spacing">24px</span>
+                </div>
+            </div>
+
+            <!-- SHADOW & EFFECTS -->
+            <div class="cp-section">
+                <div class="cp-section-title"><i class="fas fa-layer-group" style="color:#94a3b8"></i> Shadow & Effects</div>
+                <div class="cp-row">
+                    <span class="cp-label">Card Shadow</span>
+                    <select class="cp-select" id="sel-shadow" onchange="liveShadow(this.value)">
+                        <option value="none">None</option>
+                        <option value="0 1px 3px rgba(0,0,0,0.08)">Subtle</option>
+                        <option value="0 4px 24px 0 rgba(30,41,59,0.08)" selected>Default</option>
+                        <option value="0 8px 40px rgba(0,0,0,0.14)">Deep</option>
+                        <option value="0 0 0 1px rgba(30,41,59,0.06),0 20px 60px rgba(30,41,59,0.16)">Floating</option>
+                    </select>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Accent Glow</span>
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                        <input type="checkbox" id="chk-glow" onchange="liveGlow(this.checked)" style="accent-color:#3b82f6;width:16px;height:16px;">
+                        <span style="font-size:12px;font-weight:600;color:#475569">Enabled</span>
+                    </label>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Card Glass Effect</span>
+                    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                        <input type="checkbox" id="chk-glass" onchange="liveGlass(this.checked)" checked style="accent-color:#3b82f6;width:16px;height:16px;">
+                        <span style="font-size:12px;font-weight:600;color:#475569">Enabled</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- LAYOUT -->
+            <div class="cp-section">
+                <div class="cp-section-title"><i class="fas fa-th-large" style="color:#94a3b8"></i> Layout</div>
+                <div class="cp-row">
+                    <span class="cp-label">Content Width</span>
+                    <select class="cp-select" id="sel-width" onchange="liveWidth(this.value)">
+                        <option value="1280px">Wide (1280px)</option>
+                        <option value="1024px" selected>Default (1024px)</option>
+                        <option value="800px">Compact (800px)</option>
+                        <option value="100%">Full Width</option>
+                    </select>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">Tab Style</span>
+                    <select class="cp-select" id="sel-tabstyle" onchange="liveTabStyle(this.value)">
+                        <option value="underline" selected>Underline</option>
+                        <option value="pill">Pill</option>
+                        <option value="filled">Filled</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="cp-footer">
+            <button class="cp-btn cp-btn-secondary" onclick="resetUICustomizer()">↺ Reset</button>
+            <button class="cp-btn cp-btn-secondary" onclick="exportUIConfig()"><i class="fas fa-download"></i> Export</button>
+            <button class="cp-btn cp-btn-primary" onclick="closeUICustomizer()">✓ Done</button>
         </div>
     </div>
 
@@ -2912,9 +3435,387 @@
             }
         });
 
+        // --- LAYOUT CUSTOMIZER ---
+        const layoutState = {
+            search:  { visible: true, size: 'normal' },
+            cabin:   { visible: true, size: 'normal' },
+            retail:  { visible: true, size: 'normal' },
+            logbtn:  { size: 'normal' }
+        };
+
+        window.toggleLayoutPanel = function() {
+            document.getElementById('layoutPanel').classList.toggle('hidden');
+        };
+
+        window.setLayoutVisible = function(section, visible) {
+            layoutState[section].visible = visible;
+            applyLayout();
+            saveLayoutState();
+        };
+
+        window.setLayoutSize = function(section, size) {
+            layoutState[section].size = size;
+            applyLayout();
+            saveLayoutState();
+        };
+
+        window.resetLayout = function() {
+            layoutState.search  = { visible: true, size: 'normal' };
+            layoutState.cabin   = { visible: true, size: 'normal' };
+            layoutState.retail  = { visible: true, size: 'normal' };
+            layoutState.logbtn  = { size: 'normal' };
+            // Sync controls
+            document.getElementById('layout-show-search').checked  = true;
+            document.getElementById('layout-show-cabin').checked   = true;
+            document.getElementById('layout-show-retail').checked  = true;
+            document.getElementById('layout-size-search').value    = 'normal';
+            document.getElementById('layout-size-cabin').value     = 'normal';
+            document.getElementById('layout-size-retail').value    = 'normal';
+            document.getElementById('layout-size-logbtn').value    = 'normal';
+            applyLayout();
+            saveLayoutState();
+        };
+
+        function applyLayout() {
+            // ── Quick Log Search ──
+            const qs = document.getElementById('section-quicksearch');
+            const qsDivider = document.getElementById('divider-search-cabin');
+            const qsLabel = document.getElementById('label-quicksearch');
+            const qsInput = document.querySelector('#section-quicksearch input');
+            if (qs) {
+                qs.classList.toggle('hidden', !layoutState.search.visible);
+                qsDivider && qsDivider.classList.toggle('hidden', !layoutState.search.visible);
+                if (layoutState.search.size === 'compact') {
+                    qs.classList.add('mb-2');
+                    qs.classList.remove('mb-4');
+                    qsLabel && qsLabel.classList.add('hidden');
+                    qsInput && qsInput.classList.replace('py-3','py-1.5');
+                } else {
+                    qs.classList.add('mb-4');
+                    qs.classList.remove('mb-2');
+                    qsLabel && qsLabel.classList.remove('hidden');
+                    qsInput && qsInput.classList.replace('py-1.5','py-3');
+                }
+            }
+
+            // ── Cabin Input ──
+            const cab = document.getElementById('section-cabin');
+            const cabInput = document.getElementById('cabinSearch');
+            const cabLabel = document.getElementById('label-cabin');
+            if (cab) {
+                cab.classList.toggle('hidden', !layoutState.cabin.visible);
+                if (cabInput) {
+                    cabInput.classList.remove('text-3xl','text-xl','text-base','text-4xl','py-4','py-2','py-1.5','py-6','rounded-2xl','rounded-xl','rounded-lg');
+                    if (layoutState.cabin.size === 'compact') {
+                        cabInput.classList.add('text-base','py-2','rounded-lg');
+                        cabLabel && cabLabel.classList.add('hidden');
+                    } else if (layoutState.cabin.size === 'large') {
+                        cabInput.classList.add('text-4xl','py-6','rounded-2xl');
+                        cabLabel && cabLabel.classList.remove('hidden');
+                    } else {
+                        cabInput.classList.add('text-3xl','py-4','rounded-2xl');
+                        cabLabel && cabLabel.classList.remove('hidden');
+                    }
+                }
+            }
+
+            // ── Retail Items ──
+            const ret = document.getElementById('section-retail');
+            const retLabel = document.getElementById('label-retail');
+            const retAddBtn = document.getElementById('btn-add-retail');
+            const retSelects = document.querySelectorAll('.retailSelect');
+            const retQtys = document.querySelectorAll('.retailQty');
+            if (ret) {
+                ret.classList.toggle('hidden', !layoutState.retail.visible);
+                if (layoutState.retail.size === 'compact') {
+                    retLabel && retLabel.classList.add('hidden');
+                    retAddBtn && retAddBtn.classList.replace('py-3','py-1.5');
+                    retSelects.forEach(s => { s.classList.replace('py-3','py-1.5'); });
+                    retQtys.forEach(q => { q.classList.replace('py-3','py-1.5'); });
+                } else {
+                    retLabel && retLabel.classList.remove('hidden');
+                    retAddBtn && retAddBtn.classList.replace('py-1.5','py-3');
+                    retSelects.forEach(s => { s.classList.replace('py-1.5','py-3'); });
+                    retQtys.forEach(q => { q.classList.replace('py-1.5','py-3'); });
+                }
+            }
+
+            // ── Log Button ──
+            const logBtn = document.getElementById('searchBtn');
+            const logSec = document.getElementById('section-logbtn');
+            if (logBtn && logSec) {
+                logBtn.classList.remove('py-4','py-2','py-6','text-xl','text-base','text-2xl','rounded-2xl','rounded-xl');
+                if (layoutState.logbtn.size === 'compact') {
+                    logBtn.classList.add('py-2','text-base','rounded-xl');
+                } else if (layoutState.logbtn.size === 'large') {
+                    logBtn.classList.add('py-6','text-2xl','rounded-2xl');
+                } else {
+                    logBtn.classList.add('py-4','text-xl','rounded-2xl');
+                }
+            }
+        }
+
+        function saveLayoutState() {
+            try { localStorage.setItem('lmpLayoutState', JSON.stringify(layoutState)); } catch(e) {}
+        }
+
+        function loadLayoutState() {
+            try {
+                const saved = localStorage.getItem('lmpLayoutState');
+                if (!saved) return;
+                const parsed = JSON.parse(saved);
+                Object.assign(layoutState.search, parsed.search || {});
+                Object.assign(layoutState.cabin,  parsed.cabin  || {});
+                Object.assign(layoutState.retail, parsed.retail || {});
+                Object.assign(layoutState.logbtn, parsed.logbtn || {});
+                // Sync controls to saved state
+                document.getElementById('layout-show-search').checked = layoutState.search.visible;
+                document.getElementById('layout-show-cabin').checked  = layoutState.cabin.visible;
+                document.getElementById('layout-show-retail').checked = layoutState.retail.visible;
+                document.getElementById('layout-size-search').value   = layoutState.search.size;
+                document.getElementById('layout-size-cabin').value    = layoutState.cabin.size;
+                document.getElementById('layout-size-retail').value   = layoutState.retail.size;
+                document.getElementById('layout-size-logbtn').value   = layoutState.logbtn.size;
+                applyLayout();
+            } catch(e) {}
+        }
+
+        // ═══════════ UI CUSTOMIZER ENGINE ═══════════
+
+        const uiDefaults = {
+            accent:        '#2563eb',
+            accentHover:   '#1d4ed8',
+            bg:            '#f8fafc',
+            card:          '#ffffff',
+            border:        '#e2e8f0',
+            text:          '#1e293b',
+            textSecondary: '#64748b',
+            topbar:        '#0f172a',
+            font:          "'Segoe UI', system-ui, sans-serif",
+            fontSize:      15,
+            headerSize:    32,
+            radius:        16,
+            btnRadius:     14,
+            inputRadius:   14,
+            spacing:       24,
+            shadow:        '0 4px 24px 0 rgba(30,41,59,0.08)',
+            glow:          false,
+            glass:         true,
+            width:         '1024px',
+            tabStyle:      'underline'
+        };
+
+        let uiConfig = { ...uiDefaults };
+
+        const uiPresets = {
+            ocean:     { accent:'#2563eb', accentHover:'#1d4ed8', bg:'#f0f7ff', card:'#ffffff', border:'#bfdbfe', text:'#1e3a5f', textSecondary:'#3b82f6', topbar:'#1e3a8a' },
+            purple:    { accent:'#7c3aed', accentHover:'#6d28d9', bg:'#faf5ff', card:'#ffffff', border:'#ddd6fe', text:'#2e1065', textSecondary:'#7c3aed', topbar:'#2e1065' },
+            emerald:   { accent:'#059669', accentHover:'#047857', bg:'#f0fdf4', card:'#ffffff', border:'#a7f3d0', text:'#064e3b', textSecondary:'#059669', topbar:'#064e3b' },
+            sunset:    { accent:'#ea580c', accentHover:'#c2410c', bg:'#fff7ed', card:'#ffffff', border:'#fed7aa', text:'#431407', textSecondary:'#ea580c', topbar:'#431407' },
+            slatedark:  { accent:'#475569', accentHover:'#334155', bg:'#0f172a', card:'#1e293b', border:'#334155', text:'#f1f5f9', textSecondary:'#94a3b8', topbar:'#020617' },
+            rose:      { accent:'#e11d48', accentHover:'#be123c', bg:'#fff1f2', card:'#ffffff', border:'#fecdd3', text:'#4c0519', textSecondary:'#e11d48', topbar:'#4c0519' },
+            cyan:      { accent:'#0891b2', accentHover:'#0e7490', bg:'#ecfeff', card:'#ffffff', border:'#a5f3fc', text:'#083344', textSecondary:'#0891b2', topbar:'#083344' },
+            clean:     { accent:'#374151', accentHover:'#1f2937', bg:'#ffffff', card:'#f9fafb', border:'#e5e7eb', text:'#111827', textSecondary:'#6b7280', topbar:'#374151' }
+        };
+
+        window.openUICustomizer = function() {
+            syncCustomizerControls();
+            document.getElementById('uiCustomizerPanel').classList.add('open');
+            document.getElementById('uiCustomizerBackdrop').classList.add('open');
+        };
+
+        window.closeUICustomizer = function() {
+            document.getElementById('uiCustomizerPanel').classList.remove('open');
+            document.getElementById('uiCustomizerBackdrop').classList.remove('open');
+        };
+
+        function syncCustomizerControls() {
+            // Color pickers
+            const colorMap = { accent:'accent', bg:'bg', card:'card', border:'border', text:'text', textSecondary:'textSecondary', topbar:'topbar' };
+            Object.entries(colorMap).forEach(([key, prop]) => {
+                const input = document.getElementById('color-'+key);
+                const preview = document.getElementById('preview-'+key);
+                if (input) input.value = uiConfig[prop];
+                if (preview) preview.style.background = uiConfig[prop];
+            });
+            // Sliders
+            const sliderMap = { fontsize:'fontSize', headersize:'headerSize', radius:'radius', btnradius:'btnRadius', inputradius:'inputRadius', spacing:'spacing' };
+            Object.entries(sliderMap).forEach(([id, prop]) => {
+                const el = document.getElementById('sl-'+id);
+                const val = document.getElementById('val-'+id);
+                if (el) el.value = uiConfig[prop];
+                if (val) val.textContent = uiConfig[prop] + 'px';
+            });
+            // Selects
+            setSelectVal('sel-font',      uiConfig.font);
+            setSelectVal('sel-shadow',    uiConfig.shadow);
+            setSelectVal('sel-width',     uiConfig.width);
+            setSelectVal('sel-tabstyle',  uiConfig.tabStyle);
+            // Checkboxes
+            const glowEl  = document.getElementById('chk-glow');
+            const glassEl = document.getElementById('chk-glass');
+            if (glowEl)  glowEl.checked  = uiConfig.glow;
+            if (glassEl) glassEl.checked = uiConfig.glass;
+        }
+
+        function setSelectVal(id, val) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            for (let opt of el.options) { if (opt.value === val) { opt.selected = true; return; } }
+        }
+
+        function applyUIConfig() {
+            const root = document.documentElement;
+            // Compute hover as slightly darker version
+            const hover = darkenHex(uiConfig.accent, 15);
+            root.style.setProperty('--ui-accent',        uiConfig.accent);
+            root.style.setProperty('--ui-accent-hover',  hover);
+            root.style.setProperty('--ui-bg',            uiConfig.bg);
+            root.style.setProperty('--ui-card-bg',       uiConfig.card);
+            root.style.setProperty('--ui-card-border',   uiConfig.border);
+            root.style.setProperty('--ui-text-primary',  uiConfig.text);
+            root.style.setProperty('--ui-text-secondary',uiConfig.textSecondary);
+            root.style.setProperty('--ui-topbar-bg',     uiConfig.topbar);
+            root.style.setProperty('--ui-font',          uiConfig.font);
+            root.style.setProperty('--ui-font-size',     uiConfig.fontSize + 'px');
+            root.style.setProperty('--ui-header-size',   uiConfig.headerSize + 'px');
+            root.style.setProperty('--ui-radius',        uiConfig.radius + 'px');
+            root.style.setProperty('--ui-btn-radius',    uiConfig.btnRadius + 'px');
+            root.style.setProperty('--ui-input-radius',  uiConfig.inputRadius + 'px');
+            root.style.setProperty('--ui-spacing',       uiConfig.spacing + 'px');
+            root.style.setProperty('--ui-shadow',        uiConfig.shadow);
+
+            // Apply body background/text directly so it overrides theme classes on Day mode
+            const isDefaultTheme = !document.body.className.includes('theme-night') && 
+                                   !document.body.className.includes('theme-rog') &&
+                                   !document.body.className.includes('theme-legion') &&
+                                   !document.body.className.includes('theme-razer') &&
+                                   !document.body.className.includes('theme-alienware') &&
+                                   !document.body.className.includes('theme-reading');
+
+            if (isDefaultTheme) {
+                document.body.style.backgroundColor = uiConfig.bg;
+                document.body.style.color = uiConfig.text;
+                // Cards
+                document.querySelectorAll('.glass-morphism').forEach(el => {
+                    el.style.background = uiConfig.glass ? uiConfig.card : uiConfig.card;
+                    el.style.borderColor = uiConfig.border;
+                    el.style.boxShadow = uiConfig.shadow;
+                    el.style.borderRadius = uiConfig.radius + 'px';
+                });
+                // Buttons
+                document.querySelectorAll('#searchBtn, #quickPrintBtn, #downloadPDF').forEach(btn => {
+                    btn.style.backgroundColor = uiConfig.accent;
+                    btn.style.borderRadius = uiConfig.btnRadius + 'px';
+                    if (uiConfig.glow) btn.style.boxShadow = `0 4px 20px ${uiConfig.accent}66`;
+                    else btn.style.boxShadow = '';
+                });
+                // Tab active border
+                const style = document.getElementById('ui-custom-style') || (() => { const s = document.createElement('style'); s.id='ui-custom-style'; document.head.appendChild(s); return s; })();
+                const tabActiveStyle = uiConfig.tabStyle === 'pill'
+                    ? `.tab-active { background:${uiConfig.accent}!important; color:#fff!important; border-bottom:none!important; border-radius:8px!important; }`
+                    : uiConfig.tabStyle === 'filled'
+                    ? `.tab-active { background:${uiConfig.accent}22!important; color:${uiConfig.accent}!important; border-bottom:3px solid ${uiConfig.accent}!important; }`
+                    : `.tab-active { border-bottom:3px solid ${uiConfig.accent}!important; color:${uiConfig.accent}!important; }`;
+                style.textContent = `
+                    ${tabActiveStyle}
+                    .bg-blue-600 { background-color: ${uiConfig.accent} !important; }
+                    .hover\\:bg-blue-700:hover { background-color: ${darkenHex(uiConfig.accent,15)} !important; }
+                    .text-blue-600 { color: ${uiConfig.accent} !important; }
+                    .text-blue-900 { color: ${darkenHex(uiConfig.accent,40)} !important; }
+                    .border-blue-500 { border-color: ${uiConfig.accent} !important; }
+                    .focus\\:border-blue-500:focus { border-color: ${uiConfig.accent} !important; }
+                    h1 { font-size: ${uiConfig.headerSize}px !important; }
+                    body { font-family: ${uiConfig.font} !important; }
+                `;
+            }
+            // Top bar
+            const topBar = document.querySelector('.bg-slate-900.border-b');
+            if (topBar && isDefaultTheme) topBar.style.backgroundColor = uiConfig.topbar;
+
+            // Max-width
+            const container = document.querySelector('.max-w-7xl');
+            if (container) container.style.maxWidth = uiConfig.width;
+
+            saveUIConfig();
+        }
+
+        // Live update helpers
+        window.liveColor = function(prop, val) {
+            uiConfig[prop === 'textSecondary' ? 'textSecondary' : prop] = val;
+            const preview = document.getElementById('preview-' + prop);
+            if (preview) preview.style.background = val;
+            applyUIConfig();
+        };
+        window.liveFont         = v => { uiConfig.font = v; applyUIConfig(); };
+        window.liveFontSize     = v => { uiConfig.fontSize = +v; applyUIConfig(); };
+        window.liveHeaderSize   = v => { uiConfig.headerSize = +v; applyUIConfig(); };
+        window.liveRadius       = v => { uiConfig.radius = +v; applyUIConfig(); };
+        window.liveBtnRadius    = v => { uiConfig.btnRadius = +v; applyUIConfig(); };
+        window.liveInputRadius  = v => { uiConfig.inputRadius = +v; applyUIConfig(); };
+        window.liveSpacing      = v => { uiConfig.spacing = +v; applyUIConfig(); };
+        window.liveShadow       = v => { uiConfig.shadow = v; applyUIConfig(); };
+        window.liveGlow         = v => { uiConfig.glow = v; applyUIConfig(); };
+        window.liveGlass        = v => { uiConfig.glass = v; applyUIConfig(); };
+        window.liveWidth        = v => { uiConfig.width = v; applyUIConfig(); };
+        window.liveTabStyle     = v => { uiConfig.tabStyle = v; applyUIConfig(); };
+
+        window.applyPreset = function(name) {
+            const p = uiPresets[name];
+            if (!p) return;
+            Object.assign(uiConfig, p);
+            syncCustomizerControls();
+            applyUIConfig();
+            document.querySelectorAll('.cp-preset').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+        };
+
+        window.resetUICustomizer = function() {
+            uiConfig = { ...uiDefaults };
+            syncCustomizerControls();
+            applyUIConfig();
+            // Clear injected style
+            const s = document.getElementById('ui-custom-style');
+            if (s) s.textContent = '';
+            document.body.style.cssText = '';
+            document.querySelectorAll('.glass-morphism').forEach(el => el.style.cssText = '');
+            document.querySelectorAll('#searchBtn, #quickPrintBtn, #downloadPDF').forEach(b => b.style.cssText = '');
+            try { localStorage.removeItem('lmpUIConfig'); } catch(e) {}
+        };
+
+        window.exportUIConfig = function() {
+            const blob = new Blob([JSON.stringify(uiConfig, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'lmp-ui-config.json'; a.click();
+        };
+
+        function saveUIConfig() {
+            try { localStorage.setItem('lmpUIConfig', JSON.stringify(uiConfig)); } catch(e) {}
+        }
+
+        function loadUIConfig() {
+            try {
+                const saved = localStorage.getItem('lmpUIConfig');
+                if (!saved) return;
+                Object.assign(uiConfig, JSON.parse(saved));
+                applyUIConfig();
+                syncCustomizerControls();
+            } catch(e) {}
+        }
+
+        // Utility: darken a hex color by `amount` (0-255)
+        function darkenHex(hex, amount) {
+            let c = hex.replace('#','');
+            if (c.length === 3) c = c.split('').map(x=>x+x).join('');
+            let r = Math.max(0, parseInt(c.slice(0,2),16) - amount);
+            let g = Math.max(0, parseInt(c.slice(2,4),16) - amount);
+            let b = Math.max(0, parseInt(c.slice(4,6),16) - amount);
+            return '#' + [r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+        }
+
         // Init App
         applySettings();
         addRetailRow();
+        loadLayoutState();
         updateUI();
     </script>
 </body>
